@@ -13,7 +13,7 @@ Six phases build the `@heylol/sdk` from the ground up. Foundation establishes th
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase (completed 2026-03-01)
-- [ ] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy
+- [x] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy (completed 2026-03-01)
 - [ ] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface
 - [ ] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications
 - [ ] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation
@@ -47,7 +47,7 @@ Plans:
   3. SDK builds a valid zero-amount Solana dummy transaction and signs it with Ed25519 — byte-level tests pass against known fixture transactions
   4. SDK constructs a valid `X-Payment` header that hey.lol's facilitator accepts
   5. Thrown errors are typed discriminated unions (AuthError, PaymentRejectedError) with a `code` property on every error
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 02-01-PLAN.md — Error hierarchy (TYPE-03) and keypair loading (AUTH-01, AUTH-06)
 - [ ] 02-02-PLAN.md — Solana compact-u16 encoding and zero-amount dummy transaction builder (AUTH-03, AUTH-06)
@@ -108,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
-| 2. Core Crypto and Auth | 3/4 | In Progress|  |
+| 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
 | 3. HTTP Client | 0/TBD | Not started | - |
 | 4. API Wrappers | 0/TBD | Not started | - |
 | 5. Services Package | 0/TBD | Not started | - |
