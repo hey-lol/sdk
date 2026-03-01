@@ -57,6 +57,66 @@ importers:
         specifier: 'catalog:'
         version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
 
+  packages/adapter-cloudflare:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.9(vitest@2.1.9(@types/node@25.3.3)(terser@5.46.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
+
+  packages/adapter-express:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.9(vitest@2.1.9(@types/node@25.3.3)(terser@5.46.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
+
+  packages/adapter-vercel:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.9(vitest@2.1.9(@types/node@25.3.3)(terser@5.46.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
+
+  packages/sdk:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.9(vitest@2.1.9(@types/node@25.3.3)(terser@5.46.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
+
+  packages/services:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.9(vitest@2.1.9(@types/node@25.3.3)(terser@5.46.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@25.3.3)(terser@5.46.0)
+
 packages:
 
   '@ampproject/remapping@2.3.0':

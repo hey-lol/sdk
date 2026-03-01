@@ -1,0 +1,16 @@
+{
+  "name": "@heylol/adapter-vercel",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "files": ["dist"],
+  "scripts": {
+    "build": "echo 'build configured in plan 02'",
+    "test": "vitest run --coverage --config ../../vitest.config.ts"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:"
+  }
+}
