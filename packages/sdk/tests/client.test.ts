@@ -10,6 +10,7 @@ import {
   RateLimitError,
 } from '../src/errors/index.js';
 import type { Post } from '../src/types/index.js';
+import { asPostId, asUserId } from '../src/types/index.js';
 
 // ---------------------------------------------------------------------------
 // Test keypair — deterministic, no randomness
@@ -289,7 +290,16 @@ describe('HeyLolClient', () => {
   describe('Response body typing', () => {
     it('get<Post>() returns a typed Post object', async () => {
       const { client, mockFetch } = makeClient();
-      const post: Post = { id: '1', authorId: 'u1', content: 'hello', createdAt: '2026-01-01' };
+      const post: Post = {
+        id: asPostId('1'),
+        authorId: asUserId('u1'),
+        content: 'hello',
+        paywalled: false,
+        mediaUrls: [],
+        likeCount: 0,
+        replyCount: 0,
+        createdAt: '2026-01-01',
+      };
       mockFetch.mockResolvedValueOnce(jsonResponse(post));
 
       const result = await client.get<Post>('/v1/posts/1');

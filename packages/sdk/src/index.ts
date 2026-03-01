@@ -24,12 +24,28 @@ export {
   PaymentRejectedError,
   RateLimitError,
 } from './errors/index.js';
-// Types
+// Types — branded ID types (type-only export)
+// Types — request param interfaces
+// Types — x402 protocol
 export type {
+  CreatePostParams,
+  Notification,
+  NotificationId,
+  PaginatedList,
+  PaginationParams,
   PaymentHeader,
   PaymentPayload,
   PaymentRequirements,
+  PaywallOptions,
   Post,
+  PostId,
   Profile,
+  ReplyPostParams,
+  SearchParams,
+  SearchResults,
+  UpdateProfileParams,
   User,
+  UserId,
 } from './types/index.js';
+// Types — factory functions (value exports)
+export { asNotificationId, asPostId, asUserId } from './types/index.js';
