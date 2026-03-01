@@ -20,7 +20,7 @@ import {
 } from '../auth/index.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import { DEFAULT_OPTIONS, parseRetryAfterMs, withRetry } from './index.js';
-import type { ClientOptions, ResolvedOptions } from './options.js';
+import type { ClientOptions } from './options.js';
 
 export class HeyLolClient {
   private readonly keypair: Keypair;
