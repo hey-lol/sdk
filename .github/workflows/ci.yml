@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  ci:
+    name: Lint, Build, Typecheck, Test, Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run quality gates (lint, build, typecheck, test, size-check)
+        run: pnpm turbo lint build typecheck test size-check
+
+      - name: Validate package exports (publint + attw)
+        run: |
+          for pkg in packages/*/; do
+            echo "=== publint: $pkg ==="
+            pnpm --filter "./$pkg" exec publint
+          done
+          echo "=== attw: packages/sdk ==="
+          pnpm --filter @heylol/sdk exec attw --pack .
