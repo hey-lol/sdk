@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 4 in progress — API Wrappers (resource classes, branded types)
+**Current focus:** Phase 4 complete — API Wrappers (all 5 resource namespaces delivered)
 
 ## Current Position
 
 Phase: 4 of 6 (API Wrappers)
-Plan: 2 of 3 in current phase
-Status: Phase 4 Plan 2 complete — PostsResource (6 methods) and ProfileResource (3 methods) with 12 new tests
-Last activity: 2026-03-01 — Plan 04-02 complete (PostsResource POST-01..07, ProfileResource PROF-01..04, 140 tests passing)
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase 4 complete — all 5 resource namespaces (posts, profile, social, discovery, notifications) wired into HeyLolClient
+Last activity: 2026-03-01 — Plan 04-03 complete (SocialResource, DiscoveryResource, NotificationsResource, full barrel exports, 159 tests)
 
-Progress: [█████████░] 60%
+Progress: [█████████░] 67%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [█████████░] 60%
 | Phase 03-http-client P02 | 3min | 2 tasks | 4 files |
 | Phase 04-api-wrappers P01 | 2min | 2 tasks | 5 files |
 | Phase 04-api-wrappers P02 | 2min | 2 tasks | 4 files |
+| Phase 04-api-wrappers P03 | 6min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,10 @@ Recent decisions affecting current work:
 - [Phase 04-02]: Local HttpClient interface per resource class avoids circular imports — each resource declares only the HTTP verbs it needs
 - [Phase 04-02]: Single create() handles text/media/paywalled post variants via CreatePostParams — no overloads needed
 - [Phase 04-02]: ProfileResource.update() covers PROF-03 and PROF-04 — UpdateProfileParams four optional fields handle all update scenarios
+- [Phase 04-03]: search() maps params.query to q query param — REST convention, avoids query= which conflicts with some server implementations
+- [Phase 04-03]: markRead() body guard: ids && ids.length > 0 ? { ids } : undefined — undefined body means mark-all-read, avoids empty-array ambiguity
+- [Phase 04-03]: PaginationParams cast as Record<string, string | number | undefined> for typed get() — structurally matches cursor?: string and limit?: number
+- [Phase 04-03]: resources/index.ts excluded from coverage — barrel re-export pattern established for all boundary index files
 
 ### Pending Todos
 
@@ -108,5 +113,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-02-PLAN.md (PostsResource, ProfileResource, 12 new tests, 140 total)
-Resume file: .planning/phases/04-api-wrappers/04-03-PLAN.md (remaining resource classes: FeedResource, NotificationsResource, SearchResource)
+Stopped at: Completed 04-03-PLAN.md (SocialResource, DiscoveryResource, NotificationsResource, full HeyLolClient wiring, 159 tests)
+Resume file: .planning/phases/05-*/05-01-PLAN.md (Phase 5 — Services/Zod validation layer)

@@ -53,21 +53,21 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Social
 
-- [ ] **SOCL-01**: Developer can follow a user
-- [ ] **SOCL-02**: Developer can unfollow a user
-- [ ] **SOCL-03**: Developer can list followers of a user
-- [ ] **SOCL-04**: Developer can list users a user is following
+- [x] **SOCL-01**: Developer can follow a user
+- [x] **SOCL-02**: Developer can unfollow a user
+- [x] **SOCL-03**: Developer can list followers of a user
+- [x] **SOCL-04**: Developer can list users a user is following
 
 ### Discovery
 
-- [ ] **DISC-01**: Developer can search for users and posts
-- [ ] **DISC-02**: Developer can get trending posts
-- [ ] **DISC-03**: Developer can get suggested users
+- [x] **DISC-01**: Developer can search for users and posts
+- [x] **DISC-02**: Developer can get trending posts
+- [x] **DISC-03**: Developer can get suggested users
 
 ### Notifications
 
-- [ ] **NOTF-01**: Developer can list notifications
-- [ ] **NOTF-02**: Developer can mark notifications as read
+- [x] **NOTF-01**: Developer can list notifications
+- [x] **NOTF-02**: Developer can mark notifications as read
 
 ### Services & Payments
 
@@ -174,15 +174,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROF-02 | Phase 4 | Complete |
 | PROF-03 | Phase 4 | Complete |
 | PROF-04 | Phase 4 | Complete |
-| SOCL-01 | Phase 4 | Pending |
-| SOCL-02 | Phase 4 | Pending |
-| SOCL-03 | Phase 4 | Pending |
-| SOCL-04 | Phase 4 | Pending |
-| DISC-01 | Phase 4 | Pending |
-| DISC-02 | Phase 4 | Pending |
-| DISC-03 | Phase 4 | Pending |
-| NOTF-01 | Phase 4 | Pending |
-| NOTF-02 | Phase 4 | Pending |
+| SOCL-01 | Phase 4 | Complete |
+| SOCL-02 | Phase 4 | Complete |
+| SOCL-03 | Phase 4 | Complete |
+| SOCL-04 | Phase 4 | Complete |
+| DISC-01 | Phase 4 | Complete |
+| DISC-02 | Phase 4 | Complete |
+| DISC-03 | Phase 4 | Complete |
+| NOTF-01 | Phase 4 | Complete |
+| NOTF-02 | Phase 4 | Complete |
 | TYPE-01 | Phase 4 | Complete |
 | TYPE-02 | Phase 4 | Complete |
 | SVC-01 | Phase 5 | Pending |
