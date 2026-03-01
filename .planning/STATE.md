@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core Crypto and Auth
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation)
-Plan: 3 of 3 in current phase (Phase 1 COMPLETE)
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-03-01 — Plan 01-03 complete (CI quality gates)
+Phase: 2 of 6 (Core Crypto and Auth)
+Plan: 1 of 4 in current phase
+Status: Phase 2 in progress — Plan 02-01 complete
+Last activity: 2026-03-01 — Plan 02-01 complete (error hierarchy + keypair loading)
 
-Progress: [███░░░░░░░] 17%
+Progress: [████░░░░░░] 24%
 
 ## Performance Metrics
 
@@ -28,14 +28,16 @@ Progress: [███░░░░░░░] 17%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 10min | 3min |
+| 02-core-crypto-and-auth | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 01-02 (4min), 01-03 (4min)
-- Trend: Establishing baseline
+- Last 5 plans: 01-01 (2min), 01-02 (4min), 01-03 (4min), 02-01 (4min)
+- Trend: Consistent 4min execution
 
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 4min | 2 tasks | 12 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 9 files |
+| Phase 02-core-crypto-and-auth P01 | 4min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -58,6 +60,10 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: typesVersions required in SDK for node10 subpath type resolution — attw fails without it for @heylol/sdk/services
 - [Phase 01-foundation]: biome.json files.ignore is unknown in Biome 2.4.4 — use ignoreUnknown:true; dist exclusion via .gitignore and useIgnoreFile:true
 - [Phase 01-foundation]: size-limit configured via .size-limit.json at workspace root for cleaner package.json
+- [02-01]: ES2022 native class extends works correctly — Object.setPrototypeOf not needed (confirmed by instanceof tests)
+- [02-01]: Local vitest.config.ts per-package needed to exclude stub files from coverage — prevents threshold failures from phase 1 placeholders
+- [02-01]: @typescript-eslint/parser required in ESLint flat config — ESLint v9 default parser cannot parse TypeScript class body syntax
+- [02-01]: loadKeypair dispatches on decoded.length (64 vs 32 bytes) — accepts both Solana CLI/Phantom and secret-only formats
 
 ### Pending Todos
 
@@ -72,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-03-PLAN.md (CI quality gates) — Phase 1 Foundation complete
-Resume file: .planning/phases/02-core/02-01-PLAN.md (Phase 2 begins)
+Stopped at: Completed 02-01-PLAN.md (error hierarchy + keypair loading)
+Resume file: .planning/phases/02-core-crypto-and-auth/02-02-PLAN.md (Solana tx serializer)

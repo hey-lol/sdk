@@ -19,12 +19,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Auth
 
-- [ ] **AUTH-01**: Developer can initialize client with a Solana private key (base58)
+- [x] **AUTH-01**: Developer can initialize client with a Solana private key (base58)
 - [ ] **AUTH-02**: SDK automatically handles x402 challenge-response authentication on every API call
 - [ ] **AUTH-03**: SDK builds zero-amount dummy Solana transaction for wallet identification
 - [ ] **AUTH-04**: SDK parses both x402 v1 and v2 response formats
 - [ ] **AUTH-05**: SDK constructs valid X-Payment headers from x402 requirements
-- [ ] **AUTH-06**: All crypto operations use pure JS (@noble/curves, @scure/base) with zero Node.js built-ins
+- [x] **AUTH-06**: All crypto operations use pure JS (@noble/curves, @scure/base) with zero Node.js built-ins
 
 ### Client
 
@@ -82,7 +82,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **TYPE-01**: Full TypeScript types for all API methods, request params, and response objects
 - [ ] **TYPE-02**: Branded types for IDs (PostId, UserId) to prevent mixing
-- [ ] **TYPE-03**: Discriminated union error types
+- [x] **TYPE-03**: Discriminated union error types
 - [ ] **TYPE-04**: JSDoc comments with examples on all public methods
 
 ### Adapters
@@ -151,13 +151,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-05 | Phase 1 | Complete |
 | INFRA-06 | Phase 1 | Complete |
 | INFRA-07 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
 | AUTH-04 | Phase 2 | Pending |
 | AUTH-05 | Phase 2 | Pending |
-| AUTH-06 | Phase 2 | Pending |
-| TYPE-03 | Phase 2 | Pending |
+| AUTH-06 | Phase 2 | Complete |
+| TYPE-03 | Phase 2 | Complete |
 | CLT-01 | Phase 3 | Pending |
 | CLT-02 | Phase 3 | Pending |
 | CLT-03 | Phase 3 | Pending |
