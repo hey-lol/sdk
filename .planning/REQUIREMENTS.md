@@ -13,9 +13,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INFRA-02**: tsup builds produce ESM output with TypeScript declarations for all packages
 - [x] **INFRA-03**: ESLint rules ban Buffer, process, and Node.js crypto imports in core package
 - [x] **INFRA-04**: Package.json exports map configured with correct types/import/require conditions
-- [ ] **INFRA-05**: publint and attw validate package exports in CI
-- [ ] **INFRA-06**: size-limit enforces < 100 KB core bundle
-- [ ] **INFRA-07**: Changesets configured for semantic versioning and changelog generation
+- [x] **INFRA-05**: publint and attw validate package exports in CI
+- [x] **INFRA-06**: size-limit enforces < 100 KB core bundle
+- [x] **INFRA-07**: Changesets configured for semantic versioning and changelog generation
 
 ### Auth
 
@@ -148,9 +148,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
-| INFRA-05 | Phase 1 | Pending |
-| INFRA-06 | Phase 1 | Pending |
-| INFRA-07 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Complete |
+| INFRA-06 | Phase 1 | Complete |
+| INFRA-07 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
