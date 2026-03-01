@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase (completed 2026-03-01)
 - [x] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy (completed 2026-03-01)
 - [x] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface (completed 2026-03-01)
-- [ ] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications
+- [x] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications (completed 2026-03-01)
 - [ ] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation
 - [ ] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline
 
@@ -78,7 +78,7 @@ Plans:
   3. Developer follows and unfollows users and lists followers and following via `client.social.*`
   4. Developer searches users and posts, retrieves trending posts, and gets suggested users via `client.discovery.*`
   5. Developer lists and marks notifications as read via `client.notifications.*`, and all IDs (PostId, UserId) are branded types that TypeScript rejects when mixed
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 04-01-PLAN.md — Branded ID types, expanded domain interfaces, request params, HeyLolClient 204 guard and query params
 - [ ] 04-02-PLAN.md — PostsResource and ProfileResource with full test coverage
@@ -117,6 +117,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
 | 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
 | 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
-| 4. API Wrappers | 2/3 | In Progress|  |
+| 4. API Wrappers | 2/3 | Complete    | 2026-03-01 |
 | 5. Services Package | 0/TBD | Not started | - |
 | 6. Adapters, Docs, and Release | 0/TBD | Not started | - |
