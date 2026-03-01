@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 3 of 6 (HTTP Client)
-Plan: 1 of 2 in current phase
-Status: Phase 3 plan 1 complete — error hierarchy, retry utility, ClientOptions, domain stubs
-Last activity: 2026-03-01 — Plan 03-01 complete (error hierarchy, retry infrastructure, domain stubs)
+Plan: 2 of 2 in current phase
+Status: Phase 3 complete — HeyLolClient with 402 loop, retry integration, typed HTTP methods, full CI green
+Last activity: 2026-03-01 — Plan 03-02 complete (HeyLolClient, barrel exports, 123 tests passing)
 
-Progress: [████████░░] 42%
+Progress: [████████░░] 50%
 
 ## Performance Metrics
 
@@ -29,10 +29,10 @@ Progress: [████████░░] 42%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 10min | 3min |
 | 02-core-crypto-and-auth | 1 | 4min | 4min |
-| 03-http-client | 1 | 2min | 2min |
+| 03-http-client | 2 | 5min | 2.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (4min), 01-03 (4min), 02-01 (4min), 02-04 (2min), 03-01 (2min)
+- Last 5 plans: 01-03 (4min), 02-01 (4min), 02-04 (2min), 03-01 (2min), 03-02 (3min)
 - Trend: Consistent 2-4min execution
 
 *Updated after each plan completion*
@@ -43,6 +43,7 @@ Progress: [████████░░] 42%
 | Phase 02-core-crypto-and-auth P03 | 3min | 1 task | 4 files |
 | Phase 02-core-crypto-and-auth P04 | 2min | 2 tasks | 3 files |
 | Phase 03-http-client P01 | 2min | 2 tasks | 9 files |
+| Phase 03-http-client P02 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [03-01]: withRetry retries on 502 in addition to 503 — both are transient upstream failures
 - [03-01]: Injectable _sleep pattern preferred over mocking global timers — cleaner test isolation, no global state contamination
 - [03-01]: Barrel/type-only client files excluded from coverage (client/index.ts, client/options.ts) — same pattern as auth/index.ts and src/types/**
+- [03-02]: 402 payment loop implemented inline in request() closure — paymentHeader guard variable prevents infinite loops; second 402 throws PaymentRejectedError
+- [03-02]: getPaymentVersion() null-coalesced to version 1 on 402 — permissive fallback for servers that omit version header
+- [03-02]: Static analysis test for Web API portability checks literal word absence — source comment wording must not mention forbidden node globals by name
 
 ### Pending Todos
 
@@ -94,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-01-PLAN.md (error hierarchy, retry infrastructure, domain stubs)
-Resume file: .planning/phases/03-http-client/03-02-PLAN.md (HeyLolClient implementation)
+Stopped at: Completed 03-02-PLAN.md (HeyLolClient, 402 loop, barrel exports, full CI green)
+Resume file: .planning/phases/04-service-layer/ (Phase 4 plans — service layer implementation)

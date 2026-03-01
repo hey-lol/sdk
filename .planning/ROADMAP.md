@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase (completed 2026-03-01)
 - [x] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy (completed 2026-03-01)
-- [ ] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface
+- [x] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface (completed 2026-03-01)
 - [ ] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications
 - [ ] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation
 - [ ] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline
@@ -63,7 +63,7 @@ Plans:
   2. A 429 or 503 response triggers automatic retry with exponential backoff and jitter; a permanent error throws a typed HeyLolError subclass
   3. API method return values are typed domain objects (Post, Profile, User), not raw Response or JSON
   4. Client accepts constructor options for retries, timeout, and network without requiring them
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 03-01-PLAN.md — Error hierarchy extension (RateLimitError, APIError), retry utility, ClientOptions, domain type stubs
 - [ ] 03-02-PLAN.md — HeyLolClient class with 402 loop, typed HTTP methods, barrel exports, CI validation
@@ -112,7 +112,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
 | 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
-| 3. HTTP Client | 1/2 | In Progress|  |
+| 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
 | 4. API Wrappers | 0/TBD | Not started | - |
 | 5. Services Package | 0/TBD | Not started | - |
 | 6. Adapters, Docs, and Release | 0/TBD | Not started | - |
