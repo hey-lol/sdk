@@ -12,7 +12,7 @@ Six phases build the `@heylol/sdk` from the ground up. Foundation establishes th
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase
+- [x] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase (completed 2026-03-01)
 - [ ] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy
 - [ ] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface
 - [ ] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications
@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `pnpm --filter @heylol/sdk publish --dry-run` passes `publint` and `attw` checks with zero errors on all subpath exports
   4. `size-limit` check fails if core bundle exceeds 100 KB minified
   5. Changesets `pnpm changeset` creates a versioned changelog entry without errors
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 01-01-PLAN.md — Monorepo scaffold: pnpm workspaces, Turborepo, Biome, and 5 package stubs
 - [ ] 01-02-PLAN.md — Build tooling: tsup configs, exports maps, ESLint Node.js import restrictions
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress|  |
+| 1. Foundation | 2/3 | Complete    | 2026-03-01 |
 | 2. Core Crypto and Auth | 0/TBD | Not started | - |
 | 3. HTTP Client | 0/TBD | Not started | - |
 | 4. API Wrappers | 0/TBD | Not started | - |
