@@ -10,9 +10,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Infrastructure
 
 - [x] **INFRA-01**: Monorepo configured with pnpm workspaces and turborepo
-- [ ] **INFRA-02**: tsup builds produce ESM output with TypeScript declarations for all packages
-- [ ] **INFRA-03**: ESLint rules ban Buffer, process, and Node.js crypto imports in core package
-- [ ] **INFRA-04**: Package.json exports map configured with correct types/import/require conditions
+- [x] **INFRA-02**: tsup builds produce ESM output with TypeScript declarations for all packages
+- [x] **INFRA-03**: ESLint rules ban Buffer, process, and Node.js crypto imports in core package
+- [x] **INFRA-04**: Package.json exports map configured with correct types/import/require conditions
 - [ ] **INFRA-05**: publint and attw validate package exports in CI
 - [ ] **INFRA-06**: size-limit enforces < 100 KB core bundle
 - [ ] **INFRA-07**: Changesets configured for semantic versioning and changelog generation
@@ -145,9 +145,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | INFRA-01 | Phase 1 | Complete |
-| INFRA-02 | Phase 1 | Pending |
-| INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Complete |
+| INFRA-03 | Phase 1 | Complete |
+| INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Pending |
 | INFRA-06 | Phase 1 | Pending |
 | INFRA-07 | Phase 1 | Pending |
