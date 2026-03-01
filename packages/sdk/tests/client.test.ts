@@ -311,6 +311,84 @@ describe('HeyLolClient', () => {
     });
   });
 
+  describe('204 No Content guard', () => {
+    it('delete resolves to undefined for 204 response (no JSON parse error)', async () => {
+      const { client, mockFetch } = makeClient();
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+      const result = await client.delete<void>('/posts/p-1');
+
+      expect(result).toBeUndefined();
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('resolves to undefined when content-length is 0', async () => {
+      const { client, mockFetch } = makeClient();
+      mockFetch.mockResolvedValueOnce(
+        new Response('', { status: 200, headers: { 'content-length': '0' } }),
+      );
+
+      const result = await client.get<void>('/posts/p-1');
+
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('GET query params', () => {
+    it('serializes cursor and limit into query string', async () => {
+      const { client, mockFetch } = makeClient();
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ items: [], hasMore: false }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+
+      await client.get<unknown>('/users/u-1/followers', { cursor: 'abc', limit: 20 });
+
+      const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toContain('?cursor=abc&limit=20');
+    });
+
+    it('filters out undefined params from query string', async () => {
+      const { client, mockFetch } = makeClient();
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+
+      await client.get<unknown>('/posts', { cursor: undefined, limit: 10 });
+
+      const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toMatch(/\?limit=10$/);
+      expect(url).not.toContain('cursor');
+    });
+
+    it('omits query string entirely when no params provided', async () => {
+      const { client, mockFetch } = makeClient();
+      const baseUrl = 'https://api.hey.lol';
+      const customClient = new HeyLolClient({
+        privateKey: TEST_KEY,
+        baseUrl,
+        network: mockFetch as typeof fetch,
+        _sleep: () => Promise.resolve(),
+      });
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({}), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+
+      await customClient.get<unknown>('/posts/p-1');
+
+      const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe(`${baseUrl}/posts/p-1`);
+    });
+  });
+
   describe('Web API portability', () => {
     it('HeyLolClient.ts source does not reference Node.js-only globals', async () => {
       // Static source analysis — enforces CLT-01 multi-runtime portability

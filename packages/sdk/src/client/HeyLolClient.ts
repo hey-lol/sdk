@@ -123,6 +123,11 @@ export class HeyLolClient {
         });
       }
 
+      // Handle 204 No Content and zero-length bodies — prevents JSON parse error
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return undefined as T;
+      }
+
       return response.json() as Promise<T>;
     };
 
@@ -132,8 +137,16 @@ export class HeyLolClient {
     });
   }
 
-  async get<T>(path: string): Promise<T> {
-    return this.request<T>('GET', path);
+  async get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
+    const url = params ? `${path}?${this.buildQueryString(params)}` : path;
+    return this.request<T>('GET', url);
+  }
+
+  private buildQueryString(params: Record<string, string | number | undefined>): string {
+    const entries = Object.entries(params).filter(
+      (entry): entry is [string, string | number] => entry[1] !== undefined,
+    );
+    return new URLSearchParams(entries.map(([k, v]) => [k, String(v)])).toString();
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
