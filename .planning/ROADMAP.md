@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `pnpm --filter @heylol/sdk publish --dry-run` passes `publint` and `attw` checks with zero errors on all subpath exports
   4. `size-limit` check fails if core bundle exceeds 100 KB minified
   5. Changesets `pnpm changeset` creates a versioned changelog entry without errors
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
 - [ ] 01-01-PLAN.md — Monorepo scaffold: pnpm workspaces, Turborepo, Biome, and 5 package stubs
 - [ ] 01-02-PLAN.md — Build tooling: tsup configs, exports maps, ESLint Node.js import restrictions
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planned | - |
+| 1. Foundation | 1/3 | In Progress|  |
 | 2. Core Crypto and Auth | 0/TBD | Not started | - |
 | 3. HTTP Client | 0/TBD | Not started | - |
 | 4. API Wrappers | 0/TBD | Not started | - |
