@@ -20,10 +20,10 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Auth
 
 - [x] **AUTH-01**: Developer can initialize client with a Solana private key (base58)
-- [ ] **AUTH-02**: SDK automatically handles x402 challenge-response authentication on every API call
+- [x] **AUTH-02**: SDK automatically handles x402 challenge-response authentication on every API call
 - [x] **AUTH-03**: SDK builds zero-amount dummy Solana transaction for wallet identification
-- [ ] **AUTH-04**: SDK parses both x402 v1 and v2 response formats
-- [ ] **AUTH-05**: SDK constructs valid X-Payment headers from x402 requirements
+- [x] **AUTH-04**: SDK parses both x402 v1 and v2 response formats
+- [x] **AUTH-05**: SDK constructs valid X-Payment headers from x402 requirements
 - [x] **AUTH-06**: All crypto operations use pure JS (@noble/curves, @scure/base) with zero Node.js built-ins
 
 ### Client
@@ -152,10 +152,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-06 | Phase 1 | Complete |
 | INFRA-07 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Complete |
-| AUTH-02 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Complete |
-| AUTH-04 | Phase 2 | Pending |
-| AUTH-05 | Phase 2 | Pending |
+| AUTH-04 | Phase 2 | Complete |
+| AUTH-05 | Phase 2 | Complete |
 | AUTH-06 | Phase 2 | Complete |
 | TYPE-03 | Phase 2 | Complete |
 | CLT-01 | Phase 3 | Pending |

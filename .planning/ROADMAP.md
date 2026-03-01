@@ -47,7 +47,7 @@ Plans:
   3. SDK builds a valid zero-amount Solana dummy transaction and signs it with Ed25519 — byte-level tests pass against known fixture transactions
   4. SDK constructs a valid `X-Payment` header that hey.lol's facilitator accepts
   5. Thrown errors are typed discriminated unions (AuthError, PaymentRejectedError) with a `code` property on every error
-**Plans:** 4 plans
+**Plans:** 3/4 plans executed
 Plans:
 - [ ] 02-01-PLAN.md — Error hierarchy (TYPE-03) and keypair loading (AUTH-01, AUTH-06)
 - [ ] 02-02-PLAN.md — Solana compact-u16 encoding and zero-amount dummy transaction builder (AUTH-03, AUTH-06)
@@ -108,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
-| 2. Core Crypto and Auth | 0/4 | Planned | - |
+| 2. Core Crypto and Auth | 3/4 | In Progress|  |
 | 3. HTTP Client | 0/TBD | Not started | - |
 | 4. API Wrappers | 0/TBD | Not started | - |
 | 5. Services Package | 0/TBD | Not started | - |

@@ -39,6 +39,7 @@ Progress: [██████░░░░] 32%
 | Phase 01-foundation P03 | 4 | 2 tasks | 9 files |
 | Phase 02-core-crypto-and-auth P01 | 4min | 2 tasks | 8 files |
 | Phase 02-core-crypto-and-auth P02 | 2min | 2 tasks | 2 files |
+| Phase 02-core-crypto-and-auth P03 | 3min | 1 task | 4 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - [Phase 02-02]: Solana compact-u16 differs from protobuf varint — 2-byte range uses (value & 0x7f) | 0x80, value >> 7
 - [Phase 02-02]: buildDummyTransaction produces exactly 169 bytes for standard inputs — deterministic and verifiable via ed25519.verify
 - [Phase 02-02]: concatBytes() uses .set() at computed offsets — avoids spread syntax overhead for Uint8Array concatenation
+- [02-03]: parsePaymentRequirements is async because v1 requires await response.json() — return type is Promise<PaymentRequirements[]>
+- [02-03]: btoa/atob used for base64 (available in all edge runtimes) — no Buffer or Node.js crypto needed
+- [02-03]: src/types/** excluded from coverage — TypeScript interface-only files have no runtime code to cover
 
 ### Pending Todos
 
@@ -75,12 +79,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 2]: x402 facilitator payload format is LOW confidence — must validate against real API before implementing src/auth/x402.ts
 - [Phase 2]: Zero-amount dummy transaction blockhash convention is LOW confidence — requires integration test against real API
 - [Phase 6]: Miniflare v4 API may have changed since training cutoff (Aug 2025) — verify before Cloudflare adapter work
 
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-02-PLAN.md (Solana tx serializer)
-Resume file: .planning/phases/02-core-crypto-and-auth/02-03-PLAN.md (x402 response parser)
+Stopped at: Completed 02-03-PLAN.md (x402 response parser and header builder)
+Resume file: .planning/phases/02-core-crypto-and-auth/02-04-PLAN.md (HTTP client integration)
