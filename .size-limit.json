@@ -1,0 +1,12 @@
+[
+  {
+    "path": "packages/sdk/dist/index.mjs",
+    "limit": "100 kB",
+    "import": "*"
+  },
+  {
+    "path": "packages/sdk/dist/services.mjs",
+    "limit": "100 kB",
+    "import": "*"
+  }
+]

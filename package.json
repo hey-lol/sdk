@@ -13,16 +13,18 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "typescript": "catalog:",
+    "@arethetypeswrong/cli": "^0.18.2",
     "@biomejs/biome": "catalog:",
     "@changesets/cli": "catalog:",
+    "@size-limit/preset-big-lib": "latest",
+    "@vitest/coverage-v8": "catalog:",
     "husky": "latest",
     "lint-staged": "latest",
+    "publint": "^0.3.17",
     "size-limit": "latest",
-    "@size-limit/preset-big-lib": "latest",
-    "vitest": "catalog:",
-    "@vitest/coverage-v8": "catalog:"
+    "turbo": "latest",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "lint-staged": {
     "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
