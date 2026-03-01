@@ -60,9 +60,9 @@ export class PaymentRejectedError extends HeyLolError {
   }
 }
 
-// Network errors — thrown on fetch failures, timeouts, and rate limiting
+// Network errors — thrown on fetch failures and timeouts
 export class NetworkError extends HeyLolError {
-  readonly code: 'FETCH_FAILED' | 'TIMEOUT' | 'RATE_LIMITED';
+  readonly code: 'FETCH_FAILED' | 'TIMEOUT';
   readonly statusCode?: number;
 
   constructor(args: { code: NetworkError['code']; message: string; statusCode?: number }) {
@@ -73,8 +73,34 @@ export class NetworkError extends HeyLolError {
   }
 }
 
+// Rate limit errors — thrown on 429 responses with optional Retry-After
+export class RateLimitError extends HeyLolError {
+  readonly code: 'RATE_LIMITED';
+  readonly retryAfterMs?: number;
+
+  constructor(args: { message: string; retryAfterMs?: number }) {
+    super({ code: 'RATE_LIMITED', message: args.message });
+    this.name = 'RateLimitError';
+    this.code = 'RATE_LIMITED';
+    this.retryAfterMs = args.retryAfterMs;
+  }
+}
+
+// API errors — thrown on non-retryable HTTP error responses (4xx, 5xx)
+export class APIError extends HeyLolError {
+  readonly code: 'API_ERROR';
+  readonly statusCode: number;
+
+  constructor(args: { message: string; statusCode: number }) {
+    super({ code: 'API_ERROR', message: args.message });
+    this.name = 'APIError';
+    this.code = 'API_ERROR';
+    this.statusCode = args.statusCode;
+  }
+}
+
 // Type union for exhaustive narrowing in catch blocks
-export type SdkError = AuthError | PaymentRejectedError | NetworkError;
+export type SdkError = AuthError | PaymentRejectedError | NetworkError | RateLimitError | APIError;
 
 // Type guard — returns true for any SdkError (AuthError | PaymentRejectedError | NetworkError)
 export function isSdkError(e: unknown): e is SdkError {

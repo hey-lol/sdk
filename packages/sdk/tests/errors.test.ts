@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  APIError,
   AuthError,
   HeyLolError,
   isSdkError,
   NetworkError,
   PaymentRejectedError,
+  RateLimitError,
 } from '../src/errors/index.js';
 
 describe('HeyLolError', () => {
@@ -141,7 +143,7 @@ describe('isSdkError', () => {
   });
 
   it('returns true for NetworkError', () => {
-    const err = new NetworkError({ code: 'RATE_LIMITED', message: 'rate limited' });
+    const err = new NetworkError({ code: 'FETCH_FAILED', message: 'fetch failed' });
     expect(isSdkError(err)).toBe(true);
   });
 
@@ -154,5 +156,71 @@ describe('isSdkError', () => {
     expect(isSdkError(undefined)).toBe(false);
     expect(isSdkError('string')).toBe(false);
     expect(isSdkError(42)).toBe(false);
+  });
+
+  it('returns true for RateLimitError', () => {
+    const err = new RateLimitError({ message: 'rate limited' });
+    expect(isSdkError(err)).toBe(true);
+  });
+
+  it('returns true for APIError', () => {
+    const err = new APIError({ message: 'not found', statusCode: 404 });
+    expect(isSdkError(err)).toBe(true);
+  });
+});
+
+describe('RateLimitError', () => {
+  it('has correct name, code, and instanceof chain', () => {
+    const err = new RateLimitError({ message: 'rate limited' });
+    expect(err.name).toBe('RateLimitError');
+    expect(err.code).toBe('RATE_LIMITED');
+    expect(err instanceof RateLimitError).toBe(true);
+    expect(err instanceof HeyLolError).toBe(true);
+    expect(err instanceof Error).toBe(true);
+  });
+
+  it('stores retryAfterMs when provided', () => {
+    const err = new RateLimitError({ message: 'rate limited', retryAfterMs: 5000 });
+    expect(err.retryAfterMs).toBe(5000);
+  });
+
+  it('has retryAfterMs undefined when not provided', () => {
+    const err = new RateLimitError({ message: 'rate limited' });
+    expect(err.retryAfterMs).toBeUndefined();
+  });
+
+  it('toJSON returns name, code, message only', () => {
+    const err = new RateLimitError({ message: 'rate limited', retryAfterMs: 2000 });
+    const json = err.toJSON();
+    expect(json).toEqual({ name: 'RateLimitError', code: 'RATE_LIMITED', message: 'rate limited' });
+    expect(Object.keys(json)).toEqual(['name', 'code', 'message']);
+  });
+});
+
+describe('APIError', () => {
+  it('has correct name, code, statusCode, and instanceof chain', () => {
+    const err = new APIError({ message: 'not found', statusCode: 404 });
+    expect(err.name).toBe('APIError');
+    expect(err.code).toBe('API_ERROR');
+    expect(err.statusCode).toBe(404);
+    expect(err instanceof APIError).toBe(true);
+    expect(err instanceof HeyLolError).toBe(true);
+    expect(err instanceof Error).toBe(true);
+  });
+
+  it('stores different status codes correctly', () => {
+    const err500 = new APIError({ message: 'server error', statusCode: 500 });
+    expect(err500.statusCode).toBe(500);
+    const err400 = new APIError({ message: 'bad request', statusCode: 400 });
+    expect(err400.statusCode).toBe(400);
+  });
+});
+
+describe('NetworkError code narrowing', () => {
+  it('does not accept RATE_LIMITED code (TypeScript assertion)', () => {
+    // @ts-expect-error RATE_LIMITED is no longer a valid NetworkError code — use RateLimitError instead
+    const err = new NetworkError({ code: 'RATE_LIMITED', message: 'x' });
+    // Runtime: the object can still be constructed, but TypeScript rejects it at compile time
+    expect(err).toBeDefined();
   });
 });
