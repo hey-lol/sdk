@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 3 in progress — HTTP Client infrastructure
+**Current focus:** Phase 4 in progress — API Wrappers (resource classes, branded types)
 
 ## Current Position
 
-Phase: 3 of 6 (HTTP Client)
-Plan: 2 of 2 in current phase
-Status: Phase 3 complete — HeyLolClient with 402 loop, retry integration, typed HTTP methods, full CI green
-Last activity: 2026-03-01 — Plan 03-02 complete (HeyLolClient, barrel exports, 123 tests passing)
+Phase: 4 of 6 (API Wrappers)
+Plan: 1 of 3 in current phase
+Status: Phase 4 Plan 1 complete — branded ID types, domain interfaces, client 204 guard + query params
+Last activity: 2026-03-01 — Plan 04-01 complete (PostId/UserId/NotificationId brands, domain types, params, 128 tests passing)
 
-Progress: [████████░░] 50%
+Progress: [████████░░] 53%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 3min
-- Total execution time: 0.25 hours
+- Total execution time: 0.28 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [████████░░] 50%
 | 01-foundation | 3 | 10min | 3min |
 | 02-core-crypto-and-auth | 1 | 4min | 4min |
 | 03-http-client | 2 | 5min | 2.5min |
+| 04-api-wrappers | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (4min), 02-01 (4min), 02-04 (2min), 03-01 (2min), 03-02 (3min)
+- Last 5 plans: 02-04 (2min), 03-01 (2min), 03-02 (3min), 04-01 (2min)
 - Trend: Consistent 2-4min execution
 
 *Updated after each plan completion*
@@ -44,6 +45,7 @@ Progress: [████████░░] 50%
 | Phase 02-core-crypto-and-auth P04 | 2min | 2 tasks | 3 files |
 | Phase 03-http-client P01 | 2min | 2 tasks | 9 files |
 | Phase 03-http-client P02 | 3min | 2 tasks | 4 files |
+| Phase 04-api-wrappers P01 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -85,6 +87,10 @@ Recent decisions affecting current work:
 - [03-02]: 402 payment loop implemented inline in request() closure — paymentHeader guard variable prevents infinite loops; second 402 throws PaymentRejectedError
 - [03-02]: getPaymentVersion() null-coalesced to version 1 on 402 — permissive fallback for servers that omit version header
 - [03-02]: Static analysis test for Web API portability checks literal word absence — source comment wording must not mention forbidden node globals by name
+- [04-01]: unique symbol brand key used over string __brand property — prevents brand forgery across modules, matches Anthropic and Stripe production SDK patterns
+- [04-01]: Factory functions as const arrows (asPostId = (s) => s as PostId) — zero runtime overhead, sole safe entry point for branded values
+- [04-01]: URLSearchParams for GET query serialization — Web API available in all target runtimes without polyfills
+- [04-01]: 204 guard checks both status===204 and content-length==='0' — defensive against both explicit 204 and 200+empty body patterns
 
 ### Pending Todos
 
@@ -98,5 +104,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-02-PLAN.md (HeyLolClient, 402 loop, barrel exports, full CI green)
-Resume file: .planning/phases/04-service-layer/ (Phase 4 plans — service layer implementation)
+Stopped at: Completed 04-01-PLAN.md (branded types, domain interfaces, client 204 guard + query params, 128 tests)
+Resume file: .planning/phases/04-api-wrappers/04-02-PLAN.md (PostsResource and ProfileResource)

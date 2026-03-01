@@ -80,8 +80,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Types
 
-- [ ] **TYPE-01**: Full TypeScript types for all API methods, request params, and response objects
-- [ ] **TYPE-02**: Branded types for IDs (PostId, UserId) to prevent mixing
+- [x] **TYPE-01**: Full TypeScript types for all API methods, request params, and response objects
+- [x] **TYPE-02**: Branded types for IDs (PostId, UserId) to prevent mixing
 - [x] **TYPE-03**: Discriminated union error types
 - [ ] **TYPE-04**: JSDoc comments with examples on all public methods
 
@@ -183,8 +183,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISC-03 | Phase 4 | Pending |
 | NOTF-01 | Phase 4 | Pending |
 | NOTF-02 | Phase 4 | Pending |
-| TYPE-01 | Phase 4 | Pending |
-| TYPE-02 | Phase 4 | Pending |
+| TYPE-01 | Phase 4 | Complete |
+| TYPE-02 | Phase 4 | Complete |
 | SVC-01 | Phase 5 | Pending |
 | SVC-02 | Phase 5 | Pending |
 | SVC-03 | Phase 5 | Pending |
