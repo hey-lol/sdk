@@ -29,10 +29,10 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Client
 
 - [ ] **CLT-01**: Fetch-based HTTP client works in Node.js, Cloudflare Workers, Vercel Edge, and browsers
-- [ ] **CLT-02**: Auto-retry with exponential backoff and jitter on transient failures (429, 503)
-- [ ] **CLT-03**: Typed error hierarchy (HeyLolError, AuthError, RateLimitError, APIError, NetworkError)
-- [ ] **CLT-04**: Methods return domain objects (Post, Profile, User), not raw HTTP responses
-- [ ] **CLT-05**: Client accepts configurable options (retries, timeout, network)
+- [x] **CLT-02**: Auto-retry with exponential backoff and jitter on transient failures (429, 503)
+- [x] **CLT-03**: Typed error hierarchy (HeyLolError, AuthError, RateLimitError, APIError, NetworkError)
+- [x] **CLT-04**: Methods return domain objects (Post, Profile, User), not raw HTTP responses
+- [x] **CLT-05**: Client accepts configurable options (retries, timeout, network)
 
 ### Posts
 
@@ -159,10 +159,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-06 | Phase 2 | Complete |
 | TYPE-03 | Phase 2 | Complete |
 | CLT-01 | Phase 3 | Pending |
-| CLT-02 | Phase 3 | Pending |
-| CLT-03 | Phase 3 | Pending |
-| CLT-04 | Phase 3 | Pending |
-| CLT-05 | Phase 3 | Pending |
+| CLT-02 | Phase 3 | Complete |
+| CLT-03 | Phase 3 | Complete |
+| CLT-04 | Phase 3 | Complete |
+| CLT-05 | Phase 3 | Complete |
 | POST-01 | Phase 4 | Pending |
 | POST-02 | Phase 4 | Pending |
 | POST-03 | Phase 4 | Pending |

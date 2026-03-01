@@ -63,7 +63,7 @@ Plans:
   2. A 429 or 503 response triggers automatic retry with exponential backoff and jitter; a permanent error throws a typed HeyLolError subclass
   3. API method return values are typed domain objects (Post, Profile, User), not raw Response or JSON
   4. Client accepts constructor options for retries, timeout, and network without requiring them
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 03-01-PLAN.md — Error hierarchy extension (RateLimitError, APIError), retry utility, ClientOptions, domain type stubs
 - [ ] 03-02-PLAN.md — HeyLolClient class with 402 loop, typed HTTP methods, barrel exports, CI validation
@@ -112,7 +112,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
 | 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
-| 3. HTTP Client | 0/2 | Not started | - |
+| 3. HTTP Client | 1/2 | In Progress|  |
 | 4. API Wrappers | 0/TBD | Not started | - |
 | 5. Services Package | 0/TBD | Not started | - |
 | 6. Adapters, Docs, and Release | 0/TBD | Not started | - |

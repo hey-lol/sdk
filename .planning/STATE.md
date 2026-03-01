@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 2 complete — Ready for Phase 3 (HTTP Client)
+**Current focus:** Phase 3 in progress — HTTP Client infrastructure
 
 ## Current Position
 
-Phase: 2 of 6 (Core Crypto and Auth)
-Plan: 4 of 4 in current phase
-Status: Phase 2 complete — All 4 plans executed
-Last activity: 2026-03-01 — Plan 02-04 complete (SDK entry point and full CI pipeline)
+Phase: 3 of 6 (HTTP Client)
+Plan: 1 of 2 in current phase
+Status: Phase 3 plan 1 complete — error hierarchy, retry utility, ClientOptions, domain stubs
+Last activity: 2026-03-01 — Plan 03-01 complete (error hierarchy, retry infrastructure, domain stubs)
 
-Progress: [████████░░] 38%
+Progress: [████████░░] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 3min
-- Total execution time: 0.22 hours
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [████████░░] 38%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 10min | 3min |
 | 02-core-crypto-and-auth | 1 | 4min | 4min |
+| 03-http-client | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 01-02 (4min), 01-03 (4min), 02-01 (4min)
-- Trend: Consistent 4min execution
+- Last 5 plans: 01-02 (4min), 01-03 (4min), 02-01 (4min), 02-04 (2min), 03-01 (2min)
+- Trend: Consistent 2-4min execution
 
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 4min | 2 tasks | 12 files |
@@ -41,6 +42,7 @@ Progress: [████████░░] 38%
 | Phase 02-core-crypto-and-auth P02 | 2min | 2 tasks | 2 files |
 | Phase 02-core-crypto-and-auth P03 | 3min | 1 task | 4 files |
 | Phase 02-core-crypto-and-auth P04 | 2min | 2 tasks | 3 files |
+| Phase 03-http-client P01 | 2min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -75,6 +77,10 @@ Recent decisions affecting current work:
 - [02-03]: src/types/** excluded from coverage — TypeScript interface-only files have no runtime code to cover
 - [Phase 02-04]: Barrel exports at auth/ and types/ boundaries enable organized re-export without coupling index.ts to internal file structure
 - [Phase 02-04]: encodeCompactU16 exported from auth/index.ts but not from main index.ts — internal utility exposed only for advanced users
+- [03-01]: NetworkError.code narrowed to 'FETCH_FAILED' | 'TIMEOUT' — RATE_LIMITED moved to dedicated RateLimitError to prevent discriminant collision
+- [03-01]: withRetry retries on 502 in addition to 503 — both are transient upstream failures
+- [03-01]: Injectable _sleep pattern preferred over mocking global timers — cleaner test isolation, no global state contamination
+- [03-01]: Barrel/type-only client files excluded from coverage (client/index.ts, client/options.ts) — same pattern as auth/index.ts and src/types/**
 
 ### Pending Todos
 
@@ -88,5 +94,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-04-PLAN.md (SDK entry point and CI pipeline)
-Resume file: .planning/phases/03-http-client/ (next phase)
+Stopped at: Completed 03-01-PLAN.md (error hierarchy, retry infrastructure, domain stubs)
+Resume file: .planning/phases/03-http-client/03-02-PLAN.md (HeyLolClient implementation)
