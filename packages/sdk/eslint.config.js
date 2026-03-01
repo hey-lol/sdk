@@ -1,6 +1,11 @@
+import tsParser from '@typescript-eslint/parser';
+
 export default [
   {
     files: ['src/**/*.ts'],
+    languageOptions: {
+      parser: tsParser,
+    },
     rules: {
       'no-restricted-imports': [
         'error',
@@ -16,11 +21,13 @@ export default [
             },
             {
               name: 'crypto',
-              message: 'Node.js crypto is not available in edge runtimes. Use @noble/curves instead.',
+              message:
+                'Node.js crypto is not available in edge runtimes. Use @noble/curves instead.',
             },
             {
               name: 'node:crypto',
-              message: 'Node.js crypto is not available in edge runtimes. Use @noble/curves instead.',
+              message:
+                'Node.js crypto is not available in edge runtimes. Use @noble/curves instead.',
             },
             {
               name: 'process',

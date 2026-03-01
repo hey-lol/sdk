@@ -42,9 +42,10 @@
     "build": "tsup",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage --config ../../vitest.config.ts"
+    "test": "vitest run --coverage --config vitest.config.ts"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "^8.56.1",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
