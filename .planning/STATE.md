@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 2 — Core Crypto and Auth
+**Current focus:** Phase 2 complete — Ready for Phase 3 (HTTP Client)
 
 ## Current Position
 
 Phase: 2 of 6 (Core Crypto and Auth)
-Plan: 3 of 4 in current phase
-Status: Phase 2 in progress — Plan 02-03 complete
-Last activity: 2026-03-01 — Plan 02-03 complete (x402 response parser and header builder)
+Plan: 4 of 4 in current phase
+Status: Phase 2 complete — All 4 plans executed
+Last activity: 2026-03-01 — Plan 02-04 complete (SDK entry point and full CI pipeline)
 
-Progress: [██████░░░░] 32%
+Progress: [████████░░] 38%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Progress: [██████░░░░] 32%
 | Phase 02-core-crypto-and-auth P01 | 4min | 2 tasks | 8 files |
 | Phase 02-core-crypto-and-auth P02 | 2min | 2 tasks | 2 files |
 | Phase 02-core-crypto-and-auth P03 | 3min | 1 task | 4 files |
+| Phase 02-core-crypto-and-auth P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [02-03]: parsePaymentRequirements is async because v1 requires await response.json() — return type is Promise<PaymentRequirements[]>
 - [02-03]: btoa/atob used for base64 (available in all edge runtimes) — no Buffer or Node.js crypto needed
 - [02-03]: src/types/** excluded from coverage — TypeScript interface-only files have no runtime code to cover
+- [Phase 02-04]: Barrel exports at auth/ and types/ boundaries enable organized re-export without coupling index.ts to internal file structure
+- [Phase 02-04]: encodeCompactU16 exported from auth/index.ts but not from main index.ts — internal utility exposed only for advanced users
 
 ### Pending Todos
 
@@ -85,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-03-PLAN.md (x402 response parser and header builder)
-Resume file: .planning/phases/02-core-crypto-and-auth/02-04-PLAN.md (HTTP client integration)
+Stopped at: Completed 02-04-PLAN.md (SDK entry point and CI pipeline)
+Resume file: .planning/phases/03-http-client/ (next phase)
