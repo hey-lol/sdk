@@ -16,6 +16,7 @@ export default mergeConfig(
           'src/auth/index.ts',
           'src/client/index.ts',
           'src/client/options.ts',
+          'src/resources/index.ts',
           '**/*.test.ts',
           '**/*.config.ts',
           'dist/**',

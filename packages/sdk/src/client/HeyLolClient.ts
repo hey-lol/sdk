@@ -19,6 +19,13 @@ import {
   parsePaymentRequirements,
 } from '../auth/index.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
+import {
+  DiscoveryResource,
+  NotificationsResource,
+  PostsResource,
+  ProfileResource,
+  SocialResource,
+} from '../resources/index.js';
 import { DEFAULT_OPTIONS, parseRetryAfterMs, withRetry } from './index.js';
 import type { ClientOptions } from './options.js';
 
@@ -30,6 +37,12 @@ export class HeyLolClient {
   private readonly network: typeof fetch;
   private readonly _sleep?: (ms: number) => Promise<void>;
 
+  readonly posts: PostsResource;
+  readonly profile: ProfileResource;
+  readonly social: SocialResource;
+  readonly discovery: DiscoveryResource;
+  readonly notifications: NotificationsResource;
+
   constructor(opts: ClientOptions) {
     this.keypair = loadKeypair(opts.privateKey);
     this.baseUrl = opts.baseUrl ?? DEFAULT_OPTIONS.baseUrl;
@@ -37,6 +50,12 @@ export class HeyLolClient {
     this.timeout = opts.timeout ?? DEFAULT_OPTIONS.timeout;
     this.network = opts.network ?? globalThis.fetch.bind(globalThis);
     this._sleep = opts._sleep;
+
+    this.posts = new PostsResource(this);
+    this.profile = new ProfileResource(this);
+    this.social = new SocialResource(this);
+    this.discovery = new DiscoveryResource(this);
+    this.notifications = new NotificationsResource(this);
   }
 
   /**

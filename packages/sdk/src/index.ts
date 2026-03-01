@@ -24,6 +24,14 @@ export {
   PaymentRejectedError,
   RateLimitError,
 } from './errors/index.js';
+// Resources
+export {
+  DiscoveryResource,
+  NotificationsResource,
+  PostsResource,
+  ProfileResource,
+  SocialResource,
+} from './resources/index.js';
 // Types — branded ID types (type-only export)
 // Types — request param interfaces
 // Types — x402 protocol

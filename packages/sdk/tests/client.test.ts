@@ -9,6 +9,11 @@ import {
   PaymentRejectedError,
   RateLimitError,
 } from '../src/errors/index.js';
+import { DiscoveryResource } from '../src/resources/DiscoveryResource.js';
+import { NotificationsResource } from '../src/resources/NotificationsResource.js';
+import { PostsResource } from '../src/resources/PostsResource.js';
+import { ProfileResource } from '../src/resources/ProfileResource.js';
+import { SocialResource } from '../src/resources/SocialResource.js';
 import type { Post } from '../src/types/index.js';
 import { asPostId, asUserId } from '../src/types/index.js';
 
@@ -402,6 +407,43 @@ describe('HeyLolClient', () => {
       expect(source).not.toMatch(/\brequire\(/);
       expect(source).not.toMatch(/__dirname/);
       expect(source).not.toMatch(/\bprocess\.argv\b/);
+    });
+  });
+
+  describe('resource namespaces', () => {
+    it('client.posts is an instance of PostsResource', () => {
+      const { client } = makeClient();
+      expect(client.posts).toBeDefined();
+      expect(client.posts).toBeInstanceOf(PostsResource);
+      expect(typeof client.posts.create).toBe('function');
+    });
+
+    it('client.profile is an instance of ProfileResource', () => {
+      const { client } = makeClient();
+      expect(client.profile).toBeDefined();
+      expect(client.profile).toBeInstanceOf(ProfileResource);
+      expect(typeof client.profile.me).toBe('function');
+    });
+
+    it('client.social is an instance of SocialResource', () => {
+      const { client } = makeClient();
+      expect(client.social).toBeDefined();
+      expect(client.social).toBeInstanceOf(SocialResource);
+      expect(typeof client.social.follow).toBe('function');
+    });
+
+    it('client.discovery is an instance of DiscoveryResource', () => {
+      const { client } = makeClient();
+      expect(client.discovery).toBeDefined();
+      expect(client.discovery).toBeInstanceOf(DiscoveryResource);
+      expect(typeof client.discovery.search).toBe('function');
+    });
+
+    it('client.notifications is an instance of NotificationsResource', () => {
+      const { client } = makeClient();
+      expect(client.notifications).toBeDefined();
+      expect(client.notifications).toBeInstanceOf(NotificationsResource);
+      expect(typeof client.notifications.list).toBe('function');
     });
   });
 });
