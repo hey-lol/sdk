@@ -9,7 +9,14 @@ export default mergeConfig(
         // Only measure coverage for TypeScript source files with actual implementations.
         // Excludes stub re-exports (index.ts, services.ts) that will be expanded in later phases.
         include: ['src/**/*.ts'],
-        exclude: ['src/index.ts', 'src/services.ts', '**/*.test.ts', '**/*.config.ts', 'dist/**'],
+        exclude: [
+          'src/index.ts',
+          'src/services.ts',
+          'src/types/**',
+          '**/*.test.ts',
+          '**/*.config.ts',
+          'dist/**',
+        ],
       },
     },
   }),
