@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 4 of 6 (API Wrappers)
-Plan: 1 of 3 in current phase
-Status: Phase 4 Plan 1 complete — branded ID types, domain interfaces, client 204 guard + query params
-Last activity: 2026-03-01 — Plan 04-01 complete (PostId/UserId/NotificationId brands, domain types, params, 128 tests passing)
+Plan: 2 of 3 in current phase
+Status: Phase 4 Plan 2 complete — PostsResource (6 methods) and ProfileResource (3 methods) with 12 new tests
+Last activity: 2026-03-01 — Plan 04-02 complete (PostsResource POST-01..07, ProfileResource PROF-01..04, 140 tests passing)
 
-Progress: [████████░░] 53%
+Progress: [█████████░] 60%
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Progress: [████████░░] 53%
 | Phase 03-http-client P01 | 2min | 2 tasks | 9 files |
 | Phase 03-http-client P02 | 3min | 2 tasks | 4 files |
 | Phase 04-api-wrappers P01 | 2min | 2 tasks | 5 files |
+| Phase 04-api-wrappers P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [04-01]: Factory functions as const arrows (asPostId = (s) => s as PostId) — zero runtime overhead, sole safe entry point for branded values
 - [04-01]: URLSearchParams for GET query serialization — Web API available in all target runtimes without polyfills
 - [04-01]: 204 guard checks both status===204 and content-length==='0' — defensive against both explicit 204 and 200+empty body patterns
+- [Phase 04-02]: Local HttpClient interface per resource class avoids circular imports — each resource declares only the HTTP verbs it needs
+- [Phase 04-02]: Single create() handles text/media/paywalled post variants via CreatePostParams — no overloads needed
+- [Phase 04-02]: ProfileResource.update() covers PROF-03 and PROF-04 — UpdateProfileParams four optional fields handle all update scenarios
 
 ### Pending Todos
 
@@ -104,5 +108,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-01-PLAN.md (branded types, domain interfaces, client 204 guard + query params, 128 tests)
-Resume file: .planning/phases/04-api-wrappers/04-02-PLAN.md (PostsResource and ProfileResource)
+Stopped at: Completed 04-02-PLAN.md (PostsResource, ProfileResource, 12 new tests, 140 total)
+Resume file: .planning/phases/04-api-wrappers/04-03-PLAN.md (remaining resource classes: FeedResource, NotificationsResource, SearchResource)

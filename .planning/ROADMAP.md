@@ -78,7 +78,7 @@ Plans:
   3. Developer follows and unfollows users and lists followers and following via `client.social.*`
   4. Developer searches users and posts, retrieves trending posts, and gets suggested users via `client.discovery.*`
   5. Developer lists and marks notifications as read via `client.notifications.*`, and all IDs (PostId, UserId) are branded types that TypeScript rejects when mixed
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 Plans:
 - [ ] 04-01-PLAN.md — Branded ID types, expanded domain interfaces, request params, HeyLolClient 204 guard and query params
 - [ ] 04-02-PLAN.md — PostsResource and ProfileResource with full test coverage
@@ -117,6 +117,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/3 | Complete    | 2026-03-01 |
 | 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
 | 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
-| 4. API Wrappers | 0/3 | Planned | - |
+| 4. API Wrappers | 2/3 | In Progress|  |
 | 5. Services Package | 0/TBD | Not started | - |
 | 6. Adapters, Docs, and Release | 0/TBD | Not started | - |

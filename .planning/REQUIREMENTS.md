@@ -36,20 +36,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Posts
 
-- [ ] **POST-01**: Developer can create a text post
-- [ ] **POST-02**: Developer can create a post with media (images, video, GIF)
-- [ ] **POST-03**: Developer can get a post by ID
-- [ ] **POST-04**: Developer can delete own post
-- [ ] **POST-05**: Developer can like/unlike a post
-- [ ] **POST-06**: Developer can reply to a post
-- [ ] **POST-07**: Developer can create a paywalled post with teaser
+- [x] **POST-01**: Developer can create a text post
+- [x] **POST-02**: Developer can create a post with media (images, video, GIF)
+- [x] **POST-03**: Developer can get a post by ID
+- [x] **POST-04**: Developer can delete own post
+- [x] **POST-05**: Developer can like/unlike a post
+- [x] **POST-06**: Developer can reply to a post
+- [x] **POST-07**: Developer can create a paywalled post with teaser
 
 ### Profile
 
-- [ ] **PROF-01**: Developer can get own profile
-- [ ] **PROF-02**: Developer can get another user's profile
-- [ ] **PROF-03**: Developer can update profile fields
-- [ ] **PROF-04**: Developer can set avatar and banner URLs
+- [x] **PROF-01**: Developer can get own profile
+- [x] **PROF-02**: Developer can get another user's profile
+- [x] **PROF-03**: Developer can update profile fields
+- [x] **PROF-04**: Developer can set avatar and banner URLs
 
 ### Social
 
@@ -163,17 +163,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLT-03 | Phase 3 | Complete |
 | CLT-04 | Phase 3 | Complete |
 | CLT-05 | Phase 3 | Complete |
-| POST-01 | Phase 4 | Pending |
-| POST-02 | Phase 4 | Pending |
-| POST-03 | Phase 4 | Pending |
-| POST-04 | Phase 4 | Pending |
-| POST-05 | Phase 4 | Pending |
-| POST-06 | Phase 4 | Pending |
-| POST-07 | Phase 4 | Pending |
-| PROF-01 | Phase 4 | Pending |
-| PROF-02 | Phase 4 | Pending |
-| PROF-03 | Phase 4 | Pending |
-| PROF-04 | Phase 4 | Pending |
+| POST-01 | Phase 4 | Complete |
+| POST-02 | Phase 4 | Complete |
+| POST-03 | Phase 4 | Complete |
+| POST-04 | Phase 4 | Complete |
+| POST-05 | Phase 4 | Complete |
+| POST-06 | Phase 4 | Complete |
+| POST-07 | Phase 4 | Complete |
+| PROF-01 | Phase 4 | Complete |
+| PROF-02 | Phase 4 | Complete |
+| PROF-03 | Phase 4 | Complete |
+| PROF-04 | Phase 4 | Complete |
 | SOCL-01 | Phase 4 | Pending |
 | SOCL-02 | Phase 4 | Pending |
 | SOCL-03 | Phase 4 | Pending |
