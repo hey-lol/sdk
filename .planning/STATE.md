@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 6 (Core Crypto and Auth)
-Plan: 1 of 4 in current phase
-Status: Phase 2 in progress — Plan 02-01 complete
-Last activity: 2026-03-01 — Plan 02-01 complete (error hierarchy + keypair loading)
+Plan: 3 of 4 in current phase
+Status: Phase 2 in progress — Plan 02-03 complete
+Last activity: 2026-03-01 — Plan 02-03 complete (x402 response parser and header builder)
 
-Progress: [████░░░░░░] 24%
+Progress: [██████░░░░] 32%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 3min
-- Total execution time: 0.17 hours
+- Total execution time: 0.22 hours
 
 **By Phase:**
 
@@ -38,6 +38,7 @@ Progress: [████░░░░░░] 24%
 | Phase 01-foundation P02 | 4min | 2 tasks | 12 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 9 files |
 | Phase 02-core-crypto-and-auth P01 | 4min | 2 tasks | 8 files |
+| Phase 02-core-crypto-and-auth P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,9 @@ Recent decisions affecting current work:
 - [02-01]: Local vitest.config.ts per-package needed to exclude stub files from coverage — prevents threshold failures from phase 1 placeholders
 - [02-01]: @typescript-eslint/parser required in ESLint flat config — ESLint v9 default parser cannot parse TypeScript class body syntax
 - [02-01]: loadKeypair dispatches on decoded.length (64 vs 32 bytes) — accepts both Solana CLI/Phantom and secret-only formats
+- [Phase 02-02]: Solana compact-u16 differs from protobuf varint — 2-byte range uses (value & 0x7f) | 0x80, value >> 7
+- [Phase 02-02]: buildDummyTransaction produces exactly 169 bytes for standard inputs — deterministic and verifiable via ed25519.verify
+- [Phase 02-02]: concatBytes() uses .set() at computed offsets — avoids spread syntax overhead for Uint8Array concatenation
 
 ### Pending Todos
 
@@ -78,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-01-PLAN.md (error hierarchy + keypair loading)
-Resume file: .planning/phases/02-core-crypto-and-auth/02-02-PLAN.md (Solana tx serializer)
+Stopped at: Completed 02-02-PLAN.md (Solana tx serializer)
+Resume file: .planning/phases/02-core-crypto-and-auth/02-03-PLAN.md (x402 response parser)
