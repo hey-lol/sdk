@@ -56,9 +56,23 @@ export class ServicesResource {
    * NOTE: This only works for hey.lol's own services. External x402
    * services requiring real USDC payment are out of scope for v1.
    *
-   * @param serviceId - Service identifier or path segment
-   * @param input - Typed input payload
+   * @param serviceId - Service identifier or path segment used to build `/services/{serviceId}/call`
+   * @param input - Typed input payload sent as the JSON request body
    * @returns Typed output from the service
+   * @throws {PaymentRejectedError} If the identity-auth handshake fails
+   * @throws {APIError} If the service returns a non-2xx error
+   *
+   * @example
+   * ```ts
+   * interface TranslateInput { text: string; targetLanguage: string }
+   * interface TranslateOutput { translated: string }
+   *
+   * const result = await client.services.call<TranslateInput, TranslateOutput>(
+   *   'translate',
+   *   { text: 'Hello', targetLanguage: 'es' },
+   * );
+   * console.log(result.translated); // 'Hola'
+   * ```
    */
   call<TInput, TOutput>(serviceId: string, input?: TInput): Promise<TOutput> {
     return this.client.post<TOutput>(ROUTES.serviceCall(serviceId), input);

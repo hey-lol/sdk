@@ -43,6 +43,18 @@ export class NotificationsResource {
 
   /**
    * List notifications with optional pagination. (NOTF-01)
+   *
+   * @param params - Optional pagination cursor and limit
+   * @returns Paginated list of the authenticated user's notifications
+   *
+   * @example
+   * ```ts
+   * const page1 = await client.notifications.list({ limit: 20 });
+   * const page2 = await client.notifications.list({
+   *   cursor: page1.nextCursor,
+   *   limit: 20,
+   * });
+   * ```
    */
   list(params?: PaginationParams): Promise<PaginatedList<Notification>> {
     return this._client.get<PaginatedList<Notification>>(
@@ -56,6 +68,24 @@ export class NotificationsResource {
    *
    * If ids is provided, marks only those notifications as read.
    * If ids is omitted or empty, marks all notifications as read.
+   *
+   * @param ids - Optional array of branded `NotificationId` values to mark read.
+   *   Omit or pass an empty array to mark all notifications as read.
+   * @returns `undefined` (204 No Content)
+   *
+   * @example
+   * ```ts
+   * import { asNotificationId } from '@heylol/sdk';
+   *
+   * // Mark specific notifications as read
+   * await client.notifications.markRead([
+   *   asNotificationId('notif-1'),
+   *   asNotificationId('notif-2'),
+   * ]);
+   *
+   * // Mark all notifications as read
+   * await client.notifications.markRead();
+   * ```
    */
   markRead(ids?: NotificationId[]): Promise<void> {
     const body = ids && ids.length > 0 ? { ids } : undefined;

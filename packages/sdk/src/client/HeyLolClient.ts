@@ -8,6 +8,15 @@
  * - Uses only Web API primitives (fetch, AbortSignal, Response, Headers, btoa)
  * - Zero Node.js-only APIs — no node-specific globals or built-ins
  * - Works in browsers, Node.js >= 18, Deno, Cloudflare Workers, and Bun
+ *
+ * @example
+ * ```ts
+ * import { HeyLolClient } from '@heylol/sdk';
+ *
+ * const client = new HeyLolClient({ privateKey: 'YOUR_BASE58_PRIVATE_KEY' });
+ * const profile = await client.profile.me();
+ * console.log(profile.displayName);
+ * ```
  */
 
 import type { Keypair } from '../auth/index.js';
@@ -45,6 +54,21 @@ export class HeyLolClient {
   readonly discovery: DiscoveryResource;
   readonly notifications: NotificationsResource;
 
+  /**
+   * Create a new HeyLolClient.
+   *
+   * @param opts - Client configuration options including your Solana private key.
+   * @throws {AuthError} If `opts.privateKey` is not a valid Base58-encoded Solana keypair.
+   *
+   * @example
+   * ```ts
+   * const client = new HeyLolClient({
+   *   privateKey: 'YOUR_BASE58_PRIVATE_KEY',
+   *   retries: 3,
+   *   timeout: 30_000,
+   * });
+   * ```
+   */
   constructor(opts: ClientOptions) {
     this.keypair = loadKeypair(opts.privateKey);
     this.baseUrl = opts.baseUrl ?? DEFAULT_OPTIONS.baseUrl;
@@ -68,6 +92,15 @@ export class HeyLolClient {
    * - null on first attempt (no payment header yet)
    * - set after first 402 (payment header attached to retry)
    * - second 402 throws PaymentRejectedError (no infinite loop)
+   *
+   * @param method - HTTP method (GET, POST, PATCH, DELETE, etc.)
+   * @param path - URL path relative to `baseUrl` (e.g. `/posts/abc123`)
+   * @param body - Optional request body, serialized as JSON
+   * @returns Parsed JSON response body cast to `T`
+   * @throws {NetworkError} If the fetch fails or times out
+   * @throws {RateLimitError} On HTTP 429 Too Many Requests
+   * @throws {PaymentRejectedError} If a 402 is returned after a payment header was already sent
+   * @throws {APIError} On any other non-2xx response
    */
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
     let paymentHeader: { headerName: string; headerValue: string } | null = null;
@@ -159,6 +192,18 @@ export class HeyLolClient {
     });
   }
 
+  /**
+   * Issue an HTTP GET request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @param params - Optional query string parameters; `undefined` values are omitted
+   * @returns Parsed JSON response body cast to `T`
+   *
+   * @example
+   * ```ts
+   * const posts = await client.get<Post[]>('/posts', { limit: 20 });
+   * ```
+   */
   async get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
     const url = params ? `${path}?${this.buildQueryString(params)}` : path;
     return this.request<T>('GET', url);
@@ -171,14 +216,49 @@ export class HeyLolClient {
     return new URLSearchParams(entries.map(([k, v]) => [k, String(v)])).toString();
   }
 
+  /**
+   * Issue an HTTP POST request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @param body - Optional request body, serialized as JSON
+   * @returns Parsed JSON response body cast to `T`
+   *
+   * @example
+   * ```ts
+   * const post = await client.post<Post>('/posts', { content: 'Hello world' });
+   * ```
+   */
   async post<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
   }
 
+  /**
+   * Issue an HTTP PATCH request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @param body - Optional request body, serialized as JSON
+   * @returns Parsed JSON response body cast to `T`
+   *
+   * @example
+   * ```ts
+   * const profile = await client.patch<Profile>('/profile/me', { displayName: 'Alice' });
+   * ```
+   */
   async patch<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('PATCH', path, body);
   }
 
+  /**
+   * Issue an HTTP DELETE request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @returns Parsed JSON response body cast to `T`, or `undefined` for 204 No Content
+   *
+   * @example
+   * ```ts
+   * await client.delete('/posts/abc123');
+   * ```
+   */
   async delete<T>(path: string): Promise<T> {
     return this.request<T>('DELETE', path);
   }
