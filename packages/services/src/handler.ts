@@ -3,9 +3,19 @@ import { settlePayment } from './settle.js';
 import type { ServiceDefinition } from './types.js';
 import { verifyPayment } from './verify.js';
 
+/**
+ * Handler function signature for x402 services.
+ *
+ * Receives the original request and the validated (and optionally Zod-parsed)
+ * input, and must return the typed output. Called only after payment is verified.
+ */
 export type ServiceHandler<TInput, TOutput> = (request: Request, input: TInput) => Promise<TOutput>;
 
+/**
+ * Options for `createX402Service`.
+ */
 export interface X402ServiceOptions {
+  /** Optional facilitator base URL (defaults to `https://x402.org/facilitator`) */
   facilitatorUrl?: string;
 }
 
@@ -26,6 +36,51 @@ const buildRequirements = (definition: ServiceDefinition, resource: string) => (
   ],
 });
 
+/**
+ * Create a complete x402 service handler that bundles verification, handler
+ * execution, and settlement into a single fetch-compatible function.
+ *
+ * The returned handler implements the full x402 v2 lifecycle:
+ * 1. No payment header → return 402 with `PAYMENT-REQUIRED` header
+ * 2. Payment header present → verify with facilitator
+ * 3. Verification fails → return 402 with error reason
+ * 4. Parse and validate input (using `definition.inputSchema` if provided)
+ * 5. Execute `handler(request, input)` to produce output
+ * 6. Settle payment on-chain (best-effort; does not fail the response)
+ * 7. Return 200 with output JSON and optional `PAYMENT-RESPONSE` header
+ *
+ * @param definition - Service definition created via `registerService`
+ * @param handler - Async function `(request, input) => output` executed after payment verification
+ * @param opts - Optional facilitator URL override
+ * @returns A fetch-compatible handler `(request: Request) => Promise<Response>`
+ *
+ * @example
+ * ```ts
+ * import { z } from 'zod';
+ * import { registerService, createX402Service } from '@heylol/services';
+ *
+ * const echoService = registerService({
+ *   id: 'echo',
+ *   description: 'Echo your message back',
+ *   price: {
+ *     amount: '0.001',
+ *     currency: 'USDC',
+ *     network: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+ *     payTo: 'YOUR_WALLET_ADDRESS',
+ *   },
+ *   inputSchema: z.object({ message: z.string() }),
+ *   outputSchema: z.object({ echo: z.string() }),
+ * });
+ *
+ * export const handleEcho = createX402Service(
+ *   echoService,
+ *   async (_req, input) => ({ echo: input.message }),
+ * );
+ *
+ * // In your route handler:
+ * // export default { fetch: handleEcho };
+ * ```
+ */
 export const createX402Service = <TInput = unknown, TOutput = unknown>(
   definition: ServiceDefinition<TInput, TOutput>,
   handler: ServiceHandler<TInput, TOutput>,
