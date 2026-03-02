@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 8 complete — PaymentRequirements v2 type alignment, normalizeRequirements() helper, HeyLolClient circular import eliminated
+**Current focus:** Phase 9 complete — stale size-limit entry removed, encodeCompactU16 and PAYMENT_HEADERS stripped from public API, README retryAfterMs units fixed
 
 ## Current Position
 
-Phase: 8 of 8 (CI and Type Integrity)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: Phase 8 complete — PaymentRequirements.amount canonical field, maxAmountRequired deprecated alias, HeyLolClient direct imports from ./options.js and ./retry.js
-Last activity: 2026-03-02 — Plan 08-02 complete (type alignment + circular import fix)
+Phase: 9 of 9 (Size Limit Fix and Tech Debt Cleanup)
+Plan: 1 of 1 in current phase (COMPLETE)
+Status: Phase 9 complete — .size-limit.json references only index.mjs, clean public API surface, README correct units
+Last activity: 2026-03-02 — Plan 09-01 complete (size-limit fix, leaked exports removed, README ms/s fix)
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [████████░░] 80%
 | Phase 07-readme-and-documentation-fixes P01 | 1min | 2 tasks | 2 files |
 | Phase 08-ci-and-type-integrity P01 | 2min | 2 tasks | 7 files |
 | Phase 08-ci-and-type-integrity P02 | 2min | 2 tasks | 5 files |
+| Phase 09-size-limit-fix-and-tech-debt-cleanup P01 | 2min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,9 @@ Recent decisions affecting current work:
 - [Phase 08-01]: @heylol/sdk/services subpath exported only SERVICES_VERSION constant — entirely vestigial, fully removed (exports/typesVersions/tsup entry/source file)
 - [Phase 08-ci-and-type-integrity]: PaymentRequirements.amount is the v2 canonical required field; maxAmountRequired is optional deprecated alias for v1 compat; normalizeRequirements() ensures amount is always set on parsed output
 - [Phase 08-ci-and-type-integrity]: HeyLolClient.ts imports DEFAULT_OPTIONS from ./options.js and retry functions from ./retry.js directly — eliminates circular barrel dependency HeyLolClient.ts -> client/index.ts -> HeyLolClient.ts
+- [Phase 09-01]: encodeCompactU16 is an internal auth utility — must not be exported from @heylol/sdk public API surface
+- [Phase 09-01]: PAYMENT_HEADERS is an internal constant — consumers use buildPaymentHeader() not raw header names
+- [Phase 09-01]: size-limit.json services.mjs entry was vestigial from Phase 8 cleanup that removed the /services subpath
 
 ### Pending Todos
 
@@ -151,5 +155,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 08-02-PLAN.md (PaymentRequirements v2 type alignment + HeyLolClient circular import fix — Phase 8 COMPLETE)
-Resume file: N/A — all phases complete
+Stopped at: Completed 09-01-PLAN.md (stale size-limit entry removed, leaked exports cleaned, README units fixed — Phase 9 COMPLETE)
+Resume file: N/A — all phases complete (v1.0 milestone gap-closure done)
