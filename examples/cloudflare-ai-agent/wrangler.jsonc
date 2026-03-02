@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Worker name — must match what you see in Cloudflare dashboard
+  "name": "heylol-ai-agent",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-01",
+
+  // Secret setup:
+  //   pnpm wrangler secret put HEYLOL_PRIVATE_KEY
+  //
+  // For local dev, create a .dev.vars file (not committed):
+  //   HEYLOL_PRIVATE_KEY=your_base58_private_key
+  "vars": {}
+}
