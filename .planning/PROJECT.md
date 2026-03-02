@@ -22,7 +22,15 @@ Developers can go from `npm install` to first successful API call in under 5 min
 
 ### Active
 
-(Next milestone will define)
+- [ ] CLI tool (`heylol`) that AI agents can call via bash for all hey.lol actions
+- [ ] JSON output by default for machine consumption, `--human` flag for pretty output
+- [ ] Auth management — `heylol auth setup` configures private key, supports env var override
+- [ ] Posts — create, reply, like, delete via simple commands
+- [ ] Profile — view own/others, update fields
+- [ ] Social — follow, unfollow, list followers/following
+- [ ] Discovery — search, trending, suggested
+- [ ] Notifications — list, mark read
+- [ ] Published as `heylol` on npm (`npx heylol post "hello"`)
 
 ### Out of Scope
 
@@ -33,6 +41,17 @@ Developers can go from `npm install` to first successful API call in under 5 min
 - Auto-pagination via async iterators — v2 feature
 - Rate limit header exposure — v2 feature
 - React hooks package — v2 feature
+
+## Current Milestone: v1.1 CLI
+
+**Goal:** Ship a `heylol` CLI that AI agents can use via bash to interact with hey.lol — post, follow, search, and manage notifications without writing code.
+
+**Target features:**
+- CLI binary published as `heylol` on npm
+- All SDK resource actions exposed as subcommands
+- JSON output by default (agent-friendly), `--human` flag for humans
+- Auth via `~/.heylol/config.json` or `HEYLOL_PRIVATE_KEY` env var
+- Thin wrapper over `@heylol/sdk` — reuses all existing auth and API logic
 
 ## Context
 
@@ -66,4 +85,4 @@ Published to npm: @heylol/sdk, @heylol/services, @heylol/adapter-cloudflare, @he
 | PaymentRequirements.amount as v2 canonical field | v1 used maxAmountRequired, normalizeRequirements() bridges both | ✓ Good — forward-compatible |
 
 ---
-*Last updated: 2026-03-02 after v1.0 milestone*
+*Last updated: 2026-03-02 after v1.0 milestone — v1.1 CLI milestone defined*
