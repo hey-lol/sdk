@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation (completed 2026-03-02)
 - [x] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline (completed 2026-03-02)
 - [x] **Phase 7: README & Documentation Fixes** - Fix broken README code examples, complete SUMMARY frontmatter (Gap Closure)
-- [ ] **Phase 8: CI & Type Integrity** - pnpm version alignment, attw expansion, type consistency, dependency cleanup, API surface cleanup (Gap Closure)
+- [x] **Phase 8: CI & Type Integrity** - pnpm version alignment, attw expansion, type consistency, dependency cleanup, API surface cleanup (Gap Closure) (completed 2026-03-02)
 
 ## Phase Details
 
@@ -144,7 +144,7 @@ Plans:
   5. `@heylol/sdk/services` subpath exports meaningful functionality or is removed
   6. `encodeCompactU16` is not exported from @heylol/sdk public API (moved to internal)
   7. Client barrel circular import resolved with direct imports
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 08-01-PLAN.md — CI pnpm version fix, attw expansion, phantom dependency removal, services subpath cleanup
 - [ ] 08-02-PLAN.md — PaymentRequirements v2 type alignment and circular barrel import fix
@@ -163,4 +163,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Services Package | 3/3 | Complete | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
 | 7. README & Documentation Fixes | 1/1 | Complete    | 2026-03-02 |
-| 8. CI & Type Integrity | 0/2 | Planned | — |
+| 8. CI & Type Integrity | 2/2 | Complete   | 2026-03-02 |

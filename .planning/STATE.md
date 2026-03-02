@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 7 complete — README error-handling property name fixes and 06-03-SUMMARY.md requirements-completed frontmatter backfill
+**Current focus:** Phase 8 in progress — CI pnpm version fix, attw all-packages coverage, phantom dependency removal, vestigial subpath cleanup
 
 ## Current Position
 
-Phase: 7 of 7 (README and Documentation Fixes)
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase 7 complete — README err.retryAfterMs + err.statusCode corrected; 06-03-SUMMARY.md requirements-completed backfilled; all phases complete
-Last activity: 2026-03-02 — Plan 07-01 complete (README error-handling fixes + requirements-completed frontmatter)
+Phase: 8 of 8 (CI and Type Integrity)
+Plan: 1 of 2 in current phase (COMPLETE)
+Status: Phase 8 plan 01 complete — CI pnpm corrected to packageManager field, attw loops all packages, @x402/core removed from services, @heylol/sdk/services subpath fully removed
+Last activity: 2026-03-02 — Plan 08-01 complete (CI fixes + phantom dep removal + vestigial subpath cleanup)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -55,6 +55,8 @@ Progress: [██████████] 100%
 | Phase 06-adapters-docs-and-release P02 | 5min | 2 tasks | 12 files |
 | Phase 06-adapters-docs-and-release P03 | 12min | 2 tasks | 17 files |
 | Phase 07-readme-and-documentation-fixes P01 | 1min | 2 tasks | 2 files |
+| Phase 08-ci-and-type-integrity P01 | 2min | 2 tasks | 7 files |
+| Phase 08-ci-and-type-integrity P02 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -130,6 +132,12 @@ Recent decisions affecting current work:
 - [Phase 06-03]: examples/nextjs-dashboard/.gitignore excludes .next/ — staging build artifacts stalls Biome pre-commit hook on compiled JS
 - [Phase 07-01]: README error-handling uses err.retryAfterMs (RateLimitError) and err.statusCode (APIError) — verified against packages/sdk/src/errors/index.ts
 - [Phase 07-01]: requirements-completed backfilled to 06-03-SUMMARY.md for DOCS-02/03/04; DOCS-01 belongs to Phase 7 only
+- [Phase 08-01]: pnpm/action-setup@v4 with no version: field reads packageManager from root package.json — removing hardcoded version: 9 fixes pnpm@10.21.0 mismatch
+- [Phase 08-01]: attw loop `for pkg in packages/*/` validates all 5 publishable packages — more maintainable than per-package hardcoding
+- [Phase 08-01]: @x402/core was phantom dependency in services — never imported in source, removed from dependencies and tsup external[]
+- [Phase 08-01]: @heylol/sdk/services subpath exported only SERVICES_VERSION constant — entirely vestigial, fully removed (exports/typesVersions/tsup entry/source file)
+- [Phase 08-ci-and-type-integrity]: PaymentRequirements.amount is the v2 canonical required field; maxAmountRequired is optional deprecated alias for v1 compat; normalizeRequirements() ensures amount is always set on parsed output
+- [Phase 08-ci-and-type-integrity]: HeyLolClient.ts imports DEFAULT_OPTIONS from ./options.js and retry functions from ./retry.js directly — eliminates circular barrel dependency HeyLolClient.ts -> client/index.ts -> HeyLolClient.ts
 
 ### Pending Todos
 
@@ -143,5 +151,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 07-01-PLAN.md (README error-handling property names fixed, 06-03-SUMMARY.md requirements-completed backfilled — Phase 7 COMPLETE)
-Resume file: N/A — all phases complete
+Stopped at: Completed 08-01-PLAN.md (CI pnpm fix, attw all-packages, @x402/core removed, @heylol/sdk/services subpath removed)
+Resume file: .planning/phases/08-ci-and-type-integrity/08-02-PLAN.md
