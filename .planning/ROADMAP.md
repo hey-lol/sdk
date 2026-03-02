@@ -110,6 +110,11 @@ Plans:
   3. An Express app using the Express `RequestHandler` middleware processes authenticated requests end-to-end
   4. A developer unfamiliar with the project follows the README quickstart and completes a first post in under 5 minutes
   5. All public methods have JSDoc with examples, and `pnpm publish --dry-run` against a packed tarball passes `attw --pack .` with zero TypeScript declaration errors
+**Plans:** 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Runtime adapters: Cloudflare Workers, Vercel Edge, and Express middleware
+- [ ] 06-02-PLAN.md — JSDoc/TSDoc documentation on all public methods across SDK and services
+- [ ] 06-03-PLAN.md — README quickstart, example projects, and publish pipeline validation
 
 ## Progress
 
@@ -123,4 +128,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
 | 4. API Wrappers | 2/3 | Complete    | 2026-03-01 |
 | 5. Services Package | 2/3 | Complete    | 2026-03-02 |
-| 6. Adapters, Docs, and Release | 0/TBD | Not started | - |
+| 6. Adapters, Docs, and Release | 0/3 | Not started | - |
