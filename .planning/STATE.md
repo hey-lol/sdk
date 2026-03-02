@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 4 complete — API Wrappers (all 5 resource namespaces delivered)
+**Current focus:** Phase 5 in progress — Services Package (types, registerService, create402Response delivered)
 
 ## Current Position
 
-Phase: 4 of 6 (API Wrappers)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase 4 complete — all 5 resource namespaces (posts, profile, social, discovery, notifications) wired into HeyLolClient
-Last activity: 2026-03-01 — Plan 04-03 complete (SocialResource, DiscoveryResource, NotificationsResource, full barrel exports, 159 tests)
+Phase: 5 of 6 (Services Package)
+Plan: 1 of 3 in current phase (COMPLETE)
+Status: Phase 5 Plan 01 complete — @heylol/services types, registerService(), create402Response(), 12 tests
+Last activity: 2026-03-02 — Plan 05-01 complete (PriceConfig/ServiceDefinition types, registerService factory, create402Response x402 v2 generator)
 
-Progress: [█████████░] 67%
+Progress: [█████████░] 70%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [█████████░] 67%
 | Phase 04-api-wrappers P01 | 2min | 2 tasks | 5 files |
 | Phase 04-api-wrappers P02 | 2min | 2 tasks | 4 files |
 | Phase 04-api-wrappers P03 | 6min | 2 tasks | 10 files |
+| Phase 05-services-package P01 | 3min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - [Phase 04-03]: markRead() body guard: ids && ids.length > 0 ? { ids } : undefined — undefined body means mark-all-read, avoids empty-array ambiguity
 - [Phase 04-03]: PaginationParams cast as Record<string, string | number | undefined> for typed get() — structurally matches cursor?: string and limit?: number
 - [Phase 04-03]: resources/index.ts excluded from coverage — barrel re-export pattern established for all boundary index files
+- [05-01]: Zod devDep at v4 (^4.3.6) with peerDependency ^3.24.0 || ^4.0.0 — installed latest, support both v3+v4 consumers
+- [05-01]: create402Response() inlines btoa(JSON.stringify()) rather than importing from @x402/core/http — avoids full module pull for trivial one-liner
+- [05-01]: types.ts excluded from coverage via vitest.config.ts — TypeScript interface-only file has no runtime code
+- [05-01]: @x402/core externalized in tsup external[] — consumers must provide it, prevents bundling
 
 ### Pending Todos
 
@@ -112,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 04-03-PLAN.md (SocialResource, DiscoveryResource, NotificationsResource, full HeyLolClient wiring, 159 tests)
-Resume file: .planning/phases/05-*/05-01-PLAN.md (Phase 5 — Services/Zod validation layer)
+Last session: 2026-03-02
+Stopped at: Completed 05-01-PLAN.md (PriceConfig/ServiceDefinition types, registerService factory, create402Response x402 v2 generator, 12 tests)
+Resume file: .planning/phases/05-services-package/05-02-PLAN.md (Phase 5 Plan 2 — middleware)
