@@ -134,7 +134,7 @@ Plans:
 ### Phase 8: CI & Type Integrity
 **Goal**: CI validates all packages consistently, types are aligned across SDK and services, and the public API surface contains no phantom dependencies or leaked internals
 **Depends on**: Phase 6
-**Requirements**: INFRA-01, INFRA-04, INFRA-05, AUTH-04, SVC-01, SVC-02, SVC-03, SVC-04, SVC-05, SVC-06, TYPE-01
+**Requirements**: INFRA-01, INFRA-04, INFRA-05, AUTH-04, TYPE-01
 **Gap Closure:** Closes gaps from v1.0 audit
 **Success Criteria** (what must be TRUE):
   1. CI pnpm version matches package.json `packageManager` field
