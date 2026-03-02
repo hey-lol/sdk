@@ -1,3 +1,5 @@
+export type { ServiceHandler, X402ServiceOptions } from './handler.js';
+export { createX402Service } from './handler.js';
 export type { RegisterServiceOptions } from './register.js';
 export { registerService } from './register.js';
 export type { Create402Options } from './response.js';
