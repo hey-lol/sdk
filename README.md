@@ -168,9 +168,9 @@ try {
   if (err instanceof AuthError) {
     console.error('Authentication failed — check your private key');
   } else if (err instanceof RateLimitError) {
-    console.error(`Rate limited. Retry after ${err.retryAfter}s`);
+    console.error(`Rate limited. Retry after ${err.retryAfterMs}s`);
   } else if (err instanceof APIError) {
-    console.error(`API error ${err.status}: ${err.message}`);
+    console.error(`API error ${err.statusCode}: ${err.message}`);
   } else if (err instanceof NetworkError) {
     console.error(`Network error: ${err.message}`);
   }
