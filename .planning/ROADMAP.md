@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications (completed 2026-03-01)
 - [x] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation (completed 2026-03-02)
 - [x] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline (completed 2026-03-02)
-- [ ] **Phase 7: README & Documentation Fixes** - Fix broken README code examples, complete SUMMARY frontmatter (Gap Closure)
+- [x] **Phase 7: README & Documentation Fixes** - Fix broken README code examples, complete SUMMARY frontmatter (Gap Closure)
 - [ ] **Phase 8: CI & Type Integrity** - pnpm version alignment, attw expansion, type consistency, dependency cleanup, API surface cleanup (Gap Closure)
 
 ## Phase Details
@@ -129,7 +129,7 @@ Plans:
   3. 06-03-SUMMARY.md frontmatter includes `requirements-completed` for DOCS-02, DOCS-03, DOCS-04
 **Plans:** 1 plan
 Plans:
-- [ ] 07-01-PLAN.md — Fix README error property names and add requirements-completed to 06-03-SUMMARY.md
+- [x] 07-01-PLAN.md — Fix README error property names and add requirements-completed to 06-03-SUMMARY.md
 
 ### Phase 8: CI & Type Integrity
 **Goal**: CI validates all packages consistently, types are aligned across SDK and services, and the public API surface contains no phantom dependencies or leaked internals
@@ -158,5 +158,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. API Wrappers | 3/3 | Complete | 2026-03-01 |
 | 5. Services Package | 3/3 | Complete | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
-| 7. README & Documentation Fixes | 0/1 | Planned | — |
+| 7. README & Documentation Fixes | 1/1 | Complete | 2026-03-02 |
 | 8. CI & Type Integrity | 0/0 | Pending | — |

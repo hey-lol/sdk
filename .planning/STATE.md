@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 6 complete — Adapters, docs, release pipeline validated (06-01 adapters, 06-02 JSDoc/TSDoc, 06-03 README + examples + publish dry-run)
+**Current focus:** Phase 7 complete — README error-handling property name fixes and 06-03-SUMMARY.md requirements-completed frontmatter backfill
 
 ## Current Position
 
-Phase: 6 of 6 (Adapters, Docs, and Release)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase 6 complete — README quickstart, 3 example projects, all 5 packages attw + publish dry-run validated; 226 total tests pass
-Last activity: 2026-03-02 — Plan 06-03 complete (README + cloudflare-ai-agent + x402-service-provider + nextjs-dashboard examples; full CI green)
+Phase: 7 of 7 (README and Documentation Fixes)
+Plan: 1 of 1 in current phase (COMPLETE)
+Status: Phase 7 complete — README err.retryAfterMs + err.statusCode corrected; 06-03-SUMMARY.md requirements-completed backfilled; all phases complete
+Last activity: 2026-03-02 — Plan 07-01 complete (README error-handling fixes + requirements-completed frontmatter)
 
 Progress: [██████████] 100%
 
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 06-adapters-docs-and-release P01 | 4min | 2 tasks | 14 files |
 | Phase 06-adapters-docs-and-release P02 | 5min | 2 tasks | 12 files |
 | Phase 06-adapters-docs-and-release P03 | 12min | 2 tasks | 17 files |
+| Phase 07-readme-and-documentation-fixes P01 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,8 @@ Recent decisions affecting current work:
 - [Phase 06-03]: nextjs-dashboard depends on @heylol/sdk directly — adapter-vercel peers SDK, consumers importing types need explicit dep
 - [Phase 06-03]: next/app Router requires app/layout.tsx — root layout mandatory for every Next.js 15 App Router project
 - [Phase 06-03]: examples/nextjs-dashboard/.gitignore excludes .next/ — staging build artifacts stalls Biome pre-commit hook on compiled JS
+- [Phase 07-01]: README error-handling uses err.retryAfterMs (RateLimitError) and err.statusCode (APIError) — verified against packages/sdk/src/errors/index.ts
+- [Phase 07-01]: requirements-completed backfilled to 06-03-SUMMARY.md for DOCS-02/03/04; DOCS-01 belongs to Phase 7 only
 
 ### Pending Todos
 
@@ -140,5 +143,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 06-03-PLAN.md (README quickstart, 3 example projects, all 5 packages attw + publish dry-run green — Phase 6 COMPLETE)
+Stopped at: Completed 07-01-PLAN.md (README error-handling property names fixed, 06-03-SUMMARY.md requirements-completed backfilled — Phase 7 COMPLETE)
 Resume file: N/A — all phases complete
