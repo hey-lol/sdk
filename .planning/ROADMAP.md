@@ -161,6 +161,9 @@ Plans:
   3. `06-02-SUMMARY.md` frontmatter lists TYPE-04 in `requirements-completed`
   4. `encodeCompactU16` and `PAYMENT_HEADERS` are not exported from `@heylol/sdk` public API
   5. README error handling example displays `retryAfterMs` without misleading seconds suffix
+**Plans:** 1 plan
+Plans:
+- [ ] 09-01-PLAN.md — Fix size-limit config, remove leaked exports, correct README ms/s label
 
 ## Progress
 
