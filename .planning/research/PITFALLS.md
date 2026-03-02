@@ -1,210 +1,332 @@
 # Pitfalls Research
 
-**Domain:** Pure JS crypto SDK — x402 payments, Solana serialization, multi-runtime npm package
-**Researched:** 2026-02-28
-**Confidence:** HIGH (training knowledge current through Aug 2025 for these domains; confirmed against known CF Workers, @noble/curves, and npm packaging behavior)
+**Domain:** CLI tool added to existing TypeScript SDK monorepo (pnpm + Turborepo + tsup)
+**Researched:** 2026-03-02
+**Confidence:** HIGH for npm bin/shebang/tsup mechanics (well-documented, reproducible); HIGH for JSON stdout/stderr patterns (CLI best-practices literature is consistent); MEDIUM for config file atomicity (Node.js docs + community); MEDIUM for Turborepo build-order with new package (known patterns, project-specific tuning needed)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Using `crypto.getRandomValues` or `TextEncoder` Without Guards
+### Pitfall 1: Shebang Stripped or Duplicated by tsup When Bundling CLI Entry
 
 **What goes wrong:**
-Code that uses `crypto` as a bare global works in browsers and Node.js 19+ but silently breaks in Node.js 18 where `globalThis.crypto` may not be populated depending on the ESM/CJS loading context. The `TextEncoder` global is similarly absent in some Deno edge environments if the runtime hasn't initialized it. The result is a `ReferenceError: crypto is not defined` or `TextEncoder is not defined` that only surfaces when a downstream user runs on a specific runtime.
+tsup automatically detects a `#!/usr/bin/env node` shebang in the entry file and makes the output executable. However, if the CLI is bundled into both ESM and CJS formats (matching the SDK's tsup config of `format: ['esm', 'cjs']`), the shebang appears on both `dist/cli.mjs` and `dist/cli.cjs`. The `bin` field in `package.json` can only point to one file. Pointing `"heylol": "./dist/cli.mjs"` works in Node.js 18+ ESM mode but fails in environments where `.mjs` is not understood. Pointing to `dist/cli.cjs` works universally but requires the shebang to be on that file specifically. If the tsup config uses `outExtension` to produce `.mjs`/`.cjs` (as the SDK does), the shebang placement must be verified manually after every build because tsup applies the shebang to the entry-matched output — it may not carry to all format variants.
 
 **Why it happens:**
-Developers test in Node.js 20 or Bun (both have `globalThis.crypto`), miss that Node.js 18's `globalThis.crypto` is only available via `--experimental-global-webcrypto` flag before 18.19. They write `crypto.subtle.digest(...)` and ship it.
+The SDK's tsup config produces dual-format output for library consumers. Developers copying that config verbatim for the CLI package get a dual-format binary. The `bin` field then points ambiguously. tsup's auto-shebang behavior is format-aware but the documentation is sparse on what happens with dual format + outExtension.
 
 **How to avoid:**
-Use `@noble/curves` and `@noble/hashes` exclusively — they already handle the cross-runtime crypto shim. Never call `globalThis.crypto.subtle` directly in core package code. If you must call Web Crypto (e.g., for HMAC), write a helper: `const subtle = (globalThis.crypto ?? require('crypto').webcrypto).subtle` — but wrap in a runtime capability check first. Include Node.js 18 in CI matrix explicitly.
+The CLI entry should use a **single format: `'cjs'`** in its own `tsup.config.ts`. CJS is universally supported in Node.js 18+ without flags, works with `#!/usr/bin/env node`, and eliminates format ambiguity. Do not reuse the SDK's tsup config. Create a separate `packages/cli/tsup.config.ts` with:
+```ts
+export default defineConfig({
+  entry: { cli: 'src/cli.ts' },
+  format: ['cjs'],
+  platform: 'node',
+  target: 'node18',
+  banner: { js: '#!/usr/bin/env node' },
+  noExternal: [],   // bundle workspace dep @heylol/sdk entirely
+  clean: true,
+});
+```
+The `banner` option injects the shebang even if the source file doesn't have one, and it's always placed correctly on CJS output. Verify after build: `head -1 dist/cli.cjs` must be `#!/usr/bin/env node`.
 
 **Warning signs:**
-- Any bare `crypto.subtle` or `crypto.getRandomValues` call in the codebase that isn't inside a try/catch with fallback
-- Missing `"engines": {"node": ">=18.19"}` in package.json (if 18.x is supported)
-- CI only testing Node.js 20+
+- `tsup.config.ts` for CLI has `format: ['esm', 'cjs']` copied from the SDK config
+- `bin` field points to a `.mjs` file
+- `head -1 dist/cli.cjs` shows something other than `#!/usr/bin/env node`
+- `node dist/cli.cjs` works but `heylol` (installed binary) does not
 
-**Phase to address:** Phase 1 — Core crypto foundation. Establish the "no bare globals" rule before writing any crypto code.
+**Phase to address:** Phase 1 — CLI package scaffold. Establish the correct tsup config before writing any command logic.
 
 ---
 
-### Pitfall 2: Solana Transaction Byte Layout Errors That Produce Valid-Looking But Rejected Transactions
+### Pitfall 2: Binary Not Executable After Install (chmod +x Missing from Published File)
 
 **What goes wrong:**
-Manually serialized Solana transactions get silently accepted by the serializer but rejected by validators or the hey.lol API with opaque errors. The most common causes: (a) wrong compact-u16 encoding for array lengths — Solana uses a non-standard varint where values 0-127 use 1 byte but 128+ use 2 bytes in little-endian with the MSB set in the low byte, not standard protobuf varint; (b) account key deduplication not done before signing — accounts that appear in multiple instructions must be deduplicated in the account list with specific ordering rules (signers first, then non-signers, then readonly); (c) wrong signature order — the fee payer must be the first account and first signature slot even if it wasn't listed first in instruction accounts.
+`npm publish` includes the binary file but the file permission bit `0o755` is not set. The binary is installed to `node_modules/.bin/heylol` but fails to execute with `Permission denied`. This is distinct from the shebang issue — the file is present and valid, but the OS refuses to run it because the executable bit is absent.
 
 **Why it happens:**
-Developers read the Solana transaction format docs but miss that `compact-u16` is documented separately from the main transaction doc. The deduplication + ordering rules are only fully specified in the Solana program library source code, not prominently in the docs. Off-by-one errors in buffer positions compound.
+On Unix systems, tsup sets the executable bit when it detects a shebang in the source entry. However, if the shebang is added via the `banner` option (not in the source file), tsup may not set the bit automatically in all versions. Additionally, if the file is created on a Windows machine (e.g., CI running on Windows runners), the executable bit is not preserved by `git` or `npm pack` because Windows has no equivalent concept. Developers test with `node dist/cli.cjs` directly (which ignores the bit) and don't notice until after install.
 
 **How to avoid:**
-Write byte-level unit tests against known-good transactions. Serialize a known transaction from Solana's test fixtures and compare byte-by-byte against your output. Specifically test: empty transaction (zero instructions), one instruction with two accounts, transaction where the same account appears in two instructions. For the zero-amount dummy transaction case, test that an all-zeros blockhash serializes to exactly the right 32 bytes in the right position. Use a reference implementation: the `@solana/transaction-messages` package from `@solana/kit` is pure JS and edge-compatible as a reference (not as a runtime dependency, but as a test oracle).
+Always add the shebang to the **source file** `src/cli.ts` as `#!/usr/bin/env node` on the first line — this is the primary signal tsup uses to set the executable bit. Use the `banner` option as a secondary guarantee. Add a post-build verification step:
+```bash
+node -e "const {statSync} = require('fs'); const m = statSync('dist/cli.cjs').mode; process.exit((m & 0o111) ? 0 : 1)" \
+  || (chmod +x dist/cli.cjs)
+```
+Run `npm pack --dry-run` and inspect the output — look for the `x` permission bit on the binary file. On Windows CI runners, explicitly run `chmod +x dist/cli.cjs` as a build step.
 
 **Warning signs:**
-- Any `ArrayBuffer` manipulation with magic number offsets (`buf[32] = ...`) without named constants for those offsets
-- Compact-u16 encoding written inline rather than as a tested utility function
-- No test that round-trips a serialized transaction through a known base64 decoder
+- CI runs only on Windows (GitHub Actions `windows-latest`) and never on `ubuntu-latest`
+- `ls -la dist/cli.cjs` shows `-rw-r--r--` (no `x` bit)
+- `npx heylol` works (npx sets the bit) but `heylol` after `npm install -g` does not
+- Build step does not include a chmod or verification
 
-**Phase to address:** Phase 2 — Solana transaction builder. Invest in byte-level tests before anything else in this phase.
+**Phase to address:** Phase 1 — Build tooling. Add the permission check to the `build` script before publishing any version.
 
 ---
 
-### Pitfall 3: `Buffer` Usage Breaking Cloudflare Workers
+### Pitfall 3: `@heylol/sdk` Workspace Dependency Not Built Before CLI Build
 
 **What goes wrong:**
-`Buffer` is not available in Cloudflare Workers by default. `Buffer.from(hex, 'hex')`, `Buffer.alloc()`, and `buf.toString('base64')` all throw `ReferenceError: Buffer is not defined`. This is an extremely common breakage point because Node.js developers reach for `Buffer` by reflex, and it works in Bun, Deno, and Node.js — giving false confidence that the code is "edge compatible."
+Turborepo's `"build": { "dependsOn": ["^build"] }` means "build all workspace dependencies before me." When `packages/cli` declares `"@heylol/sdk": "workspace:*"` as a dependency, Turborepo will build `@heylol/sdk` first. However, if the CLI is added to `packages/` but the workspace dependency is declared incorrectly (e.g., using a version range like `"^1.0.0"` instead of `"workspace:*"`), pnpm resolves it from the npm registry rather than the local workspace. The locally modified SDK is never seen by the CLI build — the published (potentially older) version is used instead. The bug is subtle: the build succeeds, but the CLI uses stale types and code.
 
 **Why it happens:**
-`Buffer` is a Node.js built-in that CF Workers does not polyfill by default. Even with `nodejs_compat` compatibility flag, Buffer may or may not be present depending on the CF Workers version and compatibility date. Many dependencies (including old versions of `bs58`) internally use `Buffer`, which means the breakage can come transitively.
+Developers copy the `dependencies` block from examples or the README which shows `"@heylol/sdk": "^1.0.0"`. In application code outside the monorepo this is correct. Inside the monorepo, the workspace protocol must be used.
 
 **How to avoid:**
-Ban `Buffer` entirely in core package. Enforce with an ESLint rule (`no-restricted-globals: ['error', 'Buffer']`) or a build-time check that greps the output bundle for `Buffer`. Replace all uses: hex encode/decode via `Uint8Array` and a small hex utility, base64 via `btoa`/`atob` with a `Uint8Array`-to-string conversion helper, array operations via `Uint8Array` directly. Verify that `bs58` v6+ does not use `Buffer` internally (it uses `Uint8Array` natively). Pin or test the exact `bs58` version in CI.
+In `packages/cli/package.json`, declare the SDK dependency as `"@heylol/sdk": "workspace:*"`. Verify with:
+```bash
+pnpm list --filter heylol @heylol/sdk
+```
+The output should show the local workspace path, not a registry version. Add a CI step that runs `pnpm install --frozen-lockfile` and verifies the lockfile does not resolve `@heylol/sdk` to a registry URL.
 
 **Warning signs:**
-- Any `import { Buffer }` or `const { Buffer } = require('buffer')`
-- `buf.toString('hex')` or `Buffer.from(str, 'base64')` anywhere in core or services packages
-- Not running the CF Workers compatibility test in CI
+- `pnpm-lock.yaml` shows `@heylol/sdk` resolving to a registry tarball URL instead of `link:../sdk`
+- CLI type errors that don't match the local SDK source
+- Changes to `packages/sdk/src/*.ts` not reflected in CLI behavior without a manual reinstall
+- `packages/cli/package.json` has `"@heylol/sdk": "^1.0.0"` (semver range, not workspace protocol)
 
-**Phase to address:** Phase 1 — Establish as a foundational constraint. Add ESLint rule in project setup before any implementation.
+**Phase to address:** Phase 1 — Monorepo package setup. Get the workspace link right before writing any command logic.
 
 ---
 
-### Pitfall 4: x402 Header Parsing Broken by Case Sensitivity or Whitespace
+### Pitfall 4: `files` Field Omits `dist/` or `bin` — Binary Not Shipped in Published Package
 
 **What goes wrong:**
-The `WWW-Authenticate` header returned by hey.lol contains the x402 challenge. HTTP headers are case-insensitive per spec, but JavaScript's `Headers` API (Fetch API) normalizes header names to lowercase, while some frameworks or proxy layers may not. If the parser does `headers.get('WWW-Authenticate')` it works, but `headers['WWW-Authenticate']` on a plain object (like Express's `req.headers`) returns `undefined` because Node.js lowercases them to `www-authenticate`. Additionally, the x402 v1 format and v2 format differ in how the JSON payload is embedded — v1 uses a base64-encoded JSON body directly in the header value after the scheme name, while v2 uses structured fields. Treating them identically causes silent parse failures.
+`npm publish` ships only files matching the `files` array in `package.json`. If `files` is set to `["dist"]` but the CLI entry was renamed or the tsup output path changed, the binary file is absent from the tarball. npm does not validate that files referenced in the `bin` field actually exist in the package. The package publishes successfully, users install it, and `heylol` fails with `env: node: No such file or directory` or a module-not-found error.
 
 **Why it happens:**
-Developers test against one response format and don't build the multi-format parser until they hit the other in production. Header case is a known gotcha but frequently missed because browser DevTools and Postman normalize display.
+npm's publish pipeline silently succeeds when `bin` references a missing path. The `files` field was set once and never updated when the build output path changed (e.g., from `dist/index.cjs` to `dist/cli.cjs`). Developers don't run `npm pack --dry-run` before publishing.
 
 **How to avoid:**
-Always access headers via `.get()` on the Fetch `Headers` object, never via property access on plain objects. When working with Express `req.headers`, call `.toLowerCase()` on the key. Write explicit tests for both x402 v1 and v2 response parsing, with real header string fixtures copied from the actual hey.lol API responses (not synthetic ones). Test parsing with extra whitespace in header values.
+Keep the `files` field explicit: `["dist", "README.md"]`. Before every publish, run `npm pack --dry-run` and verify the output includes the binary path referenced in `bin`. Better yet, run `publint` which specifically checks that `bin` entries exist on disk. Add a CI step:
+```bash
+cd packages/cli && npx publint .
+```
+publint catches missing bin files and mis-declared exports before they reach the registry.
 
 **Warning signs:**
-- Any `headers['WWW-Authenticate']` (bracket notation on plain object)
-- Any `if (version === 'v1')` branch in the parser that was added after initial shipping
-- Missing test fixtures for both x402 header formats
+- No `npm pack --dry-run` step in CI before publish
+- `publint` not in the CLI package's CI workflow
+- `files` field lists a directory that was renamed in a tsup config change
+- `npm install -g heylol` completes but `heylol --version` gives `Cannot find module`
 
-**Phase to address:** Phase 2 — x402 client implementation. Build a spec-compliant header parser with both format tests before building higher-level auth flow.
+**Phase to address:** Phase 1 (scaffold) and every release — add `publint` to the Turborepo `build` task output verification.
 
 ---
 
-### Pitfall 5: Subpath Exports Package.json Configuration Causing Resolution Failures
+### Pitfall 5: Mixed stdout/stderr Output Breaking JSON Pipe Consumers
 
 **What goes wrong:**
-`"exports"` in `package.json` is strict — if a path is not listed in the `exports` map, it is unreachable and throws `ERR_PACKAGE_PATH_NOT_EXPORTED`. This is fine in principle but creates operational failures when: (a) TypeScript's `moduleResolution: "node"` (pre-bundler) doesn't read `exports` at all, causing `.d.ts` files to not resolve; (b) the `"types"` condition must come before `"import"` and `"require"` in the exports entry, or TypeScript ignores it; (c) Rollup, esbuild, and Vite each have slightly different behaviors when resolving `exports` with `"browser"` condition vs. `"worker"` condition — what works in Vite may fail in esbuild with the same package.
+The CLI is designed for machine consumption: JSON on stdout, errors on stderr. But diagnostic messages, warnings, and progress indicators leak onto stdout, breaking JSON pipes. The most common forms: (a) a `console.log('Authenticating...')` left in auth setup code; (b) SDK internals that write to stdout instead of stderr; (c) error paths that call `console.error(err)` which writes the full `Error` object with a stack trace — the agent parsing stderr sees `Error: ...` followed by a multi-line stack, not a JSON error object; (d) the human-readable `--human` flag accidentally also enabled on the JSON code path due to a conditional bug.
 
 **Why it happens:**
-The `exports` field spec was finalized in Node.js 12 but TypeScript support for it (via `moduleResolution: "bundler"` or `"node16"`) came later. Most tutorials still show the old `"main"` + `"module"` pattern. The condition ordering requirement (`"types"` first) is documented but buried.
+JavaScript's `console.log` defaults to stdout. Developers habitually use it for debugging and forget to remove it. The SDK's error classes have `toJSON()` methods, but `console.error(err)` calls `err.toString()` (or the V8 Error formatter), not `toJSON()`. The distinction between stdout and stderr is easy to verify manually but hard to enforce without tests.
 
 **How to avoid:**
-Use `"moduleResolution": "bundler"` in the SDK's `tsconfig.json`. In `package.json` exports, always put conditions in this order: `"types"`, `"import"`, `"require"`, `"default"`. Include `"browser"` and `"worker"` conditions where the implementation differs. Run `publint` and `@arethetypeswrong/cli` (attw) as part of the release pipeline — these tools catch exports misconfiguration before publish. Add a smoke test that does `import { something } from '@heylol/sdk/services'` in a fresh TypeScript project with `moduleResolution: "bundler"` and also `"node16"`.
+Strict rule: **all user-facing output goes through a single `Output` module** that routes based on mode:
+- JSON mode: `process.stdout.write(JSON.stringify(result) + '\n')` for success; `process.stderr.write(JSON.stringify(errorObj) + '\n')` for errors
+- Human mode: formatted text to stdout, formatted errors to stderr
+
+Never call `console.log` or `console.error` in command handlers — route through the Output module. Write an integration test that pipes CLI output through `JSON.parse()` for every command and asserts valid JSON:
+```bash
+heylol profile get | jq . # must succeed with exit 0
+```
 
 **Warning signs:**
-- `tsconfig.json` using `"moduleResolution": "node"` (not "bundler" or "node16")
-- No `publint` in CI
-- Package published with `"main"` and `"module"` but no `"exports"` field
-- Types failing to resolve for subpath imports
+- Any `console.log` in `packages/cli/src/commands/`
+- Error handler that does `console.error(err)` instead of `output.error(err.toJSON())`
+- `heylol --version 2>/dev/null | jq .` fails (stdout contains non-JSON)
+- `--human` flag logic implemented as a global mutable variable rather than passed through the Output module
 
-**Phase to address:** Phase 1 — Project setup. Configure `exports` correctly in the monorepo before writing any implementation.
+**Phase to address:** Phase 2 — Command implementation. Establish the Output module as the first thing before writing any command, and add stdout-must-be-JSON tests to CI.
 
 ---
 
-### Pitfall 6: Ed25519 Signing Output Mutation Causing Intermittent Signature Failures
+### Pitfall 6: Non-Zero Exit Code Not Set on Error — Agent Misreads Failure as Success
 
 **What goes wrong:**
-`@noble/curves` signing returns a `Uint8Array`. If that array is passed into a transaction builder that modifies it in-place (e.g., writing it into a larger buffer using `set()`), and the original reference is reused, the signature bytes can be overwritten mid-flow. This produces signatures that fail verification intermittently — the bug only manifests when the same key signs twice in rapid succession in the same JavaScript microtask queue, which happens in testing loops but rarely in production single-sign flows.
+The CLI throws an error (network failure, auth failure, API error) but exits with code `0` because the error was caught but `process.exit(1)` was not called, or because Node.js's unhandled rejection behavior (Node 15+) terminates with a non-zero code but the stderr output is not a JSON object — it's a raw error string. Agent automation checks exit codes before parsing stdout: if exit code is `0` and stdout has content, the agent treats it as success. If the actual JSON output is `{}` or missing a field because an error was silently swallowed, the agent proceeds with incorrect data.
 
 **Why it happens:**
-JavaScript developers are accustomed to string immutability. `Uint8Array` is mutable and shared by reference. The `@noble/curves` API returns a new array each call, but if calling code caches the result in a closure and reuses it, subtle aliasing bugs emerge.
+Async command handlers that `throw` propagate rejections. In some frameworks, the top-level CLI runner catches those rejections and logs them but exits `0` (treating logging as "handled"). Developers test the happy path and miss that the error path's exit code is wrong.
 
 **How to avoid:**
-Always copy signature bytes into the transaction buffer immediately and discard the source reference: `txBuffer.set(sig.slice(), offset)` not `txBuffer.set(sig, offset)`. Use `Object.freeze` on the signature array if you cache it at all (though this only prevents direct mutation, not `TypedArray.prototype.set` writes). Write a test that builds two transactions with the same key back-to-back and verifies both signatures are valid independently.
+Map all error types to specific exit codes and always call `process.exit()` explicitly at the top-level error boundary:
+
+| Exit Code | Meaning |
+|-----------|---------|
+| 0 | Success |
+| 1 | General / unexpected error |
+| 2 | Invalid arguments / usage error |
+| 3 | Auth failure (bad key, missing key) |
+| 4 | Network failure |
+| 5 | API error (4xx/5xx from hey.lol) |
+
+The top-level handler pattern:
+```ts
+main().catch((err) => {
+  output.error(err.toJSON?.() ?? { code: 'UNKNOWN', message: String(err) });
+  process.exit(getExitCode(err));
+});
+```
+Add integration tests that check `$?` after failed invocations:
+```bash
+HEYLOL_PRIVATE_KEY=invalid heylol profile get; test $? -eq 3
+```
 
 **Warning signs:**
-- Any `const sig = sign(...)` followed by a reference passed around without `.slice()` copy
-- Missing test for repeated signing with the same key
-- Signature verification not tested independently of the signing call
+- Top-level CLI runner uses `.catch(console.error)` without `process.exit`
+- CI tests only check stdout content, never `$?`
+- `heylol invalid-command; echo $?` prints `0`
+- Error boundary catches `SdkError` but doesn't differentiate AuthError from NetworkError for exit code
 
-**Phase to address:** Phase 2 — Solana transaction builder and x402 auth. This is a signing-layer concern.
+**Phase to address:** Phase 2 — The exit code map and top-level error boundary must be defined before any command is considered "done."
 
 ---
 
-### Pitfall 7: Zero-Amount Dummy Transaction All-Zeros Blockhash Rejected as Malformed
+### Pitfall 7: Private Key Leaking into Error Messages, Logs, or Stack Traces
 
 **What goes wrong:**
-The zero-amount wallet identification flow uses a dummy Solana transaction with an all-zeros blockhash (`new Uint8Array(32).fill(0)`). Some validators and API validators reject this because they check `blockhash !== PublicKey.default.toBase58()` — i.e., they explicitly check that the blockhash is not all-zeros as a sanity check. If hey.lol's API server validates the blockhash field format (not just its validity on-chain), the entire zero-amount flow breaks silently if the API server is updated to add this check.
+The CLI reads a private key from `~/.heylol/config.json` or `HEYLOL_PRIVATE_KEY`. If an error occurs during auth (e.g., `loadKeypair` throws with an invalid key), the thrown error's message may contain the raw key string if the developer does `throw new Error(`Invalid key: ${privateKey}`)`. Even if the SDK's `AuthError.toJSON()` is clean (and it is — verified in the SDK source), the CLI layer may expose the key by: (a) logging the full environment variable in debug output; (b) including the private key string in a "did you mean...?" suggestion; (c) the Node.js unhandled rejection handler printing the full `cause` chain.
 
 **Why it happens:**
-The zero-amount pattern is a convention for wallet identification without payment — it's not part of the Solana protocol spec. It's a hey.lol-specific convention. If the API team tightens validation on their side, all SDKs built on this convention break at once.
+Developers add diagnostic context to help users fix problems: "The key you provided was: [key]..." This is natural for debugging but catastrophic for a private key. The SDK's `AuthError` is intentionally clean, but CLI code that wraps it and adds "helpful" context can undo this safety.
 
 **How to avoid:**
-Document this as a known protocol assumption. Pin to a specific hey.lol API version or include a runtime check: before sending, call a lightweight API endpoint that confirms the zero-amount format is still accepted (a `HEAD` request to the auth endpoint). Build the dummy transaction construction in a single, isolated function (`buildDummyTransaction`) with a clear comment: "This format is hey.lol-specific and may change — see API changelog." Write an integration test that actually sends a zero-amount request to the hey.lol API (not mocked) in CI.
+Define a firm rule: **the private key value never appears in any string that gets written to stdout, stderr, or any log**. Enforce with a test:
+```ts
+// After a failed auth attempt, verify the key is not in stderr
+const result = spawnSync('heylol', ['profile', 'get'], {
+  env: { HEYLOL_PRIVATE_KEY: 'TESTKEYVALUE123' }
+});
+assert(!result.stderr.toString().includes('TESTKEYVALUE123'));
+```
+In error messages, reference the key source ("the key loaded from HEYLOL_PRIVATE_KEY"), not the key value. Truncate to first/last 4 chars maximum if any reference is needed for debugging: `key[0:4]...key[-4:]`. Never log `process.env` wholesale.
 
 **Warning signs:**
-- Zero-amount transaction building scattered across multiple files instead of isolated
-- No integration test against the real API
-- No comment in code referencing the hey.lol protocol convention
+- Any error message template literal that interpolates a variable that could be a private key
+- `console.error(process.env)` or similar env dumps in debug paths
+- Error handler that includes `cause.message` from `AuthError` without inspecting whether the message contains key material
+- Missing test that verifies the key value doesn't appear in error output
 
-**Phase to address:** Phase 2 — Zero-amount wallet identification. Isolate and document the convention on day one of that phase.
+**Phase to address:** Phase 2 — Auth command implementation. Add the key-leak test to the auth setup phase specifically.
 
 ---
 
-### Pitfall 8: ESM/CJS Dual Package Hazard Causing Double Module Instances
+### Pitfall 8: Config File Write Race Condition and Permissions
 
 **What goes wrong:**
-Publishing a package as both ESM and CJS (dual package) without careful singleton management causes two instances of the module to load simultaneously in the same process. This is the "dual package hazard" documented in the Node.js docs. For a crypto SDK, the consequences are subtle: two separate copies of internal state (e.g., curve point caches in `@noble/curves`) double memory use, and any module-level singleton (e.g., a cached keypair or nonce manager) gets two separate instances that diverge.
+`heylol auth setup` writes the private key to `~/.heylol/config.json`. If two instances run simultaneously (unlikely for a user CLI, but possible in CI/CD), or if the write is interrupted by a signal, the config file is left partially written or truncated. A truncated JSON file causes all subsequent commands to fail with a `SyntaxError: Unexpected end of JSON input` that looks like a bug in the CLI, not a write failure. Additionally, if `~/.heylol/` is created without explicit mode `0o700` and `config.json` without `0o600`, other users on a shared system can read the private key.
 
 **Why it happens:**
-Tooling like `tsup` makes it easy to output both CJS and ESM. Developers do it "for compatibility" without understanding that when both are present and a consumer's bundler picks CJS for one import path and ESM for another, both load. The hazard is documented but rarely encountered in testing because test runners use one format consistently.
+`fs.writeFileSync(path, JSON.stringify(config))` is not atomic — if the process is killed mid-write, the file is truncated. `fs.mkdirSync('~/.heylol')` uses a default umask that may be `0o755` (world-readable directory). Developers test on single-user dev machines and don't notice permission issues.
 
 **How to avoid:**
-Ship ESM-only for the core package. Provide a CJS wrapper only for the Express adapter (`@heylol/sdk-express`) where Node.js CJS-only environments are the actual target. Use the Node.js dual package hazard pattern if CJS must be supported: export a shared singleton from a separate `state.js` file that both ESM and CJS re-export, preventing divergence. Run the `are-the-types-wrong` tool to verify the package doesn't trigger the hazard.
+Write atomically: write to a temp file, then `fs.renameSync(tmpPath, configPath)` — rename is atomic on POSIX. Set explicit permissions:
+```ts
+import { writeFileSync, mkdirSync, renameSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+
+// Create directory with restricted permissions
+mkdirSync(configDir, { recursive: true, mode: 0o700 });
+
+// Write atomically
+const tmp = join(tmpdir(), `heylol-config-${process.pid}.json`);
+writeFileSync(tmp, JSON.stringify(config, null, 2), { mode: 0o600 });
+renameSync(tmp, configPath);
+```
+On read, catch `SyntaxError` from `JSON.parse` and show a clear error: "Config file is corrupted. Run `heylol auth setup` to reconfigure." Check that the config directory and file have correct permissions at startup, warn if not (don't block, warn).
 
 **Warning signs:**
-- `tsup` config outputting both `dist/index.js` (CJS) and `dist/index.mjs` (ESM) without a `state.js` singleton
-- Consumer imports where `require('@heylol/sdk')` and `import '@heylol/sdk'` both appear in the same build
+- `fs.writeFileSync(configPath, ...)` without a temp-file-and-rename pattern
+- `mkdirSync` without explicit `mode: 0o700`
+- No `try/catch` around `JSON.parse(configContent)` in config read path
+- `ls -la ~/.heylol/` shows `drwxr-xr-x` (world-readable) or `-rw-r--r--` (world-readable file)
 
-**Phase to address:** Phase 1 — Build tooling and package structure setup.
+**Phase to address:** Phase 2 — Auth config command. Get the atomic write and permission modes right from the start; retrofitting is easy to forget.
 
 ---
 
-### Pitfall 9: TypeScript Declaration Files Missing for Conditional Exports
+### Pitfall 9: `noExternal` Bundling Pulls in Node.js-Only Code from SDK Into "Universal" Bundle
 
 **What goes wrong:**
-The package works at runtime for all targets but TypeScript users get `Cannot find module '@heylol/sdk/services' or its corresponding type declarations`. This happens when the `exports` map has `"types"` pointing to a path that doesn't exist (off-by-one in the build output path), or when the `types` field in `package.json` root is set but doesn't account for subpath exports. TypeScript 4.7+ requires subpath export `"types"` conditions, but TypeScript 4.6 and earlier (still in common use) silently ignores them.
+The CLI uses `noExternal: ['@heylol/sdk']` in tsup to bundle the SDK into the CLI binary (avoiding the need for users to install the SDK separately). However, the SDK is designed to be edge-compatible — it has zero Node.js built-ins. The CLI itself uses Node.js built-ins (`fs`, `os`, `path`, `process`). If `noExternal` is not carefully combined with `platform: 'node'`, esbuild may attempt to resolve node built-ins as browser equivalents, producing a broken bundle. Conversely, if `platform` is set correctly but any transitive dep of `@heylol/sdk` happens to have a conditional `require('node:fs')` (for Node.js environments), it gets bundled in unnecessarily.
 
 **Why it happens:**
-Build tools like `tsup` generate `dist/services.d.ts` but the exports map says `"types": "./dist/services/index.d.ts"`. The mismatch is invisible until a user reports it. Developers don't test with older TypeScript versions.
+The SDK was built edge-first. Its transitive deps (`@noble/curves`, `@scure/base`) are pure JS. But esbuild's bundling of `@heylol/sdk` may pull in type-only imports or conditional branches that reference node builtins. Developers set `noExternal` to simplify distribution without checking what gets bundled.
 
 **How to avoid:**
-Run `attw` (are-the-types-wrong) in CI against the published tarball (use `npm pack` then `attw ./heylol-sdk-1.0.0.tgz`). Test type resolution with TypeScript 4.7, 5.0, and latest. In the exports map, use `"types"` as the first condition everywhere. Generate declarations with `tsc --declaration --emitDeclarationOnly` rather than relying on tsup's bundled `.d.ts` output, which can mangle re-exports.
+Set `platform: 'node'` and `target: 'node18'` explicitly in the CLI tsup config. List `@heylol/sdk` in `noExternal` to bundle it, but mark node built-ins as external (they're available in Node.js anyway). Check the bundle output for unintended inclusions:
+```bash
+# Inspect what's bundled
+node -e "const s = require('fs').readFileSync('dist/cli.cjs','utf8'); console.log(s.length)"
+# Bundle should be <2MB for a thin CLI wrapper
+```
+Run `npx bundlesize` or just check `ls -lh dist/cli.cjs` — if the CLI bundle is >5MB, something is being pulled in unexpectedly.
 
 **Warning signs:**
-- `attw` not in CI
-- `.d.ts` files generated by tsup's `dts: true` option without verification
-- No test project importing the packed tarball
+- `dist/cli.cjs` is larger than 2MB (the pure SDK + CLI code should be well under this)
+- Bundle contains `__webpack_require__` or other bundler artifacts (wrong tool in the chain)
+- CLI requires installing `@heylol/sdk` separately as a peer dependency
+- `node dist/cli.cjs` works but produces different output than `heylol` after global install
 
-**Phase to address:** Phase 1 (build configuration) and Phase 5 (pre-release verification).
+**Phase to address:** Phase 1 — tsup configuration. Verify bundle size and contents before adding any commands.
 
 ---
 
-### Pitfall 10: `x402-axios` or `x402-fetch` Interceptor Pattern Copied Incorrectly
+### Pitfall 10: Turborepo Caches Stale CLI Build When SDK Changes
 
 **What goes wrong:**
-The x402 protocol requires a specific retry flow: make initial request, receive 402, parse `WWW-Authenticate`, build payment transaction, sign it, encode in `X-Payment` header, retry original request. Developers building their own interceptor often get the retry wrong: (a) they mutate the original request URL or body on retry instead of cloning the original; (b) they don't handle the case where the retry also returns 402 (a new challenge, not an infinite loop — hey.lol may issue a fresh nonce); (c) they forget that the `X-Payment` header must be on the *retry* request only, not the initial request.
+Turborepo caches the `build` output of each package. If the CLI's `package.json` `turbo.json` pipeline is misconfigured, Turborepo may serve a cached CLI build even after `@heylol/sdk` has changed. The cache key for the CLI package includes the SDK's output hash only if the CLI declares a proper `dependsOn: ["^build"]` task dependency. If the CLI package doesn't have a `build` script in its `turbo.json` task map, or if it's not listed in the root `turbo.json`, the CLI build is never invalidated when the SDK changes.
 
 **Why it happens:**
-The x402 spec describes the flow at a high level. The edge cases (what if retry 402s?) are not prominently documented. Developers write a happy-path interceptor that works in testing but fails in production when the server issues a fresh challenge.
+Adding a new package to a Turborepo monorepo requires registering it in the pipeline. Developers add `packages/cli` but forget that Turborepo discovers tasks by `package.json` script names — if the CLI `package.json` has a `build` script but the root `turbo.json` doesn't include a `"build"` task config, it runs without caching. This can mean the CLI builds fine but never benefits from parallelism or caching.
 
 **How to avoid:**
-Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY → SUCCESS | RETRY_FAILED`. Cap retries at 2 (initial + one retry with payment). On a second 402 after payment, surface a specific `X402RetryExceededError` not a generic failure. Always clone the original `Request` object for retry: `new Request(originalRequest, { headers: new Headers(originalRequest.headers) })`. Test the retry-with-fresh-challenge scenario with a mock server.
+Verify the CLI package appears correctly in `turbo run build --dry-run`:
+```bash
+pnpm turbo build --dry-run 2>&1 | grep cli
+```
+The output must show `packages/cli#build` with `@heylol/sdk#build` as an upstream dependency. If the CLI build is listed as having 0 dependencies, the workspace link is wrong. Add a `"size-check"` task entry to turbo.json if a size gate is desired, following the same `dependsOn: ["build"]` pattern as other packages.
 
 **Warning signs:**
-- No retry cap logic
-- `req.headers.set(...)` on the original request (mutation instead of clone)
-- No test for "server returned 402 again after payment attempt"
+- `pnpm turbo build --dry-run` does not list `packages/cli#build` at all
+- After changing `packages/sdk/src/*.ts`, `pnpm build` doesn't rebuild the CLI
+- CLI binary behavior doesn't change after SDK changes without running `pnpm -C packages/cli build` manually
 
-**Phase to address:** Phase 3 — x402 interceptor and high-level API wrappers.
+**Phase to address:** Phase 1 — Turborepo configuration. Verify the full dependency graph before writing any command logic.
+
+---
+
+### Pitfall 11: Changesets Converts `workspace:*` to Real Version But Package Name `heylol` (Not `@heylol/cli`) Has a Name Collision Risk
+
+**What goes wrong:**
+Two distinct issues at publish time: (a) the `heylol` package name on npm is unscoped — if another package already owns `heylol` on the registry, publish fails with a 403. This must be verified before starting implementation, not at publish time. (b) Changesets automatically converts `"@heylol/sdk": "workspace:*"` to the resolved version (`"@heylol/sdk": "1.0.0"`) during publish. This is correct. However, if the CLI has not been added to the changesets workflow (no `.changeset/` entry), it will not be versioned or published by `changeset publish` — it just gets skipped silently.
+
+**Why it happens:**
+Developers create the package and write code but never run `pnpm changeset add` to register an initial changeset. Changeset publish skips packages with no pending changeset and no version bump. The package exists in the monorepo but is never published.
+
+**How to avoid:**
+Before writing code: check npm registry for the `heylol` name:
+```bash
+npm view heylol 2>&1 | head -5
+```
+If taken, the package name must be chosen now (e.g., `@heylol/cli` with a bin alias, or a different unscoped name). Create an initial changeset for the CLI package as part of the scaffold phase:
+```bash
+pnpm changeset add  # select packages/cli, bump minor (new feature)
+```
+Verify the CLI appears in `pnpm changeset status`.
+
+**Warning signs:**
+- `pnpm changeset status` does not list `heylol` (or whatever the package is named)
+- `npm view heylol` returns an existing package from another author
+- CI publish step shows "No changed packages to publish" despite new CLI code
+
+**Phase to address:** Phase 1 — Package scaffold. Check npm name availability on day one and add the initial changeset.
 
 ---
 
@@ -212,12 +334,13 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Use `Buffer` polyfill in all environments | Works everywhere now | Polyfill adds ~10KB, breaks CF Workers without explicit polyfill flag | Never — ban it in core |
-| Hardcode x402 field names as strings | Fast to write | Breaks silently when protocol changes field casing | MVP only if documented with a TODO and protocol version pin |
-| Skip compact-u16 for known small arrays | Simpler code | Breaks for any instruction with >127 accounts | Never — always implement correctly |
-| Single `index.ts` instead of subpath exports | Easier initial setup | Prevents tree-shaking, forces users to bundle everything | Never — set up subpaths from day one |
-| Generate `.d.ts` with tsup default config | Zero config | Bundled declarations mangle complex re-exports | Only if verified with `attw` before each release |
-| Mock hey.lol API in all tests | Fast CI | Never catches real protocol breakage | Acceptable for unit tests; must have at least one integration test suite against real API |
+| Copy SDK's `tsup.config.ts` for CLI | Zero config work | Dual format binary causes shebang/permissions issues; dual-format CLI has no consumer benefit | Never — CLI needs its own CJS-only config |
+| Use `console.log` for output instead of an Output module | Faster initial development | stdout/stderr discipline breaks instantly; JSON output corrupted by stray logs | Never — establish the Output module before first command |
+| Hardcode exit code 1 everywhere | Simple | Agent consumers can't distinguish auth failures from network failures from bad args | Only in very first scaffold; fix before any public release |
+| Skip atomic writes for config file | Simpler code | Corrupted config on interrupt causes confusing failures | Never — the atomic rename is 2 lines and prevents a bad class of bugs |
+| Bundle `@heylol/sdk` into CLI vs. listing as peerDep | Simpler user install (one package) | Bundle must be checked for size regressions at every SDK change | Acceptable if a size check is in CI; bundling is the right choice for a CLI |
+| Accept private key as CLI argument (`heylol --key <base58>`) | Convenient for testing | Key appears in shell history, `ps aux`, and `~/.bash_history` | Never — environment variable or config file only |
+| Single output format for both `--human` and JSON (e.g., always-JSON) | Simpler code | Human operators can't use the tool without piping through `jq` | Never — the `--human` flag is necessary for interactive use |
 
 ---
 
@@ -225,12 +348,12 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| hey.lol API — x402 v1 vs v2 | Assume v2 is always returned; break on v1 servers | Parse the `scheme` or version field first; branch explicitly; test both |
-| @noble/curves Ed25519 | Import `ed25519` from `@noble/curves/ed25519` but forget to handle the return type difference between `sign()` (Uint8Array) and `getPublicKey()` (Uint8Array) — they look the same, easy to swap | Use branded types: `type PrivateKey = Branded<Uint8Array, 'PrivateKey'>` to prevent accidental pass-through |
-| bs58 | Import from `bs58` which uses `Buffer` internally in v4 and earlier | Pin `bs58` to v6+; verify with `npm list bs58` |
-| Solana RPC (if ever added) | Use `fetch` directly with JSON-RPC and assume stable response shape | Never add RPC in core; keep it in an optional `@heylol/sdk-rpc` package |
-| Cloudflare Workers — KV / Durable Objects | Store private keys in Worker KV | Never. KV is not encrypted at rest. Document this explicitly. |
-| Vercel Edge Functions | Assume `process.env` works | Vercel Edge supports `process.env` but Cloudflare Workers does not without bindings. Use a runtime-agnostic `getEnv(key)` helper. |
+| `@heylol/sdk` from CLI | Import SDK types with `import type` but accidentally import value at runtime, causing bundler to not tree-shake | Use explicit value imports only for what is needed; verify bundle does not contain unused SDK methods |
+| `HeyLolClient` init in CLI | Create a new client on every command invocation (which is correct — CLI is ephemeral) but forget to pass `fetch` override, using `globalThis.fetch` which is always available in Node.js 18+ | No fix needed for Node 18+; but document minimum Node version in CLI README and `"engines"` field |
+| `loadKeypair` from SDK | CLI calls `loadKeypair(key)` without a try/catch and the thrown `AuthError` propagates to Node.js's unhandled rejection handler, producing a raw error on stderr instead of a JSON error object | Always wrap `loadKeypair` in try/catch in the CLI layer; convert to JSON error before writing to stderr |
+| `process.env.HEYLOL_PRIVATE_KEY` | Read at module load time, not at command execution time — if the env var is set after the CLI module loads (unusual but possible in some test harnesses), the key is `undefined` | Read env var inside the command handler function, not at top-level module scope |
+| Config file path | Use `~/.heylol/config.json` literally with `~` — `fs` does not expand tilde on all platforms | Use `path.join(os.homedir(), '.heylol', 'config.json')` explicitly |
+| `JSON.stringify` in output | `JSON.stringify(result)` produces compact output; piping through `jq` is readable but `jq .` output is not what the test fixture expects | Use `JSON.stringify(result)` (compact, one line per object) for stdout — agents parse this; `JSON.stringify(result, null, 2)` for `--human` mode |
 
 ---
 
@@ -238,10 +361,10 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Re-deriving public key from private key on every request | Extra 1-3ms per request in CF Workers (subtle for single requests, visible at scale) | Cache derived public key at SDK init time | At ~50 req/s sustained on cold workers |
-| Creating new `Uint8Array(1232)` (max Solana tx size) for every transaction regardless of actual size | Memory pressure in Workers (128MB limit) | Allocate exact needed size using pre-computed byte length | At ~1000 concurrent requests |
-| Parsing x402 header JSON in the retry interceptor on every failed request | Adds JSON.parse overhead to every 402 response | Negligible in practice; don't optimize | N/A — not a real trap at this scale |
-| Base58 encoding/decoding full 64-byte keypairs repeatedly | bs58 is not cheap | Encode once at SDK init, cache as string | At high signing frequency |
+| CLI startup time >500ms due to bundled SDK size | Users notice delay; `time heylol --version` is slow | Bundle only what is needed; avoid pulling in all SDK resources if only auth is needed at startup | If bundle exceeds ~3MB; at sub-1MB with tree-shaking this is not an issue |
+| Re-reading config file on every sub-command call | No user-visible symptom; minor I/O | Read config once, pass as context to all command handlers | Not an issue at CLI scale — file reads are <1ms |
+| Spawning `heylol` from another CLI tool with `spawnSync` | Synchronous blocking of parent process | Use `spawn` (async) with stream handling in parent | When orchestrating many `heylol` calls in parallel |
+| Sending private key over any network boundary (e.g., proxied requests) | Key exposed in logs on proxy | Ensure `fetch` calls in SDK never include auth header on non-hey.lol domains | At deploy time — verify no proxy rewriting |
 
 ---
 
@@ -249,39 +372,44 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Accepting private key as hex string in SDK API | Key logged in error messages, stored in memory as string longer than needed | Accept `Uint8Array` only; convert from hex at the app boundary, not inside the SDK |
-| Logging the `X-Payment` header value | Payment transaction visible in logs; replay possible within validity window | Redact all headers containing `X-Payment` in any built-in logging helpers |
-| Not validating the server's `WWW-Authenticate` challenge before signing | Signing arbitrary transactions from a malicious server that spoofs hey.lol | Validate that the transaction recipient address matches known hey.lol addresses; document expected addresses |
-| Caching the signed payment transaction for reuse | Payment transactions have a blockhash validity window (~60s on Solana mainnet) | Never cache signed transactions; sign fresh on every 402 response |
-| Exposing private key in error objects | Key leaks in Sentry/Datadog/logs | Implement `toJSON()` on keypair objects to return only the public key; never include private key in Error messages |
-| Using predictable nonce in zero-amount transaction | Replay attack on wallet identification | Use `crypto.getRandomValues()` (via noble) for any nonce field, even in dummy transactions |
+| Storing private key in config file without `0o600` permissions | Any user on the machine can read the key | `writeFileSync(path, content, { mode: 0o600 })`; check permissions on read |
+| Accepting private key as a positional argument (`heylol setup <key>`) | Key appears in `ps aux`, `~/.bash_history`, shell logs | Only accept from env var or interactive stdin prompt (with `readline` in no-echo mode) |
+| Config file in a world-readable directory | Key readable if file permissions are wrong | Create `~/.heylol/` with `mode: 0o700` |
+| Including full error stack trace in JSON error output | Leaks internal file paths, node_modules structure | Catch errors at boundary, output `{ code, message }` only — no `stack` field in JSON mode |
+| `JSON.stringify(client)` or `JSON.stringify(keypair)` in debug output | Private key bytes appear in logs | SDK's `HeyLolError.toJSON()` is already safe; verify `JSON.stringify(new HeyLolClient({ privateKey }))` does not include key material |
+| Env var `HEYLOL_PRIVATE_KEY` printed in `--verbose` mode | Key in CI logs | Redact all `HEYLOL_*` env vars from any verbose output; print `HEYLOL_PRIVATE_KEY=[REDACTED]` |
 
 ---
 
-## UX Pitfalls (SDK Developer Experience)
+## UX Pitfalls
 
-| Pitfall | Developer Impact | Better Approach |
-|---------|-----------------|-----------------|
-| Opaque error: "Transaction failed" | Developer spends hours debugging serialization | Include the serialized transaction as hex in the error, with a link to a Solana transaction inspector |
-| Returning `Uint8Array` everywhere with no helper | Developers don't know how to get a base58 address | Export utility functions: `toBase58(bytes)`, `fromBase58(str)`, `toHex(bytes)` |
-| Silent x402 retry without exposing payment amount | Developer can't tell how much USDC was spent | Emit a `payment` event or callback with amount, recipient, txHash before retry |
-| Throwing on missing private key instead of returning Result type | Breaks async error boundaries | Use `Result<T, E>` pattern or explicit `try/catch` boundaries; never let crypto errors propagate as unhandled rejections |
-| No way to dry-run / inspect what would be signed | Developer can't audit payment before it happens | Expose `buildPaymentTransaction(challenge)` as a public API, separate from `sendWithPayment()` |
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| JSON error on stdout instead of stderr | Agent downstream gets error mixed with data; `jq` parsing fails | All errors to stderr as JSON; success data to stdout as JSON |
+| Exit 0 with empty JSON `{}` on auth failure | Agent treats auth failure as empty successful result | Exit code 3 with `{ "error": { "code": "AUTH_FAILED", "message": "..." } }` on stderr |
+| `--human` flag producing ANSI color codes that appear in redirected output | CI logs full of escape codes | Use `chalk` with `chalk.level = 0` when `!process.stdout.isTTY`; or use `picocolors` which auto-detects TTY |
+| No `--version` flag | Agent can't identify CLI version in bug reports | Always implement `heylol --version` outputting `{ "version": "x.y.z" }` |
+| Silent success (exit 0, empty stdout) | Agent can't confirm the action occurred | All successful commands output at minimum `{ "ok": true }` or the created resource |
+| Deeply nested JSON output for simple actions | Agent must navigate nested paths like `.data.result.post.id` | Keep output flat: `{ "id": "...", "content": "...", "createdAt": "..." }` directly at root |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **x402 Parser:** Handles both v1 and v2 formats — verify by testing against real response fixtures from hey.lol, not synthetic ones.
-- [ ] **Solana Transaction Builder:** Compact-u16 encoding tested against known byte sequences, not just "it looks right."
-- [ ] **Zero-amount transaction:** Integration test against real hey.lol API, not just a mock. Servers can silently change validation.
-- [ ] **CF Workers compatibility:** Package tested in a real Wrangler dev environment, not just assumed to work because no `Buffer` appears in source. Transitive dependencies may still use `Buffer`.
-- [ ] **TypeScript declarations:** Run `attw` against the actual packed tarball (`npm pack`), not the source tree.
-- [ ] **Subpath exports:** Test `import { X } from '@heylol/sdk/services'` in a separate TypeScript project consuming the packed tarball — not the monorepo workspace.
-- [ ] **Signing correctness:** Ed25519 signature verified by an independent verifier (e.g., `@noble/curves` `verify()`) after every `sign()` call in tests.
-- [ ] **Private key safety:** `console.log(sdk)` and `JSON.stringify(sdk)` do not expose the private key in their output.
-- [ ] **Error messages:** Every thrown error has a `code` property for programmatic handling (not just a message string).
-- [ ] **Retry cap:** x402 retry interceptor tested against a server that 402s twice in a row; verify `X402RetryExceededError` is thrown.
+- [ ] **Shebang:** `head -1 dist/cli.cjs` returns exactly `#!/usr/bin/env node` — verified after clean build
+- [ ] **Executable bit:** `ls -la dist/cli.cjs` shows `x` for owner — not just present but executable
+- [ ] **Workspace link:** `pnpm list --filter heylol @heylol/sdk` shows local link, not registry version
+- [ ] **JSON purity:** `heylol profile get 2>/dev/null | jq .` succeeds — stdout is always valid JSON on success
+- [ ] **Exit codes:** `HEYLOL_PRIVATE_KEY=invalid heylol profile get; echo $?` prints `3` (or chosen auth error code), not `0` or `1`
+- [ ] **Key safety:** Error output when given invalid key does not contain the key value — verified by test
+- [ ] **Config permissions:** `~/.heylol/config.json` has mode `0600`, `~/.heylol/` has mode `0700` after `heylol auth setup`
+- [ ] **Tilde expansion:** Config path uses `os.homedir()`, not literal `~` — verified on Windows path
+- [ ] **Bundle size:** `dist/cli.cjs` is under 2MB (or established budget) — checked in CI
+- [ ] **Turborepo registration:** `pnpm turbo build --dry-run` lists `packages/cli#build` with SDK as dependency
+- [ ] **Changeset registered:** `pnpm changeset status` shows `heylol` (CLI package) pending for publish
+- [ ] **npm name:** `npm view heylol` either 404s (name available) or is the team's own package
+- [ ] **No stray console.log:** `grep -r 'console\.log' packages/cli/src/` returns empty
+- [ ] **Human flag isolation:** `heylol --human profile get | jq .` fails (human output is not JSON) — confirms modes are separate
 
 ---
 
@@ -289,13 +417,14 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Buffer usage discovered post-publish | MEDIUM | Add `nodejs_compat` flag documentation; ship patch with polyfill; long-term remove Buffer in next minor |
-| Solana byte layout wrong in v1.0 | HIGH | All existing integrations break silently; requires a v1.1 with breaking change to serialization; add format version to error messages to ease debugging |
-| x402 header parser only handles v1 | LOW | Ship a patch; v2 parser is additive |
-| Subpath exports broken for TypeScript | MEDIUM | Ship a patch release; existing JS users are unaffected but TypeScript users can't use types until update |
-| Dual package hazard with singleton divergence | HIGH | Requires major version bump if CJS was shipped; add the `state.js` singleton pattern in a breaking patch |
-| Private key exposed in logs | CRITICAL | Rotate all affected keys immediately; ship emergency patch with key redaction; notify affected users |
-| Signed transaction cached and replayed | HIGH | Revoke/report the payments if possible; audit all signed transactions in logs; ship emergency patch |
+| Shebang missing from published binary | LOW | Ship patch — update tsup config with `banner`, republish; existing installs need `npm install -g heylol@latest` |
+| Binary not executable in published package | LOW | Ship patch with `chmod +x` in postinstall script; republish |
+| Wrong npm package name (taken) | HIGH | Must rename; all existing `npm install heylol` instructions wrong; choose scoped name `@heylol/cli` early |
+| stdout/stderr contamination discovered post-release | MEDIUM | Audit all `console.log` calls; ship minor with Output module; agents need to update |
+| Private key leaked in error message (discovered in logs) | CRITICAL | Treat as security incident; rotate key; ship emergency patch; audit log retention |
+| Config file corruption on interrupted write | LOW | Clear user messaging ("Run `heylol auth setup` again"); ship patch with atomic write |
+| `workspace:*` not converted on publish (wrong version pinned) | MEDIUM | changesets handles this automatically; if using manual publish, add pre-publish check |
+| Turborepo cache stale (wrong CLI shipped) | LOW | `pnpm turbo build --force`; verify pipeline config; add pipeline verification to CI |
 
 ---
 
@@ -303,33 +432,33 @@ Write an explicit retry state machine: `INITIAL → PENDING_PAYMENT → RETRY �
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Bare crypto globals (`crypto`, `TextEncoder`) | Phase 1 — Project setup + ESLint rules | Run in CF Workers wrangler dev; no errors |
-| Solana compact-u16 / byte layout | Phase 2 — Transaction builder | Byte-for-byte comparison against known fixture |
-| `Buffer` in any form | Phase 1 — ESLint + build check | `grep -r "Buffer" dist/` returns empty |
-| x402 header case sensitivity + v1/v2 | Phase 2 — x402 parser | Tests with real header fixtures, both formats |
-| Subpath exports misconfiguration | Phase 1 — Package setup | `attw` passes against packed tarball |
-| Ed25519 signature mutation | Phase 2 — Signing layer | Double-sign test verifies both outputs |
-| Zero-amount blockhash rejection | Phase 2 — Dummy transaction | Integration test against real API |
-| ESM/CJS dual package hazard | Phase 1 — Build tooling | No CJS output from core package |
-| TypeScript declarations missing | Phase 1 (config) + Phase 5 (release) | `attw` clean on every release |
-| x402 retry interceptor errors | Phase 3 — API wrappers | Mock server test with double-402 scenario |
-| Private key in error objects | Phase 2 — Crypto layer | `JSON.stringify(keypair)` test shows no private bytes |
-| Transaction caching | Phase 2 + Phase 3 | Code review gate: no `const` caching of signed tx |
+| Shebang missing or duplicated | Phase 1 — tsup config | `head -1 dist/cli.cjs` check in build script |
+| Binary not executable | Phase 1 — build tooling | `ls -la dist/cli.cjs` check; CI on `ubuntu-latest` |
+| SDK workspace link wrong | Phase 1 — package scaffold | `pnpm list --filter heylol @heylol/sdk` |
+| `files` field omits binary | Phase 1 — package scaffold; every release | `publint` in CI |
+| Mixed stdout/stderr | Phase 2 — command implementation | JSON pipe test for every command |
+| Wrong or missing exit codes | Phase 2 — error boundary | `$?` tests for failure paths |
+| Private key in error output | Phase 2 — auth command | Key-leak test in auth command suite |
+| Config file permissions | Phase 2 — auth config command | `stat ~/.heylol/config.json` mode check |
+| `noExternal` bundling issues | Phase 1 — tsup config | Bundle size check < 2MB |
+| Turborepo cache invalidation | Phase 1 — Turborepo config | `pnpm turbo build --dry-run` output check |
+| npm name collision + changeset gap | Phase 1 — pre-scaffold | `npm view heylol` + `changeset status` |
 
 ---
 
 ## Sources
 
-- Cloudflare Workers runtime documentation (Web Crypto API support, `nodejs_compat` flag, Buffer availability) — HIGH confidence from known CF Workers behavior
-- Node.js v18 release notes and `globalThis.crypto` availability — HIGH confidence (this is a well-documented breaking point)
-- `@noble/curves` and `@noble/hashes` API design and return types — HIGH confidence (reviewed source)
-- Solana transaction binary format specification (compact-u16 encoding, account deduplication rules) — HIGH confidence (this is stable and well-documented in Solana docs and program library source)
-- Node.js dual package hazard documentation — HIGH confidence (official Node.js docs)
-- npm `exports` field and TypeScript `moduleResolution` interaction — HIGH confidence (TypeScript 4.7+ docs)
-- `publint` and `are-the-types-wrong` tooling behavior — MEDIUM confidence (behavior verified from community usage patterns through Aug 2025)
-- x402 protocol v1 vs v2 header differences — MEDIUM confidence (based on x402 spec and known implementations; verify against current hey.lol API responses)
-- hey.lol zero-amount transaction convention — MEDIUM confidence (project-specific; based on project context that this is a real API convention, not a Solana protocol standard)
+- tsup documentation (tsup.egoist.dev) — shebang auto-detection, `banner` option, `platform`, `noExternal` — HIGH confidence
+- npm documentation — `bin` field behavior, `files` field, publish pipeline, no bin file existence validation — HIGH confidence (confirmed via npm/npm GitHub issue #18554)
+- pnpm workspace documentation (pnpm.io/workspaces) — `workspace:*` protocol, version conversion on publish — HIGH confidence
+- Turborepo documentation — `dependsOn: ["^build"]` task dependency semantics — HIGH confidence
+- clig.dev CLI best practices — stdout/stderr separation, exit codes, JSON output — HIGH confidence (authoritative community standard)
+- Node.js fs documentation — `writeFileSync` mode option, `mkdirSync` mode, `renameSync` atomicity — HIGH confidence
+- write-file-atomic npm package docs — atomic write pattern — HIGH confidence
+- MITRE ATT&CK T1552.003 and shell history documentation — private key shell history leak — HIGH confidence
+- Changesets GitHub and pnpm workspace protocol conversion behavior — MEDIUM confidence (multiple corroborating sources, standard monorepo pattern)
+- Claude Code CLI GitHub issues (anthropics/claude-code) — JSON truncation and partial output patterns in agent-consumed CLIs — MEDIUM confidence (specific to Claude Code but pattern generalizes)
 
 ---
-*Pitfalls research for: hey.lol SDK — pure JS crypto, x402, Solana serialization, multi-runtime npm*
-*Researched: 2026-02-28*
+*Pitfalls research for: heylol CLI tool — adding binary to existing TypeScript SDK monorepo*
+*Researched: 2026-03-02*

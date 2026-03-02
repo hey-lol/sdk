@@ -1,8 +1,8 @@
 # Architecture Research
 
-**Domain:** Multi-runtime TypeScript SDK monorepo with x402 payment auth
-**Researched:** 2026-02-28
-**Confidence:** HIGH (Node.js exports docs verified; x402 flow from Coinbase spec training data — MEDIUM; SDK patterns from well-known open-source SDKs — MEDIUM)
+**Domain:** Multi-runtime TypeScript SDK monorepo with x402 payment auth + CLI package integration
+**Researched:** 2026-03-02 (CLI section added; original SDK sections from 2026-02-28)
+**Confidence:** HIGH (CLI integration — verified from existing codebase; SDK sections — see original confidence notes)
 
 ---
 
@@ -124,14 +124,30 @@ heylol-sdk/
 │   │       ├── client.ts       # VercelClient extends HeyLolClient
 │   │       └── middleware.ts   # withPayment() for Next.js middleware
 │   │
-│   └── express/                # @heylol/sdk/express
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── tsup.config.ts
+│   ├── express/                # @heylol/sdk/express
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── tsup.config.ts
+│   │   └── src/
+│   │           ├── index.ts
+│   │           ├── client.ts       # ExpressClient extends HeyLolClient
+│   │           └── middleware.ts   # paymentMiddleware(options) → Handler
+│   │
+│   └── cli/                    # NEW — heylol (binary package)
+│       ├── package.json        # name: heylol, bin: { heylol: ./dist/cli.cjs }
+│       ├── tsconfig.json       # extends ../../tsconfig.json
+│       ├── tsup.config.ts      # entry: src/cli.ts, format: ['cjs'], banner: shebang
 │       └── src/
-│           ├── index.ts
-│           ├── client.ts       # ExpressClient extends HeyLolClient
-│           └── middleware.ts   # paymentMiddleware(options) → Handler
+│           ├── cli.ts          # entry — Commander program setup + parseAsync
+│           ├── client.ts       # createClient() — reads config, constructs HeyLolClient
+│           ├── config.ts       # loadConfig() — reads env var or ~/.config/heylol/
+│           ├── output.ts       # formatPost(), formatProfile(), formatList(), printJson()
+│           └── commands/
+│               ├── post.ts
+│               ├── profile.ts
+│               ├── social.ts
+│               ├── discovery.ts
+│               └── notifications.ts
 │
 ├── examples/
 │   ├── cloudflare-worker/      # Standalone CF Worker example
@@ -147,12 +163,76 @@ heylol-sdk/
 - **`packages/services/` is a sibling of core, not a wrapper.** It imports core types but doesn't import HeyLolClient. Service creators don't need the client — they're on the receiving end of requests.
 - **`src/auth/` subdirectory in core** groups all x402 and Solana logic so it can be tested in isolation and swapped if the protocol evolves.
 - **`src/client/resources/`** follows the pattern established by Stripe's Node.js SDK — one file per API resource group, each receiving a pre-configured request function rather than the full client.
+- **`packages/cli/` follows the adapter pattern:** It is a consumer of `@heylol/sdk`, not a modifier. It lives in `packages/` under the `packages/*` glob that pnpm-workspace.yaml already covers. No workspace config changes needed.
+
+---
+
+## CLI Integration Architecture (NEW)
+
+### CLI Package Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        packages/cli                             │
+│                                                                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
+│  │post cmds │  │profile   │  │social    │  │discovery │        │
+│  │          │  │cmds      │  │cmds      │  │cmds      │        │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘        │
+│       │             │             │             │               │
+│  ┌────┴─────────────┴─────────────┴─────────────┴──────────┐   │
+│  │              Commander.js program (cli.ts)               │   │
+│  └────────────────────────────┬────────────────────────────┘   │
+│                                │                                │
+│  ┌─────────────────────────────┴──────────────────────────┐    │
+│  │                   client factory (client.ts)            │    │
+│  │        (reads config/env → new HeyLolClient())          │    │
+│  └─────────────────────────────┬──────────────────────────┘    │
+│                                │                                │
+│  ┌─────────────────────────────┴──────────────────────────┐    │
+│  │                  output formatters (output.ts)          │    │
+│  │              (JSON / human-readable table)              │    │
+│  └────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────┬───────────────────────────┘
+                                      │ import { HeyLolClient }
+                                      │ from '@heylol/sdk'
+┌─────────────────────────────────────┴───────────────────────────┐
+│                        packages/sdk                             │
+│  HeyLolClient                                                   │
+│    .posts   .profile   .social   .discovery                     │
+│    .notifications   .services                                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### New vs Modified Components
+
+| Component | New / Modified | Notes |
+|-----------|---------------|-------|
+| `packages/cli/` | **NEW** | Entire package. Does not modify any existing package. |
+| `packages/sdk/` | **NO CHANGE** | CLI imports SDK as a consumer. No SDK-specific code added to SDK. |
+| Root `turbo.json` | **NO CHANGE** | `"dependsOn": ["^build"]` automatically handles CLI-after-SDK build order. |
+| Root `pnpm-workspace.yaml` | **NO CHANGE** | `packages/*` glob already covers `packages/cli`. |
+| Root `tsconfig.json` | **NO CHANGE** | CLI's `tsconfig.json` extends root config the same way adapters do. |
+
+### CLI Component Responsibilities
+
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| `cli.ts` | Shebang, program registration, `program.parseAsync()` | Commander `new Command()` root |
+| `commands/post.ts` | Post subcommands: create, get, delete, like, unlike, reply | Commander `.command()` chains |
+| `commands/profile.ts` | Profile subcommands: me, get, update | Commander `.command()` chains |
+| `commands/social.ts` | Social subcommands: follow, unfollow, followers, following | Commander `.command()` chains |
+| `commands/discovery.ts` | Discovery subcommands: search, trending, suggested | Commander `.command()` chains |
+| `commands/notifications.ts` | Notification subcommands: list, mark-read | Commander `.command()` chains |
+| `client.ts` | `createClient()` factory — resolves private key, constructs `HeyLolClient` | Single exported function |
+| `config.ts` | `loadConfig()` — reads `HEYLOL_PRIVATE_KEY` env var or `~/.config/heylol/config.json` | fs + JSON parse, XDG path |
+| `output.ts` | Converts SDK response objects to stdout text or JSON | Pure functions, no I/O |
 
 ---
 
 ## Package.json Exports Configuration
 
-### Core Package (`packages/core/package.json`)
+### Core Package (`packages/core/package.json`) — Existing
 
 This is the single published package with one subpath (`@heylol/sdk`). The root of the monorepo is NOT published — each package publishes independently.
 
@@ -177,7 +257,42 @@ This is the single published package with one subpath (`@heylol/sdk`). The root 
 
 **Why `main` and `module` fields still exist:** Legacy bundlers (Webpack 4, older Rollup) don't read `exports`. Including `main` (CJS) and `module` (ESM) ensures compatibility.
 
-### Services Package (`packages/services/package.json`)
+### CLI Package (`packages/cli/package.json`) — NEW
+
+```json
+{
+  "name": "heylol",
+  "version": "1.0.0",
+  "license": "MIT",
+  "bin": {
+    "heylol": "./dist/cli.cjs"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage --config ../../vitest.config.ts"
+  },
+  "dependencies": {
+    "@heylol/sdk": "workspace:*",
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
+```
+
+**Key differences from adapter packages:**
+- `bin` field instead of `exports` — this is a binary, not a library
+- `"type": "module"` is intentionally omitted — CJS bundle with explicit `.cjs` extension avoids conflicts
+- `commander` is a runtime dependency (not dev-only) — it is shipped to consumers who `npx heylol`
+- `@heylol/sdk` is `dependencies` (not `devDependencies`) — must be installed when the CLI package is installed
+
+### Services Package (`packages/services/package.json`) — Existing
 
 ```json
 {
@@ -275,7 +390,7 @@ The monorepo structure is for development organization. At publish time, a singl
 
 ## Architectural Patterns
 
-### Pattern 1: Constructor Injection for Auth
+### Pattern 1: Constructor Injection for Auth (SDK)
 
 **What:** The client accepts a keypair or private key at construction time and internally builds all auth state. Consumers never touch signing internals.
 
@@ -357,30 +472,6 @@ async request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 ```
 
-**Optimization — include payment preemptively when cache hit exists:**
-
-```typescript
-async request<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${this.baseUrl}${path}`;
-  const cached = this.requirementsCache.get(url);
-
-  const headers: Headers = new Headers(init?.headers);
-  if (cached) {
-    headers.set('X-Payment', await this.buildPaymentHeader(cached));
-  }
-
-  const response = await fetch(url, { ...init, headers });
-
-  if (response.status === 402) {
-    const requirements = await this.parse402Response(response);
-    this.requirementsCache.set(url, requirements);
-    return this.request(path, init); // Retry once — now has fresh cache
-  }
-
-  return this.handleResponse<T>(response);
-}
-```
-
 ### Pattern 3: Resource Classes (Stripe Pattern)
 
 **What:** High-level API methods are organized into resource classes (`client.posts`, `client.profile`, `client.social`). Each resource class receives a bound `request` function, not the full client.
@@ -446,49 +537,211 @@ export class CloudflareClient extends HeyLolClient {
     });
   }
 }
-
-// packages/express/src/middleware.ts
-export function createExpressMiddleware(client: HeyLolClient) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    // Attach client to request
-    (req as any).heylol = client;
-    next();
-  };
-}
 ```
 
-### Pattern 5: Zero-Amount Dummy Transaction for Wallet Identification
+### Pattern 5: CLI-Only CJS Bundle (not dual-format)
 
-**What:** When the payment amount is zero (free API calls that still require identity), the SDK constructs a minimal Solana transaction — enough to prove wallet ownership via Ed25519 signature, without an RPC call or SOL balance.
+**What:** The CLI is bundled as a single CJS file with a shebang injected via tsup's `banner` option. No ESM, no dual format, no type declarations.
 
-**When to use:** Any x402 request where `amount: 0`.
+**When to use:** Always for Node.js CLI binaries. No browser/runtime portability needed. CJS avoids `"type": "module"` conflicts with hashbang. A `bin` field can only point to one file anyway.
 
-**Trade-offs:** The transaction must be well-formed enough to satisfy the hey.lol facilitator's verification, but does NOT need to be submittable to Solana mainnet. Pure binary serialization, no RPC dependency.
+**Trade-offs:** No tree-shaking of unused SDK exports. Acceptable because CLI startup time is dominated by Node.js init overhead, not module parse size.
 
+**Example:**
 ```typescript
-// packages/core/src/auth/solana.ts
+// packages/cli/tsup.config.ts
+import { defineConfig } from 'tsup';
 
-// Minimal Solana transaction: VersionedTransaction (v0) with one memo instruction
-// Proves keypair ownership without SOL balance or RPC call
-export function buildZeroAmountTransaction(
-  feePayer: Uint8Array,    // Ed25519 public key bytes
-  recentBlockhash: string, // Any valid base58 blockhash string (can be placeholder for zero-amount)
-): Uint8Array {
-  // Serialize compact Solana v0 transaction format
-  // message_header + account_keys + recent_blockhash + instructions
-  // Sign with Ed25519 private key
-  // Return base64-encoded serialized transaction bytes
+export default defineConfig({
+  entry: { cli: 'src/cli.ts' },
+  format: ['cjs'],      // CLI only — no ESM needed
+  dts: false,           // no type declarations for a binary
+  splitting: false,
+  sourcemap: true,
+  clean: true,
+  external: ['@heylol/sdk'],   // do NOT bundle the SDK — it's a runtime dep
+  banner: {
+    js: '#!/usr/bin/env node',  // tsup injects shebang at bundle top
+  },
+  outExtension() {
+    return { js: '.cjs' };      // dist/cli.cjs
+  },
+});
+```
+
+### Pattern 6: Client Factory with Credential Resolution (CLI)
+
+**What:** Commands never directly construct `HeyLolClient`. A `createClient()` factory resolves the private key from environment variables or a config file and returns a ready client. Commands receive it via call.
+
+**When to use:** Always. This pattern decouples auth from command logic, enables testing by injecting a mock client, and centralizes the "where is my key?" error into one place.
+
+**Example:**
+```typescript
+// src/config.ts
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
+
+export interface CliConfig {
+  privateKey: string;
+}
+
+export function loadConfig(): CliConfig {
+  // 1. Env var takes precedence
+  if (process.env.HEYLOL_PRIVATE_KEY) {
+    return { privateKey: process.env.HEYLOL_PRIVATE_KEY };
+  }
+  // 2. XDG config file fallback
+  const configDir = process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config');
+  const configPath = join(configDir, 'heylol', 'config.json');
+  try {
+    const raw = readFileSync(configPath, 'utf8');
+    const parsed = JSON.parse(raw) as Partial<CliConfig>;
+    if (parsed.privateKey) return { privateKey: parsed.privateKey };
+  } catch {
+    // file doesn't exist — fall through to error
+  }
+  throw new Error(
+    'No private key found. Set HEYLOL_PRIVATE_KEY env var or run: heylol auth login'
+  );
+}
+
+// src/client.ts
+import { HeyLolClient } from '@heylol/sdk';
+import { loadConfig } from './config.js';
+
+export function createClient(): HeyLolClient {
+  const config = loadConfig();
+  return new HeyLolClient({ privateKey: config.privateKey });
 }
 ```
 
-**Confidence note:** The exact zero-amount transaction format expected by hey.lol's facilitator requires validation against the actual API. The placeholder blockhash behavior is LOW confidence — test early.
+### Pattern 7: Commander.js Subcommand Structure Mirrors SDK Resources
+
+**What:** Each SDK resource becomes a Commander subcommand group. Each resource method becomes a subcommand within that group. Commands are registered via module-level functions injected into the root `program`.
+
+**When to use:** Always — this is the direct mapping strategy. It produces predictable, discoverable command names aligned with SDK documentation.
+
+**Trade-offs:** Commands are `heylol post create` (two levels deep) rather than flat `heylol post`. This is necessary to accommodate multiple operations per resource without flag-based dispatch. All major CLIs (git, npm, gh) use this pattern.
+
+**Example:**
+```typescript
+// src/commands/post.ts
+import { Command } from 'commander';
+import { createClient } from '../client.js';
+import { formatPost, printJson } from '../output.js';
+import { asPostId } from '@heylol/sdk';
+
+export function registerPostCommands(program: Command): void {
+  const post = program.command('post').description('Manage posts');
+
+  post
+    .command('create')
+    .description('Create a new post')
+    .argument('<content>', 'Post content')
+    .option('--json', 'Output raw JSON')
+    .action(async (content: string, opts) => {
+      const client = createClient();
+      const result = await client.posts.create({ content });
+      opts.json ? printJson(result) : formatPost(result);
+    });
+
+  post
+    .command('get')
+    .description('Get a post by ID')
+    .argument('<id>', 'Post ID')
+    .option('--json', 'Output raw JSON')
+    .action(async (id: string, opts) => {
+      const client = createClient();
+      const result = await client.posts.get(asPostId(id));
+      opts.json ? printJson(result) : formatPost(result);
+    });
+}
+
+// src/cli.ts  (note: shebang is injected by tsup banner — not needed in source)
+import { Command } from 'commander';
+import { registerPostCommands } from './commands/post.js';
+import { registerProfileCommands } from './commands/profile.js';
+import { registerSocialCommands } from './commands/social.js';
+import { registerDiscoveryCommands } from './commands/discovery.js';
+import { registerNotificationCommands } from './commands/notifications.js';
+
+const program = new Command()
+  .name('heylol')
+  .version('1.0.0')
+  .description('hey.lol CLI');
+
+registerPostCommands(program);
+registerProfileCommands(program);
+registerSocialCommands(program);
+registerDiscoveryCommands(program);
+registerNotificationCommands(program);
+
+program.parseAsync(process.argv).catch((err) => {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+});
+```
 
 ---
 
-## x402 Payment Auth Data Flow
+## Data Flow
+
+### Command Invocation Flow (CLI)
 
 ```
-Consumer Code
+User runs: heylol post create "hello world"
+    |
+    v
+Node.js executes dist/cli.cjs (shebang directs to node)
+    |
+    v
+Commander.js parser
+  → matches "post" subcommand → "create" sub-subcommand
+  → extracts positional arg "hello world"
+    |
+    v
+createClient()
+  → loadConfig()
+    → reads HEYLOL_PRIVATE_KEY env var  [or]
+    → reads ~/.config/heylol/config.json
+  → new HeyLolClient({ privateKey })
+    |
+    v
+client.posts.create({ content: 'hello world' })
+  → HeyLolClient.post('/posts', { content: 'hello world' })
+  → [x402 auth handshake — 402 probe → sign → retry]
+  → HTTP POST to https://api.hey.lol/posts
+    |
+    v
+Post response object (typed: Post)
+    |
+    v
+Output formatter
+  → --json: printJson(post) → console.log(JSON.stringify(post, null, 2))
+  → default: formatPost(post) → human-readable stdout
+    |
+    v
+process.exit(0)
+```
+
+### Credential Resolution Precedence
+
+```
+HEYLOL_PRIVATE_KEY env var  (highest priority — set in shell or CI)
+    |
+    v  (not set)
+~/.config/heylol/config.json  ("privateKey" field — written by heylol auth login)
+    |
+    v  (not found / parse failure)
+Error: "No private key found. Set HEYLOL_PRIVATE_KEY or run: heylol auth login"
+    → process.exit(1)
+```
+
+### x402 Payment Auth Data Flow (SDK, used by CLI)
+
+```
+Consumer Code (CLI command or library user)
     │
     ├─ client.posts.list()
     │
@@ -503,95 +756,54 @@ fetch('https://api.hey.lol/v1/posts')  ← No auth header
     │
     ▼
 hey.lol API returns HTTP 402
-    Body: {
-      version: "x402-v1",
-      accepts: [{
-        scheme: "exact",
-        network: "solana-mainnet",
-        currency: "USDC",
-        amount: "0",           ← zero-amount = wallet identification only
-        address: "<treasury>",
-        decimals: 6
-      }]
-    }
+    Body: { version: "x402-v1", accepts: [{ amount: "0", ... }] }
     │
     ▼
-parse402Response(response)
-    │
-    ▼
+parse402Response(response) → requirements
 buildPaymentHeader(requirements)
-    │
-    ├─ IF amount === "0":
-    │   └─ buildZeroAmountTransaction(publicKey, placeholderBlockhash)
-    │       Uses: @noble/curves/ed25519 for signing
-    │             bs58 for encoding
-    │
-    ├─ IF amount > 0:
-    │   └─ Build real USDC transfer transaction
-    │       (requires SOL RPC or pre-built transaction from user)
-    │
-    ▼
-Construct X-Payment header:
-    base64(JSON.stringify({
-      version: "x402-v1",
-      scheme: "exact",
-      network: "solana-mainnet",
-      payload: {
-        transaction: "<base64-serialized-tx>",
-        message: "<optional-memo>"
-      }
-    }))
+  → buildDummyTransaction(publicKey, secretKey)  [zero-amount = wallet identity]
+  → base64-encodes signed transaction
     │
     ▼
 fetch('/v1/posts', { headers: { 'X-Payment': header } })
     │
     ▼
-hey.lol API → Facilitator.verify(payment)
-    │           Checks: signature valid, address matches, amount correct
+hey.lol API → Facilitator.verify(payment) → 200 OK
     │
     ▼
-200 OK + Response body
-    │
-    ▼
-handleResponse<Post[]>(response)
-    │
-    ▼
-Consumer receives typed Post[] result
+Consumer receives typed response
 ```
 
-### Service Data Flow (services package — server-side)
+### Key Data Flows
 
-```
-Incoming HTTP Request (to developer's service)
-    │
-    ▼
-withPayment(handler, { price: "0.01", currency: "USDC" })
-    │
-    ├─ Extract X-Payment header from request
-    │
-    ├─ IF no header:
-    │   └─ Return 402 with payment requirements
-    │       create402Response({ price, currency, address })
-    │
-    ├─ IF header present:
-    │   └─ verifyPayment(payment, requirements)
-    │       Calls: hey.lol facilitator /verify endpoint
-    │       Returns: { valid: boolean, payer: string }
-    │
-    ├─ IF invalid:
-    │   └─ Return 402 with error details
-    │
-    ├─ IF valid:
-    │   └─ Call settlePayment(payment)
-    │       Calls: hey.lol facilitator /settle endpoint
-    │       Broadcasts transaction to Solana
-    │
-    ▼
-handler(request, { payment: VerifiedPayment })
-    │
-    ▼
-Developer's business logic runs
-```
+1. **SDK response → CLI output:** SDK methods return typed objects (`Post`, `Profile`, `User`). Formatter functions in `output.ts` consume those types directly. The `--json` path bypasses formatters entirely, printing `JSON.stringify` directly.
+2. **Error propagation in CLI:** SDK errors (`APIError`, `AuthError`, `NetworkError`) propagate out of command `.action()` handlers and are caught by the top-level `program.parseAsync().catch()` handler. This prints the error message to stderr and calls `process.exit(1)`. Per-command try/catch is avoided to keep command files thin.
+3. **Branded IDs:** SDK methods like `client.posts.get(id)` require branded `PostId` values created via `asPostId()`. CLI commands accept plain strings from argv and call `asPostId(id)` before passing to the SDK — the conversion happens inside the command's `.action()` handler.
+
+---
+
+## SDK Command Mapping (CLI)
+
+| CLI Command | SDK Call | Notes |
+|-------------|----------|-------|
+| `heylol post create <content>` | `client.posts.create({ content })` | `--paywall-teaser` + `--paywall-price` flags map to `paywall: { teaser, price }` |
+| `heylol post get <id>` | `client.posts.get(asPostId(id))` | Plain string → branded type via `asPostId()` |
+| `heylol post delete <id>` | `client.posts.delete(asPostId(id))` | |
+| `heylol post like <id>` | `client.posts.like(asPostId(id))` | |
+| `heylol post unlike <id>` | `client.posts.unlike(asPostId(id))` | |
+| `heylol post reply <id> <content>` | `client.posts.reply(asPostId(id), { content })` | |
+| `heylol profile me` | `client.profile.me()` | |
+| `heylol profile get <id>` | `client.profile.get(asUserId(id))` | |
+| `heylol profile update` | `client.profile.update(params)` | `--display-name`, `--bio`, `--avatar-url`, `--banner-url` flags |
+| `heylol social follow <id>` | `client.social.follow(asUserId(id))` | |
+| `heylol social unfollow <id>` | `client.social.unfollow(asUserId(id))` | |
+| `heylol social followers <id>` | `client.social.followers(asUserId(id), pagination)` | `--limit`, `--cursor` flags |
+| `heylol social following <id>` | `client.social.following(asUserId(id), pagination)` | `--limit`, `--cursor` flags |
+| `heylol discovery search <query>` | `client.discovery.search({ query })` | `--type users\|posts\|all` |
+| `heylol discovery trending` | `client.discovery.trending(pagination)` | `--limit`, `--cursor` |
+| `heylol discovery suggested` | `client.discovery.suggested(pagination)` | `--limit`, `--cursor` |
+| `heylol notifications list` | `client.notifications.list(pagination)` | `--limit`, `--cursor` |
+| `heylol notifications mark-read [ids...]` | `client.notifications.markRead(ids?)` | No args = mark all read; space-separated IDs = mark specific |
 
 ---
 
@@ -600,54 +812,26 @@ Developer's business logic runs
 Dependencies flow in one direction. Build order must respect this:
 
 ```
-1. core              — No internal dependencies
+1. packages/sdk           — No internal monorepo dependencies
         ↓
-2. services          — Imports types from core
+2. packages/services      — Imports types from sdk
         ↓
-3. cloudflare        — Imports core + services
-   vercel            — Imports core + services  (can build in parallel with cloudflare)
-   express           — Imports core + services  (can build in parallel)
+3. packages/adapter-*     — Import sdk + services (parallel)
+   packages/cli           — Imports sdk only (parallel with adapters)
 ```
 
-**Turborepo `turbo.json` pipeline:**
+**Turborepo handles this automatically.** `turbo.json` uses `"dependsOn": ["^build"]` which means "build all packages I depend on first." Because `packages/cli/package.json` lists `"@heylol/sdk": "workspace:*"` in `dependencies`, Turborepo knows to build SDK before CLI.
 
-```json
-{
-  "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "dev": {
-      "dependsOn": ["^build"],
-      "cache": false
-    },
-    "test": {
-      "dependsOn": ["build"],
-      "outputs": []
-    },
-    "typecheck": {
-      "dependsOn": ["^build"]
-    }
-  }
-}
-```
-
-`"^build"` means "build all packages this package depends on first." Turborepo resolves the graph automatically from workspace `dependencies` in each `package.json`.
-
-**pnpm workspace references:**
-
-In `packages/services/package.json`:
+**pnpm workspace references in `packages/cli/package.json`:**
 ```json
 {
   "dependencies": {
-    "@heylol/core": "workspace:*"
+    "@heylol/sdk": "workspace:*"
   }
 }
 ```
 
-During development, `workspace:*` resolves to the local package. At publish time, pnpm replaces it with the actual published version.
+During development, `workspace:*` resolves to the local `packages/sdk` directory. At publish time, pnpm replaces it with the actual published semver range.
 
 ---
 
@@ -661,6 +845,9 @@ During development, `workspace:*` resolves to the local package. At publish time
 | core → adapters | Adapter imports `HeyLolClient` class and extends it | Client constructor options interface must be stable |
 | services → adapters | Adapters import `withPayment`, `create402Response` from services | Handler wrapper function signature |
 | adapters → adapters | No cross-adapter imports | Each adapter is independent |
+| **cli → sdk** | **CLI imports `HeyLolClient`, branded ID factories (`asPostId`, etc.), error types** | **Public API only. No reaching into SDK internals.** |
+| **cli commands → client factory** | **`createClient()` returns `HeyLolClient`** | **All credential logic stays in `client.ts`** |
+| **cli commands → output formatters** | **Functions accept typed SDK response objects** | **Formatters are pure functions; no I/O other than `console.log`** |
 
 ### External Service Integration
 
@@ -676,7 +863,7 @@ During development, `workspace:*` resolves to the local package. At publish time
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Importing Platform APIs in Core
+### Anti-Pattern 1: Importing Platform APIs in Core (SDK)
 
 **What people do:** Use `Buffer`, `process.env`, `crypto.createHash` (Node.js globals) in core package code.
 
@@ -684,43 +871,51 @@ During development, `workspace:*` resolves to the local package. At publish time
 
 **Do this instead:** Use only Web Platform APIs — `globalThis.crypto.subtle` for crypto (or @noble/curves which is pure JS), `fetch` for HTTP, `TextEncoder`/`TextDecoder` for encoding. If a Node.js API is unavoidable, put it in the `express` adapter (Node-only) not core.
 
-### Anti-Pattern 2: Publishing Separate Packages for Each Subpath
+**Note:** The CLI CAN use Node.js APIs (`fs`, `os`, `path`) freely because it only runs in Node.js.
 
-**What people do:** Publish `@heylol/sdk-core`, `@heylol/sdk-services`, `@heylol/sdk-cloudflare` as separate npm packages to get independent versioning.
+### Anti-Pattern 2: Bundling `@heylol/sdk` Into the CLI
 
-**Why it's wrong:** Consumers must manage multiple package versions. A breaking change to core types causes a coordination problem across all dependent packages. The `@heylol/sdk/services` subpath import UX is better than `@heylol/sdk-services`.
+**What people do:** Omit `external: ['@heylol/sdk']` from the CLI's tsup config, causing the SDK source to be inlined into the CLI bundle.
 
-**Do this instead:** Publish a single `@heylol/sdk` package with subpath exports. Use semver normally. If adapters truly need independent versioning later (they're on major version N+2 due to CF API changes), split them out then — premature splitting adds complexity now.
+**Why it's wrong:** The SDK is already a workspace dependency. Bundling it doubles the CLI bundle size and breaks any future workspace-linking optimizations. SDK updates require a CLI rebuild even if CLI code didn't change.
 
-### Anti-Pattern 3: Signing in the Hot Path Without Caching
+**Do this instead:** Always mark `@heylol/sdk` as external in `tsup.config.ts`. Let pnpm install it as a `node_modules` dependency at runtime. This is the exact pattern `packages/adapter-cloudflare` already uses (`external: ['@heylol/sdk']`).
 
-**What people do:** Build a fresh signed payment for every single API request, including retries.
+### Anti-Pattern 3: Dual ESM+CJS for the CLI Binary
 
-**Why it's wrong:** Ed25519 signing via @noble/curves is fast (~1ms) but payment headers are request-specific (include endpoint, amount). The 402 round-trip overhead is the real cost — not the signing. However, payment *requirements* (what the server expects) CAN be cached per endpoint.
+**What people do:** Copy the SDK's tsup config (`format: ['esm', 'cjs']`) into the CLI, producing both `cli.mjs` and `cli.cjs`.
 
-**Do this instead:** Cache `X402Requirements` (the 402 response body) per endpoint URL. On cache hit, skip the probe request and go directly to signed request. Cache TTL should be short (60 seconds) since payment requirements can change.
+**Why it's wrong:** A binary is consumed by Node.js directly, not imported by other packages. ESM output adds no value and the `bin` field can only point to one file. CJS with explicit `.cjs` extension is simpler and has zero interop issues.
 
-### Anti-Pattern 4: Exposing Raw Transaction Bytes to Consumers
+**Do this instead:** Use `format: ['cjs']` only with `banner: { js: '#!/usr/bin/env node' }`.
 
-**What people do:** Surface the Solana transaction construction as a public API so consumers can "customize" it.
+### Anti-Pattern 4: Credential Resolution Inside Command Handlers
 
-**Why it's wrong:** It leaks x402/Solana internals that the SDK is supposed to hide. Consumers shouldn't need to know a transaction exists.
+**What people do:** Call `new HeyLolClient({ privateKey: process.env.HEYLOL_PRIVATE_KEY! })` directly inside each command's `.action()` handler.
 
-**Do this instead:** The transaction builder is internal to `src/auth/solana.ts`. The public API is `new HeyLolClient({ privateKey })`. If advanced users need custom transaction logic, accept a `transactionBuilder` option in the constructor — a function, not raw bytes.
+**Why it's wrong:** Credential logic gets scattered across all command files. Changing how keys are resolved (e.g., adding config file support) requires touching every command. Testing requires mocking `process.env` in every test.
 
-### Anti-Pattern 5: Using `exports["./*"]` Glob Instead of Explicit Subpaths
+**Do this instead:** Use the `createClient()` factory pattern. All commands call `createClient()` and receive a fully configured client. Tests inject a stub client.
 
-**What people do:** Use `"./*": "./dist/*/index.js"` to lazily expose all subfolders as subpaths.
+### Anti-Pattern 5: `"type": "module"` in the CLI package.json
 
-**Why it's wrong:** TypeScript's module resolution doesn't resolve glob subpaths correctly in all configurations. It also exposes internal paths unintentionally. IDE autocomplete doesn't work with globs.
+**What people do:** Set `"type": "module"` in `packages/cli/package.json` to match the SDK package.
 
-**Do this instead:** List each subpath explicitly. For this SDK there are only 5 subpaths — the verbosity is worth the correctness.
+**Why it's wrong:** When `"type": "module"` is set, Node.js treats all `.js` files as ESM. tsup's CJS output uses `.cjs` extension specifically to avoid this, but the conflicting `"type": "module"` creates confusion in tools and can cause interop issues. More importantly, there is no benefit — the CLI is not imported by anything else.
+
+**Do this instead:** Omit `"type": "module"` from the CLI package entirely. Use `outExtension: () => ({ js: '.cjs' })` in tsup.
+
+### Anti-Pattern 6: Publishing Separate Packages for Each SDK Subpath
+
+**What people do:** Publish `@heylol/sdk-core`, `@heylol/sdk-services`, `@heylol/sdk-cloudflare` as separate npm packages.
+
+**Why it's wrong:** Consumers must manage multiple package versions. A breaking change to core types causes a coordination problem across all dependent packages.
+
+**Do this instead:** Publish a single `@heylol/sdk` package with subpath exports. Use semver normally. If adapters truly need independent versioning later, split them out then.
 
 ---
 
 ## Scaling Considerations
-
-This is an SDK, not a server — "scaling" means adoption-time concerns:
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
@@ -728,33 +923,31 @@ This is an SDK, not a server — "scaling" means adoption-time concerns:
 | 100–1k consumers | Add `publint` and `attw` (Are the Types Wrong?) to CI to catch export misconfiguration before publish |
 | 1k+ consumers | Consider splitting CF/Vercel adapters to separate packages if they accumulate platform-specific dependencies that bloat installs for non-CF users |
 
-### Bundle Size Checkpoints
+**CLI-specific:**
 
-- Core bundle target: < 100 KB minified (per PROJECT.md constraint)
-- `@noble/curves/ed25519` alone is ~25 KB minified. Leaves ~75 KB for client, auth, types.
-- `bs58` is ~3 KB. Well within budget.
-- Services adds ~10 KB (verify/settle/response logic). Acceptable.
-- Adapters should each be < 5 KB since they're thin wrappers.
+| Concern | Now | As SDK Grows |
+|---------|-----|--------------|
+| New SDK resource | Add one `commands/*.ts` file + register in `cli.ts` | Pattern is established; low friction |
+| Changing output format | Modify `output.ts` | Single file change affects all commands |
+| Adding `--json` globally | Already done at Commander root level | No per-command changes |
+| Config file format changes | Modify `config.ts` | Isolated from command files |
 
 ---
 
 ## Sources
 
-- Node.js Package Exports documentation (verified): https://nodejs.org/api/packages.html#subpath-exports — HIGH confidence for exports field syntax and conditional exports specification
-- TypeScript `moduleResolution` documentation (training data, Medium confidence): `bundler` mode reads `exports`, `node16` requires explicit extensions
-- Stripe Node.js SDK architecture (training data, Medium confidence) — Resource class pattern, constructor injection, retry loop
-- Octokit SDK architecture (training data, Medium confidence) — Plugin composition pattern (noted but not recommended for this SDK's scale)
-- Turborepo pipeline `^build` pattern (training data, Medium confidence) — Standard for monorepo dependency-aware builds
-- x402 protocol specification by Coinbase (training data, Medium confidence) — HTTP 402 flow, X-Payment header format, facilitator verify/settle pattern
-- @noble/curves Ed25519 API (training data, Medium confidence) — Pure JS signing, no platform dependencies
-
-**Gaps requiring validation:**
-- Exact x402 payload format that hey.lol's facilitator expects (LOW confidence — verify against actual API)
-- Zero-amount transaction serialization format (LOW confidence — test against real facilitator)
-- Whether hey.lol uses x402 v1 or v2 response format (LOW confidence — check API docs or existing integration code)
-- Whether `moduleResolution: "bundler"` consumers can resolve `@heylol/sdk/services` without additional tsconfig (verify during Phase 1 development)
+- Existing `packages/adapter-cloudflare/tsup.config.ts` — `external: ['@heylol/sdk']` pattern: HIGH confidence (directly observed in codebase)
+- Existing `packages/sdk/tsup.config.ts` — dual format baseline for comparison: HIGH confidence (directly observed)
+- Existing `turbo.json` `"dependsOn": ["^build"]` pattern: HIGH confidence (directly observed)
+- Existing `packages/adapter-cloudflare/package.json` — `peerDependencies: { "@heylol/sdk": "workspace:*" }` pattern: HIGH confidence (directly observed)
+- tsup documentation — `banner` option for shebang injection: [tsup.egoist.dev](https://tsup.egoist.dev/) — MEDIUM confidence (WebSearch-verified behavior)
+- Commander.js — current package: [github.com/tj/commander.js](https://github.com/tj/commander.js) — HIGH confidence (actively maintained, v14 current as of 2026)
+- [Creating a TypeScript CLI for Your Monorepo — DEV Community](https://dev.to/zirkelc/creating-a-typescript-cli-for-your-monorepo-5aa) — MEDIUM confidence
+- [How to use a compiled bin in a TypeScript monorepo with pnpm](https://webpro.nl/scraps/compiled-bin-in-typescript-monorepo) — MEDIUM confidence
+- [Node.js CLI Apps Best Practices — lirantal](https://github.com/lirantal/nodejs-cli-apps-best-practices) — MEDIUM confidence (XDG config pattern, credential storage)
+- Node.js Package Exports documentation: https://nodejs.org/api/packages.html#subpath-exports — HIGH confidence for exports field syntax
 
 ---
 
-*Architecture research for: hey.lol SDK — multi-runtime TypeScript monorepo*
-*Researched: 2026-02-28*
+*Architecture research for: hey.lol SDK — multi-runtime TypeScript monorepo + CLI package integration*
+*Researched: 2026-03-02*
