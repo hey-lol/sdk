@@ -127,7 +127,7 @@ Plans:
   1. README quickstart code compiles without TypeScript errors — all method names, parameter types, and error property names match the actual SDK API
   2. API Overview table lists all public resource methods including `profile.me()` and `discovery.suggested()`
   3. 06-03-SUMMARY.md frontmatter includes `requirements-completed` for DOCS-02, DOCS-03, DOCS-04
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [x] 07-01-PLAN.md — Fix README error property names and add requirements-completed to 06-03-SUMMARY.md
 
@@ -158,5 +158,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. API Wrappers | 3/3 | Complete | 2026-03-01 |
 | 5. Services Package | 3/3 | Complete | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
-| 7. README & Documentation Fixes | 1/1 | Complete | 2026-03-02 |
+| 7. README & Documentation Fixes | 1/1 | Complete    | 2026-03-02 |
 | 8. CI & Type Integrity | 0/0 | Pending | — |
