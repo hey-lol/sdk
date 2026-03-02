@@ -24,10 +24,18 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage --config ../../vitest.config.ts"
+    "test": "vitest run --coverage --config vitest.config.ts"
+  },
+  "peerDependencies": {
+    "@heylol/sdk": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@vercel/edge-config": "^1.0.0"
   },
   "devDependencies": {
+    "@heylol/sdk": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
+    "next": "^15.0.0",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

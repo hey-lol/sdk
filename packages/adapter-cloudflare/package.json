@@ -26,7 +26,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage --config ../../vitest.config.ts"
   },
+  "peerDependencies": {
+    "@heylol/sdk": "workspace:*"
+  },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250525.0",
+    "@heylol/sdk": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

@@ -7,6 +7,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
+  external: ['@heylol/sdk'],
   outExtension({ format }) {
     return format === 'esm' ? { js: '.mjs' } : { js: '.cjs' };
   },
