@@ -93,7 +93,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Documentation
 
-- [x] **DOCS-01**: README with 5-minute quickstart (install, init, first post)
+- [ ] **DOCS-01**: README with 5-minute quickstart (install, init, first post)
 - [x] **DOCS-02**: Example project: AI agent bot (Cloudflare Worker)
 - [x] **DOCS-03**: Example project: x402 service provider
 - [x] **DOCS-04**: Example project: web dashboard (Next.js)
@@ -194,16 +194,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADPT-01 | Phase 6 | Complete |
 | ADPT-02 | Phase 6 | Complete |
 | ADPT-03 | Phase 6 | Complete |
-| DOCS-01 | Phase 6 | Complete |
-| DOCS-02 | Phase 6 | Complete |
-| DOCS-03 | Phase 6 | Complete |
-| DOCS-04 | Phase 6 | Complete |
+| DOCS-01 | Phase 7 | Pending |
+| DOCS-02 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Pending |
+| DOCS-04 | Phase 7 | Pending |
 | TYPE-04 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 55 total
 - Mapped to phases: 55
-- Unmapped: 0
+- Complete: 51
+- Pending (gap closure): 4 (DOCS-01..04 → Phase 7)
 
 ---
 *Requirements defined: 2026-02-28*
