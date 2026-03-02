@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 5 complete — Services Package (types, registerService, create402Response, middleware, ServicesResource all delivered)
+**Current focus:** Phase 6 in progress — Adapters, docs, and release (06-01 Cloudflare/Express/Vercel adapters complete, 06-02 JSDoc/TSDoc documentation complete)
 
 ## Current Position
 
-Phase: 5 of 6 (Services Package)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase 5 complete — ServicesResource wired on HeyLolClient with call<TInput, TOutput>() method, 165 SDK tests pass
-Last activity: 2026-03-02 — Plan 05-03 complete (ServicesResource, client.services namespace, 5 new tests, full CI green)
+Phase: 6 of 6 (Adapters, Docs, and Release)
+Plan: 2 of 4 in current phase (IN PROGRESS)
+Status: Phase 6 Plan 2 complete — TSDoc on all HeyLolClient, 6 Resource classes, and @heylol/services exports; TYPE-04 satisfied
+Last activity: 2026-03-01 — Plan 06-02 complete (JSDoc on all public SDK/services methods, 165 SDK + 40 services tests pass)
 
-Progress: [█████████░] 83%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [█████████░] 83%
 | Phase 05-services-package P01 | 3min | 2 tasks | 10 files |
 | Phase 05-services-package P03 | 2min | 1 tasks | 6 files |
 | Phase 05-services-package P02 | 3min | 2 tasks | 7 files |
+| Phase 06-adapters-docs-and-release P02 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 05-services-package]: Direct fetch to facilitator /verify and /settle — no HTTPFacilitatorClient import; keeps verify/settle modules minimal
 - [Phase 05-services-package]: Settlement failure does not fail the response — handler output returned as 200 even if settle fails (best-effort)
 - [Phase 05-services-package]: typeof result.isValid === 'boolean' guard in verifyPayment — prevents truthy string bypass
+- [Phase 06-02]: JSDoc @example blocks in HeyLolClient.ts must not use process.env — source file is scanned by static portability test that rejects Node.js globals even in comments; use string literal placeholders
+- [Phase 06-02]: TSDoc style — descriptions only in @param (no type repetition); TypeScript already infers types
+- [Phase 06-02]: Interface field JSDoc uses single-line /** description */ above each field for clean IDE hover text
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 05-03-PLAN.md (ServicesResource with call() method, HeyLolClient wiring, 5 tests, 165 total SDK tests, full CI green)
-Resume file: .planning/phases/06-adapters/ (Phase 6 — Cloudflare/Express/Vercel adapters)
+Last session: 2026-03-01
+Stopped at: Completed 06-02-PLAN.md (TSDoc on all SDK + services public methods, TYPE-04 satisfied, 165 SDK + 40 services tests pass)
+Resume file: .planning/phases/06-adapters-docs-and-release/ (Phase 6 — Plan 03 next)
