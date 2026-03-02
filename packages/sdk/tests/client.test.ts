@@ -13,6 +13,7 @@ import { DiscoveryResource } from '../src/resources/DiscoveryResource.js';
 import { NotificationsResource } from '../src/resources/NotificationsResource.js';
 import { PostsResource } from '../src/resources/PostsResource.js';
 import { ProfileResource } from '../src/resources/ProfileResource.js';
+import { ServicesResource } from '../src/resources/ServicesResource.js';
 import { SocialResource } from '../src/resources/SocialResource.js';
 import type { Post } from '../src/types/index.js';
 import { asPostId, asUserId } from '../src/types/index.js';
@@ -444,6 +445,13 @@ describe('HeyLolClient', () => {
       expect(client.notifications).toBeDefined();
       expect(client.notifications).toBeInstanceOf(NotificationsResource);
       expect(typeof client.notifications.list).toBe('function');
+    });
+
+    it('client.services is an instance of ServicesResource', () => {
+      const { client } = makeClient();
+      expect(client.services).toBeDefined();
+      expect(client.services).toBeInstanceOf(ServicesResource);
+      expect(typeof client.services.call).toBe('function');
     });
   });
 });

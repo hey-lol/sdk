@@ -24,6 +24,7 @@ import {
   NotificationsResource,
   PostsResource,
   ProfileResource,
+  ServicesResource,
   SocialResource,
 } from '../resources/index.js';
 import { DEFAULT_OPTIONS, parseRetryAfterMs, withRetry } from './index.js';
@@ -39,6 +40,7 @@ export class HeyLolClient {
 
   readonly posts: PostsResource;
   readonly profile: ProfileResource;
+  readonly services: ServicesResource;
   readonly social: SocialResource;
   readonly discovery: DiscoveryResource;
   readonly notifications: NotificationsResource;
@@ -53,6 +55,7 @@ export class HeyLolClient {
 
     this.posts = new PostsResource(this);
     this.profile = new ProfileResource(this);
+    this.services = new ServicesResource(this);
     this.social = new SocialResource(this);
     this.discovery = new DiscoveryResource(this);
     this.notifications = new NotificationsResource(this);

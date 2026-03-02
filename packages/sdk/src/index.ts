@@ -30,6 +30,7 @@ export {
   NotificationsResource,
   PostsResource,
   ProfileResource,
+  ServicesResource,
   SocialResource,
 } from './resources/index.js';
 // Types — branded ID types (type-only export)
