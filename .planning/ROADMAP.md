@@ -144,6 +144,10 @@ Plans:
   5. `@heylol/sdk/services` subpath exports meaningful functionality or is removed
   6. `encodeCompactU16` is not exported from @heylol/sdk public API (moved to internal)
   7. Client barrel circular import resolved with direct imports
+**Plans:** 2 plans
+Plans:
+- [ ] 08-01-PLAN.md — CI pnpm version fix, attw expansion, phantom dependency removal, services subpath cleanup
+- [ ] 08-02-PLAN.md — PaymentRequirements v2 type alignment and circular barrel import fix
 
 ## Progress
 
@@ -159,4 +163,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Services Package | 3/3 | Complete | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
 | 7. README & Documentation Fixes | 1/1 | Complete    | 2026-03-02 |
-| 8. CI & Type Integrity | 0/0 | Pending | — |
+| 8. CI & Type Integrity | 0/2 | Planned | — |
