@@ -24,12 +24,24 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage --config ../../vitest.config.ts"
+    "test": "vitest run --coverage --config vitest.config.ts"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "zod": "^4.3.6"
+  },
+  "dependencies": {
+    "@x402/core": "^2.5.0"
+  },
+  "peerDependencies": {
+    "zod": "^3.24.0 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   }
 }
