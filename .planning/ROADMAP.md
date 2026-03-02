@@ -43,7 +43,9 @@
   2. `heylol --help` works after `npm install -g heylol` (bin field resolves correctly)
   3. Every subcommand and flag shows a description when `--help` is passed
   4. `HEYLOL_BASE_URL=https://custom.api heylol --help` loads without crashing (env var is wired through)
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 10-01-PLAN.md — CLI package structure, build config, commander program with global options, all 6 command groups registered as stubs
 
 ### Phase 11: Output and Infrastructure
 **Goal**: All CLI output follows a consistent contract — JSON to stdout on success, JSON errors to stderr on failure, human-readable format when requested, correct exit codes always.
@@ -105,7 +107,7 @@
 | 7. README & Documentation Fixes | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 8. CI & Type Integrity | v1.0 | 2/2 | Complete | 2026-03-02 |
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
-| 10. CLI Scaffold | v1.1 | 0/? | Not started | - |
+| 10. CLI Scaffold | v1.1 | 0/1 | Not started | - |
 | 11. Output and Infrastructure | v1.1 | 0/? | Not started | - |
 | 12. Auth Commands | v1.1 | 0/? | Not started | - |
 | 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
