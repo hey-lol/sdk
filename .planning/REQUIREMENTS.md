@@ -83,13 +83,13 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TYPE-01**: Full TypeScript types for all API methods, request params, and response objects
 - [x] **TYPE-02**: Branded types for IDs (PostId, UserId) to prevent mixing
 - [x] **TYPE-03**: Discriminated union error types
-- [ ] **TYPE-04**: JSDoc comments with examples on all public methods
+- [x] **TYPE-04**: JSDoc comments with examples on all public methods
 
 ### Adapters
 
-- [ ] **ADPT-01**: Cloudflare Workers adapter with env binding support
-- [ ] **ADPT-02**: Vercel Edge adapter with edge config helpers
-- [ ] **ADPT-03**: Express middleware with request/response integration
+- [x] **ADPT-01**: Cloudflare Workers adapter with env binding support
+- [x] **ADPT-02**: Vercel Edge adapter with edge config helpers
+- [x] **ADPT-03**: Express middleware with request/response integration
 
 ### Documentation
 
@@ -191,14 +191,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SVC-04 | Phase 5 | Complete |
 | SVC-05 | Phase 5 | Complete |
 | SVC-06 | Phase 5 | Complete |
-| ADPT-01 | Phase 6 | Pending |
-| ADPT-02 | Phase 6 | Pending |
-| ADPT-03 | Phase 6 | Pending |
+| ADPT-01 | Phase 6 | Complete |
+| ADPT-02 | Phase 6 | Complete |
+| ADPT-03 | Phase 6 | Complete |
 | DOCS-01 | Phase 6 | Pending |
 | DOCS-02 | Phase 6 | Pending |
 | DOCS-03 | Phase 6 | Pending |
 | DOCS-04 | Phase 6 | Pending |
-| TYPE-04 | Phase 6 | Pending |
+| TYPE-04 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 55 total

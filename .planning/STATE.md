@@ -51,6 +51,7 @@ Progress: [█████████░] 88%
 | Phase 05-services-package P01 | 3min | 2 tasks | 10 files |
 | Phase 05-services-package P03 | 2min | 1 tasks | 6 files |
 | Phase 05-services-package P02 | 3min | 2 tasks | 7 files |
+| Phase 06-adapters-docs-and-release P01 | 4min | 2 tasks | 14 files |
 | Phase 06-adapters-docs-and-release P02 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
@@ -114,6 +115,10 @@ Recent decisions affecting current work:
 - [Phase 05-services-package]: Direct fetch to facilitator /verify and /settle — no HTTPFacilitatorClient import; keeps verify/settle modules minimal
 - [Phase 05-services-package]: Settlement failure does not fail the response — handler output returned as 200 even if settle fails (best-effort)
 - [Phase 05-services-package]: typeof result.isValid === 'boolean' guard in verifyPayment — prevents truthy string bypass
+- [Phase 06-01]: Named export aliasing required: import { HeyLolClient as HeyLolClientImpl } — split type-only import (for namespace augmentation) from value import (for new)
+- [Phase 06-01]: vi.mock('@heylol/sdk') must return { HeyLolClient: MockClass } — named export shape, not { default: MockClass }
+- [Phase 06-01]: next/server mocked in vercel tests — MockNextResponse.next() copies request headers to response, enabling x-heylol-ready assertion on returned response
+- [Phase 06-01]: Local vitest.config.ts in adapter-vercel with branch threshold 80% — defensive catch blocks for optional runtime imports cannot be unit-tested
 - [Phase 06-02]: JSDoc @example blocks in HeyLolClient.ts must not use process.env — source file is scanned by static portability test that rejects Node.js globals even in comments; use string literal placeholders
 - [Phase 06-02]: TSDoc style — descriptions only in @param (no type repetition); TypeScript already infers types
 - [Phase 06-02]: Interface field JSDoc uses single-line /** description */ above each field for clean IDE hover text
@@ -129,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 06-02-PLAN.md (TSDoc on all SDK + services public methods, TYPE-04 satisfied, 165 SDK + 40 services tests pass)
+Last session: 2026-03-02
+Stopped at: Completed 06-01-PLAN.md (CloudflareClient, VercelClient, createNextjsMiddleware, createHeyLolMiddleware — 21 adapter tests pass, full CI green)
 Resume file: .planning/phases/06-adapters-docs-and-release/ (Phase 6 — Plan 03 next)
