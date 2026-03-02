@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 5 in progress — Services Package (types, registerService, create402Response delivered)
+**Current focus:** Phase 5 complete — Services Package (types, registerService, create402Response, middleware, ServicesResource all delivered)
 
 ## Current Position
 
 Phase: 5 of 6 (Services Package)
-Plan: 1 of 3 in current phase (COMPLETE)
-Status: Phase 5 Plan 01 complete — @heylol/services types, registerService(), create402Response(), 12 tests
-Last activity: 2026-03-02 — Plan 05-01 complete (PriceConfig/ServiceDefinition types, registerService factory, create402Response x402 v2 generator)
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase 5 complete — ServicesResource wired on HeyLolClient with call<TInput, TOutput>() method, 165 SDK tests pass
+Last activity: 2026-03-02 — Plan 05-03 complete (ServicesResource, client.services namespace, 5 new tests, full CI green)
 
-Progress: [█████████░] 70%
+Progress: [█████████░] 83%
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Progress: [█████████░] 70%
 | Phase 04-api-wrappers P02 | 2min | 2 tasks | 4 files |
 | Phase 04-api-wrappers P03 | 6min | 2 tasks | 10 files |
 | Phase 05-services-package P01 | 3min | 2 tasks | 10 files |
+| Phase 05-services-package P03 | 2min | 1 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - [05-01]: create402Response() inlines btoa(JSON.stringify()) rather than importing from @x402/core/http — avoids full module pull for trivial one-liner
 - [05-01]: types.ts excluded from coverage via vitest.config.ts — TypeScript interface-only file has no runtime code
 - [05-01]: @x402/core externalized in tsup external[] — consumers must provide it, prevents bundling
+- [Phase 05-03]: Method-level generics on call<TInput, TOutput>() — single ServicesResource instance handles multiple service I/O types
+- [Phase 05-03]: URL pattern /services/{serviceId}/call is provisional — documented as pending validation against hey.lol API docs
+- [Phase 05-03]: Scope bounded to hey.lol identity-auth handshake (dummy Solana tx) — external x402 services requiring real USDC out of scope for v1
 
 ### Pending Todos
 
@@ -118,5 +122,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-01-PLAN.md (PriceConfig/ServiceDefinition types, registerService factory, create402Response x402 v2 generator, 12 tests)
-Resume file: .planning/phases/05-services-package/05-02-PLAN.md (Phase 5 Plan 2 — middleware)
+Stopped at: Completed 05-03-PLAN.md (ServicesResource with call() method, HeyLolClient wiring, 5 tests, 165 total SDK tests, full CI green)
+Resume file: .planning/phases/06-adapters/ (Phase 6 — Cloudflare/Express/Vercel adapters)
