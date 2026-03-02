@@ -93,44 +93,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| INFRA-06 | — | Pending |
-| INFRA-07 | — | Pending |
-| INFRA-08 | — | Pending |
-| INFRA-09 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| POST-01 | — | Pending |
-| POST-02 | — | Pending |
-| POST-03 | — | Pending |
-| POST-04 | — | Pending |
-| POST-05 | — | Pending |
-| POST-06 | — | Pending |
-| PROF-01 | — | Pending |
-| PROF-02 | — | Pending |
-| PROF-03 | — | Pending |
-| SOCL-01 | — | Pending |
-| SOCL-02 | — | Pending |
-| SOCL-03 | — | Pending |
-| SOCL-04 | — | Pending |
-| DISC-01 | — | Pending |
-| DISC-02 | — | Pending |
-| DISC-03 | — | Pending |
-| NOTF-01 | — | Pending |
-| NOTF-02 | — | Pending |
+| INFRA-01 | Phase 10 | Pending |
+| INFRA-02 | Phase 11 | Pending |
+| INFRA-03 | Phase 11 | Pending |
+| INFRA-04 | Phase 11 | Pending |
+| INFRA-05 | Phase 11 | Pending |
+| INFRA-06 | Phase 11 | Pending |
+| INFRA-07 | Phase 10 | Pending |
+| INFRA-08 | Phase 10 | Pending |
+| INFRA-09 | Phase 11 | Pending |
+| AUTH-01 | Phase 12 | Pending |
+| AUTH-02 | Phase 12 | Pending |
+| AUTH-03 | Phase 12 | Pending |
+| AUTH-04 | Phase 12 | Pending |
+| AUTH-05 | Phase 12 | Pending |
+| POST-01 | Phase 13 | Pending |
+| POST-02 | Phase 13 | Pending |
+| POST-03 | Phase 13 | Pending |
+| POST-04 | Phase 13 | Pending |
+| POST-05 | Phase 13 | Pending |
+| POST-06 | Phase 13 | Pending |
+| PROF-01 | Phase 13 | Pending |
+| PROF-02 | Phase 13 | Pending |
+| PROF-03 | Phase 13 | Pending |
+| SOCL-01 | Phase 14 | Pending |
+| SOCL-02 | Phase 14 | Pending |
+| SOCL-03 | Phase 14 | Pending |
+| SOCL-04 | Phase 14 | Pending |
+| DISC-01 | Phase 14 | Pending |
+| DISC-02 | Phase 14 | Pending |
+| DISC-03 | Phase 14 | Pending |
+| NOTF-01 | Phase 14 | Pending |
+| NOTF-02 | Phase 14 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32 ⚠️
+- Mapped to phases: 32
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-02*
-*Last updated: 2026-03-02 after initial definition*
+*Last updated: 2026-03-02 — traceability mapped to phases 10-14*
