@@ -35,6 +35,14 @@ export function getPaymentVersion(response: Response): 1 | 2 | null {
 // Parser
 // ---------------------------------------------------------------------------
 
+/** Ensures `amount` is always populated (falls back to `maxAmountRequired` for v1 wire data). */
+function normalizeRequirements(raw: Array<Record<string, unknown>>): PaymentRequirements[] {
+  return raw.map((req) => ({
+    ...req,
+    amount: (req.amount as string) ?? (req.maxAmountRequired as string),
+  })) as PaymentRequirements[];
+}
+
 /**
  * Parses payment requirements from an x402 402 response.
  *
@@ -54,8 +62,8 @@ export async function parsePaymentRequirements(response: Response): Promise<Paym
   if (version === 2) {
     try {
       const header = response.headers.get(PAYMENT_HEADERS.REQUIRED) as string;
-      const decoded = JSON.parse(atob(header)) as { accepts: PaymentRequirements[] };
-      return decoded.accepts;
+      const decoded = JSON.parse(atob(header)) as { accepts: Array<Record<string, unknown>> };
+      return normalizeRequirements(decoded.accepts);
     } catch {
       throw new AuthError({
         code: 'X402_PARSE_FAILED',
@@ -66,8 +74,11 @@ export async function parsePaymentRequirements(response: Response): Promise<Paym
 
   // version === 1
   try {
-    const body = (await response.json()) as { x402Version: number; accepts: PaymentRequirements[] };
-    return body.accepts;
+    const body = (await response.json()) as {
+      x402Version: number;
+      accepts: Array<Record<string, unknown>>;
+    };
+    return normalizeRequirements(body.accepts);
   } catch {
     throw new AuthError({
       code: 'X402_PARSE_FAILED',

@@ -44,6 +44,7 @@ const v1_402 = new Response(
       {
         scheme: 'exact',
         network: 'solana-mainnet',
+        amount: '0',
         maxAmountRequired: '0',
         resource: 'https://api.hey.lol/test',
       },
@@ -62,6 +63,7 @@ function v2_402(): Response {
             {
               scheme: 'exact',
               network: 'solana-mainnet',
+              amount: '0',
               maxAmountRequired: '0',
               resource: 'https://api.hey.lol/test',
             },

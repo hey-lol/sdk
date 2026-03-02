@@ -29,6 +29,7 @@ function mockV1Response(requirements: PaymentRequirements[]): Response {
 const FIXTURE_REQUIREMENTS: PaymentRequirements = {
   scheme: 'exact',
   network: 'solana-mainnet',
+  amount: '0',
   maxAmountRequired: '0',
   resource: 'https://api.hey.lol/v1/posts',
 };
@@ -36,6 +37,7 @@ const FIXTURE_REQUIREMENTS: PaymentRequirements = {
 const FIXTURE_REQUIREMENTS_V2: PaymentRequirements = {
   scheme: 'exact',
   network: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+  amount: '0',
   maxAmountRequired: '0',
   resource: 'https://api.hey.lol/v1/posts',
 };
@@ -103,7 +105,7 @@ describe('parsePaymentRequirements', () => {
     expect(result).toHaveLength(1);
     expect(result[0].scheme).toBe('exact');
     expect(result[0].network).toBe('solana-mainnet');
-    expect(result[0].maxAmountRequired).toBe('0');
+    expect(result[0].amount).toBe('0');
     expect(result[0].resource).toBe('https://api.hey.lol/v1/posts');
   });
 
