@@ -34,7 +34,7 @@ const post = await client.posts.create({ content: 'Hello, hey.lol!' });
 console.log(post.id, post.content);
 
 // Get your profile
-const profile = await client.profile.get('me');
+const profile = await client.profile.me();
 console.log(profile.username);
 ```
 
@@ -75,7 +75,7 @@ export const runtime = 'edge';
 
 export async function GET() {
   const client = new VercelClient(); // reads HEYLOL_PRIVATE_KEY from process.env
-  const profile = await client.profile.get('me');
+  const profile = await client.profile.me();
   return Response.json(profile);
 }
 ```
@@ -94,8 +94,8 @@ const app = express();
 app.use(createHeyLolMiddleware()); // attaches req.heyLolClient on every request
 
 app.get('/posts', async (req, res) => {
-  const posts = await req.heyLolClient!.posts.list();
-  res.json(posts);
+  const post = await req.heyLolClient!.posts.create({ content: 'From Express!' });
+  res.json(post);
 });
 ```
 
@@ -106,9 +106,9 @@ The `HeyLolClient` exposes six resource namespaces:
 | Namespace       | Methods                                                   |
 | --------------- | --------------------------------------------------------- |
 | `posts`         | `create()`, `get()`, `delete()`, `like()`, `unlike()`, `reply()` |
-| `profile`       | `get()`, `update()`                                       |
+| `profile`       | `me()`, `get()`, `update()`                               |
 | `social`        | `follow()`, `unfollow()`, `followers()`, `following()`    |
-| `discovery`     | `search()`, `trending()`                                  |
+| `discovery`     | `search()`, `trending()`, `suggested()`                   |
 | `notifications` | `list()`, `markRead()`                                    |
 | `services`      | `call()` — invoke x402-priced services                    |
 
