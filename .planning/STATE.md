@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 6 in progress — Adapters, docs, and release (06-01 Cloudflare/Express/Vercel adapters complete, 06-02 JSDoc/TSDoc documentation complete)
+**Current focus:** Phase 6 complete — Adapters, docs, release pipeline validated (06-01 adapters, 06-02 JSDoc/TSDoc, 06-03 README + examples + publish dry-run)
 
 ## Current Position
 
 Phase: 6 of 6 (Adapters, Docs, and Release)
-Plan: 2 of 4 in current phase (IN PROGRESS)
-Status: Phase 6 Plan 2 complete — TSDoc on all HeyLolClient, 6 Resource classes, and @heylol/services exports; TYPE-04 satisfied
-Last activity: 2026-03-01 — Plan 06-02 complete (JSDoc on all public SDK/services methods, 165 SDK + 40 services tests pass)
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase 6 complete — README quickstart, 3 example projects, all 5 packages attw + publish dry-run validated; 226 total tests pass
+Last activity: 2026-03-02 — Plan 06-03 complete (README + cloudflare-ai-agent + x402-service-provider + nextjs-dashboard examples; full CI green)
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 88%
 | Phase 05-services-package P02 | 3min | 2 tasks | 7 files |
 | Phase 06-adapters-docs-and-release P01 | 4min | 2 tasks | 14 files |
 | Phase 06-adapters-docs-and-release P02 | 5min | 2 tasks | 12 files |
+| Phase 06-adapters-docs-and-release P03 | 12min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,10 @@ Recent decisions affecting current work:
 - [Phase 06-02]: JSDoc @example blocks in HeyLolClient.ts must not use process.env — source file is scanned by static portability test that rejects Node.js globals even in comments; use string literal placeholders
 - [Phase 06-02]: TSDoc style — descriptions only in @param (no type repetition); TypeScript already infers types
 - [Phase 06-02]: Interface field JSDoc uses single-line /** description */ above each field for clean IDE hover text
+- [Phase 06-03]: PostsResource has no list() — example GET handlers use get(id) with query param; README API table corrected
+- [Phase 06-03]: nextjs-dashboard depends on @heylol/sdk directly — adapter-vercel peers SDK, consumers importing types need explicit dep
+- [Phase 06-03]: next/app Router requires app/layout.tsx — root layout mandatory for every Next.js 15 App Router project
+- [Phase 06-03]: examples/nextjs-dashboard/.gitignore excludes .next/ — staging build artifacts stalls Biome pre-commit hook on compiled JS
 
 ### Pending Todos
 
@@ -135,5 +140,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 06-01-PLAN.md (CloudflareClient, VercelClient, createNextjsMiddleware, createHeyLolMiddleware — 21 adapter tests pass, full CI green)
-Resume file: .planning/phases/06-adapters-docs-and-release/ (Phase 6 — Plan 03 next)
+Stopped at: Completed 06-03-PLAN.md (README quickstart, 3 example projects, all 5 packages attw + publish dry-run green — Phase 6 COMPLETE)
+Resume file: N/A — all phases complete
