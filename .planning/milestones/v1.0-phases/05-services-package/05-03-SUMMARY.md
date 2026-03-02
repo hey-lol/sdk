@@ -78,7 +78,7 @@ Each task was committed atomically:
 
 1. **Task 1: ServicesResource class and HeyLolClient wiring** - `fb3b7ed` (feat)
 
-**Plan metadata:** [pending final commit]
+**Plan metadata:** `9f410d6` (docs: complete plan)
 
 ## Files Created/Modified
 - `packages/sdk/src/resources/ServicesResource.ts` - ServicesResource class with call<TInput, TOutput>(serviceId, input?) method, local HttpClient interface, ROUTES const

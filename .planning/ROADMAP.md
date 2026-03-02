@@ -1,183 +1,36 @@
 # Roadmap: hey.lol SDK
 
-## Overview
+## Milestones
 
-Six phases build the `@heylol/sdk` from the ground up. Foundation establishes the monorepo and package infrastructure that every subsequent phase depends on. Core Crypto and Auth delivers the x402 authentication engine — the irreducible root that nothing else works without. The HTTP Client wraps auth into a callable interface with retry and error handling. API Wrappers expose the full hey.lol social surface (posts, profiles, social graph, discovery, notifications). Services Package gives service providers the tools to accept x402 payments. Adapters, Docs, and Release ships runtime adapters for Cloudflare Workers, Vercel Edge, and Express, complete examples, and validates the end-to-end publish pipeline.
+- ✅ **v1.0 SDK Launch** — Phases 1-9 (shipped 2026-03-02)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>✅ v1.0 SDK Launch (Phases 1-9) — SHIPPED 2026-03-02</summary>
 
-Decimal phases appear between their surrounding integers in numeric order.
+- [x] Phase 1: Foundation (3/3 plans) — completed 2026-03-01
+- [x] Phase 2: Core Crypto and Auth (4/4 plans) — completed 2026-03-01
+- [x] Phase 3: HTTP Client (2/2 plans) — completed 2026-03-01
+- [x] Phase 4: API Wrappers (3/3 plans) — completed 2026-03-01
+- [x] Phase 5: Services Package (3/3 plans) — completed 2026-03-02
+- [x] Phase 6: Adapters, Docs, and Release (3/3 plans) — completed 2026-03-02
+- [x] Phase 7: README & Documentation Fixes (1/1 plan) — completed 2026-03-02
+- [x] Phase 8: CI & Type Integrity (2/2 plans) — completed 2026-03-02
+- [x] Phase 9: Size-Limit Fix & Tech Debt Cleanup (1/1 plan) — completed 2026-03-02
 
-- [x] **Phase 1: Foundation** - Monorepo, build tooling, CI gates, and ESLint rules that guard every subsequent phase (completed 2026-03-01)
-- [x] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy (completed 2026-03-01)
-- [x] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface (completed 2026-03-01)
-- [x] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications (completed 2026-03-01)
-- [x] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation (completed 2026-03-02)
-- [x] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline (completed 2026-03-02)
-- [x] **Phase 7: README & Documentation Fixes** - Fix broken README code examples, complete SUMMARY frontmatter (Gap Closure)
-- [x] **Phase 8: CI & Type Integrity** - pnpm version alignment, attw expansion, type consistency, dependency cleanup, API surface cleanup (Gap Closure) (completed 2026-03-02)
-- [ ] **Phase 9: Size-Limit Fix & Tech Debt Cleanup** - Stale size-limit entry, SUMMARY frontmatter backfills, public API surface cleanup, README ms/s fix (Gap Closure)
-
-## Phase Details
-
-### Phase 1: Foundation
-**Goal**: A developer can clone the repo, run one command, and get a passing build with CI-enforced safety nets that prevent the entire class of runtime bugs identified in research
-**Depends on**: Nothing (first phase)
-**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06, INFRA-07
-**Success Criteria** (what must be TRUE):
-  1. `pnpm install && pnpm build` succeeds from a clean checkout with ESM output and `.d.ts` files emitted for all packages
-  2. `pnpm lint` fails if any file in the core package imports `Buffer`, `process`, or Node.js `crypto`
-  3. `pnpm --filter @heylol/sdk publish --dry-run` passes `publint` and `attw` checks with zero errors on all subpath exports
-  4. `size-limit` check fails if core bundle exceeds 100 KB minified
-  5. Changesets `pnpm changeset` creates a versioned changelog entry without errors
-**Plans:** 3/3 plans complete
-Plans:
-- [ ] 01-01-PLAN.md — Monorepo scaffold: pnpm workspaces, Turborepo, Biome, and 5 package stubs
-- [ ] 01-02-PLAN.md — Build tooling: tsup configs, exports maps, ESLint Node.js import restrictions
-- [ ] 01-03-PLAN.md — CI gates: publint, attw, size-limit, changesets, GitHub Actions, husky
-
-### Phase 2: Core Crypto and Auth
-**Goal**: A developer can provide a base58 private key and the SDK will authenticate any request via x402 challenge-response using pure-JS crypto with zero Node.js built-ins
-**Depends on**: Phase 1
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, TYPE-03
-**Success Criteria** (what must be TRUE):
-  1. Developer initializes the client with a base58 private key and no crypto knowledge required
-  2. SDK correctly parses both x402 v1 and v2 response formats from real API fixtures without case sensitivity errors
-  3. SDK builds a valid zero-amount Solana dummy transaction and signs it with Ed25519 — byte-level tests pass against known fixture transactions
-  4. SDK constructs a valid `X-Payment` header that hey.lol's facilitator accepts
-  5. Thrown errors are typed discriminated unions (AuthError, PaymentRejectedError) with a `code` property on every error
-**Plans:** 4/4 plans complete
-Plans:
-- [ ] 02-01-PLAN.md — Error hierarchy (TYPE-03) and keypair loading (AUTH-01, AUTH-06)
-- [ ] 02-02-PLAN.md — Solana compact-u16 encoding and zero-amount dummy transaction builder (AUTH-03, AUTH-06)
-- [ ] 02-03-PLAN.md — x402 v1/v2 response parser and payment header constructor (AUTH-02, AUTH-04, AUTH-05)
-- [ ] 02-04-PLAN.md — Integration wiring: barrel exports, runtime deps, and full CI pipeline validation
-
-### Phase 3: HTTP Client
-**Goal**: Developers can make API calls that automatically handle authentication, retry transient failures, and return typed domain objects — with no visibility into the underlying 402 handshake
-**Depends on**: Phase 2
-**Requirements**: CLT-01, CLT-02, CLT-03, CLT-04, CLT-05
-**Success Criteria** (what must be TRUE):
-  1. A single client instance makes authenticated API calls in Node.js 18+, Cloudflare Workers, Vercel Edge, and browsers without modification
-  2. A 429 or 503 response triggers automatic retry with exponential backoff and jitter; a permanent error throws a typed HeyLolError subclass
-  3. API method return values are typed domain objects (Post, Profile, User), not raw Response or JSON
-  4. Client accepts constructor options for retries, timeout, and network without requiring them
-**Plans:** 2/2 plans complete
-Plans:
-- [ ] 03-01-PLAN.md — Error hierarchy extension (RateLimitError, APIError), retry utility, ClientOptions, domain type stubs
-- [ ] 03-02-PLAN.md — HeyLolClient class with 402 loop, typed HTTP methods, barrel exports, CI validation
-
-### Phase 4: API Wrappers
-**Goal**: Developers have a complete, typed API surface for all hey.lol social actions — creating posts, managing profiles, following users, searching, and reading notifications
-**Depends on**: Phase 3
-**Requirements**: POST-01, POST-02, POST-03, POST-04, POST-05, POST-06, POST-07, PROF-01, PROF-02, PROF-03, PROF-04, SOCL-01, SOCL-02, SOCL-03, SOCL-04, DISC-01, DISC-02, DISC-03, NOTF-01, NOTF-02, TYPE-01, TYPE-02
-**Success Criteria** (what must be TRUE):
-  1. Developer creates a text post, a media post, a reply, a paywalled post with teaser, likes/unlikes a post, and deletes a post — all via `client.posts.*` with typed parameters
-  2. Developer reads own and other users' profiles, updates profile fields, and sets avatar/banner URLs via `client.profile.*`
-  3. Developer follows and unfollows users and lists followers and following via `client.social.*`
-  4. Developer searches users and posts, retrieves trending posts, and gets suggested users via `client.discovery.*`
-  5. Developer lists and marks notifications as read via `client.notifications.*`, and all IDs (PostId, UserId) are branded types that TypeScript rejects when mixed
-**Plans:** 3/3 plans complete
-Plans:
-- [ ] 04-01-PLAN.md — Branded ID types, expanded domain interfaces, request params, HeyLolClient 204 guard and query params
-- [ ] 04-02-PLAN.md — PostsResource and ProfileResource with full test coverage
-- [ ] 04-03-PLAN.md — SocialResource, DiscoveryResource, NotificationsResource, HeyLolClient wiring, barrel exports
-
-### Phase 5: Services Package
-**Goal**: Service providers can accept x402 payments by verifying incoming payment headers, settling on-chain, and generating 402 Payment Required responses — all without handling raw x402 protocol details
-**Depends on**: Phase 2
-**Requirements**: SVC-01, SVC-02, SVC-03, SVC-04, SVC-05, SVC-06
-**Success Criteria** (what must be TRUE):
-  1. Developer calls an x402 service via `client.services.call()` with typed input/output
-  2. Developer registers a service with a price, currency, and schema via `sdk.services.register()`
-  3. Developer verifies an incoming `X-Payment` header and receives a typed `VerifyResult` — valid or rejected with reason
-  4. Developer settles a verified payment on-chain via `sdk.services.settle()`
-  5. Developer generates a `402 Payment Required` response and wraps a handler with `createX402Service()` that bundles verify, settle, and handler dispatch
-**Plans:** 3/3 plans complete
-Plans:
-- [ ] 05-01-PLAN.md — Types, service registration (registerService), and 402 response generation (create402Response)
-- [ ] 05-02-PLAN.md — Payment verification (verifyPayment), settlement (settlePayment), and service handler wrapper (createX402Service)
-- [ ] 05-03-PLAN.md — ServicesResource on HeyLolClient (client.services.call) and SDK wiring
-
-### Phase 6: Adapters, Docs, and Release
-**Goal**: Developers on Cloudflare Workers, Vercel Edge, and Express can integrate the SDK with platform-native patterns, and any developer can go from npm install to first API call in under 5 minutes by following the README
-**Depends on**: Phase 3, Phase 4, Phase 5
-**Requirements**: ADPT-01, ADPT-02, ADPT-03, DOCS-01, DOCS-02, DOCS-03, DOCS-04, TYPE-04
-**Success Criteria** (what must be TRUE):
-  1. A Cloudflare Worker using `CloudflareClient` with env binding support builds and deploys via `wrangler dev` without errors
-  2. A Vercel Edge function using `VercelClient` and the Next.js middleware helper compiles without TypeScript errors
-  3. An Express app using the Express `RequestHandler` middleware processes authenticated requests end-to-end
-  4. A developer unfamiliar with the project follows the README quickstart and completes a first post in under 5 minutes
-  5. All public methods have JSDoc with examples, and `pnpm publish --dry-run` against a packed tarball passes `attw --pack .` with zero TypeScript declaration errors
-**Plans:** 3/3 plans complete
-Plans:
-- [ ] 06-01-PLAN.md — Runtime adapters: Cloudflare Workers, Vercel Edge, and Express middleware
-- [ ] 06-02-PLAN.md — JSDoc/TSDoc documentation on all public methods across SDK and services
-- [ ] 06-03-PLAN.md — README quickstart, example projects, and publish pipeline validation
-
-### Phase 7: README & Documentation Fixes
-**Goal**: README code examples compile and run correctly, so a developer following the quickstart hits zero TypeScript errors on first try
-**Depends on**: Phase 6
-**Requirements**: DOCS-01, DOCS-02, DOCS-03, DOCS-04
-**Gap Closure:** Closes gaps from v1.0 audit
-**Success Criteria** (what must be TRUE):
-  1. README quickstart code compiles without TypeScript errors — all method names, parameter types, and error property names match the actual SDK API
-  2. API Overview table lists all public resource methods including `profile.me()` and `discovery.suggested()`
-  3. 06-03-SUMMARY.md frontmatter includes `requirements-completed` for DOCS-02, DOCS-03, DOCS-04
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 07-01-PLAN.md — Fix README error property names and add requirements-completed to 06-03-SUMMARY.md
-
-### Phase 8: CI & Type Integrity
-**Goal**: CI validates all packages consistently, types are aligned across SDK and services, and the public API surface contains no phantom dependencies or leaked internals
-**Depends on**: Phase 6
-**Requirements**: INFRA-01, INFRA-04, INFRA-05, AUTH-04, TYPE-01
-**Gap Closure:** Closes gaps from v1.0 audit
-**Success Criteria** (what must be TRUE):
-  1. CI pnpm version matches package.json `packageManager` field
-  2. `attw --pack .` passes for @heylol/sdk, @heylol/services, and all 3 adapter packages
-  3. `PaymentRequirements` type is consistent between SDK and services packages (same field names)
-  4. `@x402/core` is not listed as a production dependency in @heylol/services (or is actually imported)
-  5. `@heylol/sdk/services` subpath exports meaningful functionality or is removed
-  6. `encodeCompactU16` is not exported from @heylol/sdk public API (moved to internal)
-  7. Client barrel circular import resolved with direct imports
-**Plans:** 2/2 plans complete
-Plans:
-- [ ] 08-01-PLAN.md — CI pnpm version fix, attw expansion, phantom dependency removal, services subpath cleanup
-- [ ] 08-02-PLAN.md — PaymentRequirements v2 type alignment and circular barrel import fix
-
-### Phase 9: Size-Limit Fix & Tech Debt Cleanup
-**Goal**: CI size-check passes again and public API surface contains no leaked internals or stale tracking gaps
-**Depends on**: Phase 8
-**Requirements**: INFRA-06
-**Gap Closure:** Closes remaining gap from v1.0 re-audit + tech debt items
-**Success Criteria** (what must be TRUE):
-  1. `.size-limit.json` references only existing dist files — `pnpm turbo size-check` passes
-  2. `04-02-SUMMARY.md` frontmatter lists POST-01..07, PROF-01..04 in `requirements-completed`
-  3. `06-02-SUMMARY.md` frontmatter lists TYPE-04 in `requirements-completed`
-  4. `encodeCompactU16` and `PAYMENT_HEADERS` are not exported from `@heylol/sdk` public API
-  5. README error handling example displays `retryAfterMs` without misleading seconds suffix
-**Plans:** 1 plan
-Plans:
-- [ ] 09-01-PLAN.md — Fix size-limit config, remove leaked exports, correct README ms/s label
+</details>
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation | 3/3 | Complete | 2026-03-01 |
-| 2. Core Crypto and Auth | 4/4 | Complete | 2026-03-01 |
-| 3. HTTP Client | 2/2 | Complete | 2026-03-01 |
-| 4. API Wrappers | 3/3 | Complete | 2026-03-01 |
-| 5. Services Package | 3/3 | Complete | 2026-03-02 |
-| 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
-| 7. README & Documentation Fixes | 1/1 | Complete | 2026-03-02 |
-| 8. CI & Type Integrity | 2/2 | Complete | 2026-03-02 |
-| 9. Size-Limit Fix & Tech Debt | 0/0 | Planned | — |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Foundation | v1.0 | 3/3 | Complete | 2026-03-01 |
+| 2. Core Crypto and Auth | v1.0 | 4/4 | Complete | 2026-03-01 |
+| 3. HTTP Client | v1.0 | 2/2 | Complete | 2026-03-01 |
+| 4. API Wrappers | v1.0 | 3/3 | Complete | 2026-03-01 |
+| 5. Services Package | v1.0 | 3/3 | Complete | 2026-03-02 |
+| 6. Adapters, Docs, and Release | v1.0 | 3/3 | Complete | 2026-03-02 |
+| 7. README & Documentation Fixes | v1.0 | 1/1 | Complete | 2026-03-02 |
+| 8. CI & Type Integrity | v1.0 | 2/2 | Complete | 2026-03-02 |
+| 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |

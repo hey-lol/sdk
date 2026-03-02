@@ -81,7 +81,7 @@ Each task was committed atomically:
 1. **Task 1: Package setup, types, and registerService()** - `e0583df` (feat)
 2. **Task 2: create402Response() and barrel export finalization** - `986be0a` (feat)
 
-**Plan metadata:** _(docs commit — see below)_
+**Plan metadata:** `b00f75b` (docs: complete services-package foundation plan)
 
 ## Files Created/Modified
 - `packages/services/src/types.ts` - PriceConfig, ServiceDefinition, VerifyResult, SettleResult interfaces
