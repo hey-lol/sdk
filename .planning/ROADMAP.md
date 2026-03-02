@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface (completed 2026-03-01)
 - [x] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications (completed 2026-03-01)
 - [x] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation (completed 2026-03-02)
-- [ ] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline
+- [x] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline (completed 2026-03-02)
 
 ## Phase Details
 
@@ -110,7 +110,7 @@ Plans:
   3. An Express app using the Express `RequestHandler` middleware processes authenticated requests end-to-end
   4. A developer unfamiliar with the project follows the README quickstart and completes a first post in under 5 minutes
   5. All public methods have JSDoc with examples, and `pnpm publish --dry-run` against a packed tarball passes `attw --pack .` with zero TypeScript declaration errors
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 06-01-PLAN.md — Runtime adapters: Cloudflare Workers, Vercel Edge, and Express middleware
 - [ ] 06-02-PLAN.md — JSDoc/TSDoc documentation on all public methods across SDK and services
@@ -128,4 +128,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
 | 4. API Wrappers | 2/3 | Complete    | 2026-03-01 |
 | 5. Services Package | 2/3 | Complete    | 2026-03-02 |
-| 6. Adapters, Docs, and Release | 2/3 | In Progress|  |
+| 6. Adapters, Docs, and Release | 2/3 | Complete    | 2026-03-02 |
