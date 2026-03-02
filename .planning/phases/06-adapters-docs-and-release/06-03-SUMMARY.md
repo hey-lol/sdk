@@ -3,6 +3,7 @@ phase: 06-adapters-docs-and-release
 plan: 03
 subsystem: docs-and-release
 tags: [readme, examples, cloudflare-workers, nextjs, x402, publish-pipeline, attw]
+requirements-completed: [DOCS-02, DOCS-03, DOCS-04]
 
 # Dependency graph
 requires:
