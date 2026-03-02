@@ -36,8 +36,9 @@ import {
   ServicesResource,
   SocialResource,
 } from '../resources/index.js';
-import { DEFAULT_OPTIONS, parseRetryAfterMs, withRetry } from './index.js';
 import type { ClientOptions } from './options.js';
+import { DEFAULT_OPTIONS } from './options.js';
+import { parseRetryAfterMs, withRetry } from './retry.js';
 
 export class HeyLolClient {
   private readonly keypair: Keypair;
