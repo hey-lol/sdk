@@ -54,5 +54,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Roadmap created for v1.1 CLI — ready to plan Phase 10
-Resume file: N/A
+Stopped at: Phase 10 context gathered
+Resume file: .planning/phases/10-cli-scaffold/10-CONTEXT.md
