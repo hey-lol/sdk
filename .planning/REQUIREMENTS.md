@@ -14,7 +14,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INFRA-03**: ESLint rules ban Buffer, process, and Node.js crypto imports in core package
 - [x] **INFRA-04**: Package.json exports map configured with correct types/import/require conditions
 - [x] **INFRA-05**: publint and attw validate package exports in CI
-- [x] **INFRA-06**: size-limit enforces < 100 KB core bundle
+- [ ] **INFRA-06**: size-limit enforces < 100 KB core bundle
 - [x] **INFRA-07**: Changesets configured for semantic versioning and changelog generation
 
 ### Auth
@@ -149,7 +149,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
-| INFRA-06 | Phase 1 | Complete |
+| INFRA-06 | Phase 9 | Pending |
 | INFRA-07 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Complete |
 | AUTH-02 | Phase 2 | Complete |
@@ -203,8 +203,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 55 total
 - Mapped to phases: 55
-- Complete: 51
-- Pending (gap closure): 4 (DOCS-01..04 → Phase 7)
+- Complete: 54
+- Pending (gap closure): 1 (INFRA-06 → Phase 9)
 
 ---
 *Requirements defined: 2026-02-28*

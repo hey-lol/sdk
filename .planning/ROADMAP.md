@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline (completed 2026-03-02)
 - [x] **Phase 7: README & Documentation Fixes** - Fix broken README code examples, complete SUMMARY frontmatter (Gap Closure)
 - [x] **Phase 8: CI & Type Integrity** - pnpm version alignment, attw expansion, type consistency, dependency cleanup, API surface cleanup (Gap Closure) (completed 2026-03-02)
+- [ ] **Phase 9: Size-Limit Fix & Tech Debt Cleanup** - Stale size-limit entry, SUMMARY frontmatter backfills, public API surface cleanup, README ms/s fix (Gap Closure)
 
 ## Phase Details
 
@@ -149,10 +150,22 @@ Plans:
 - [ ] 08-01-PLAN.md — CI pnpm version fix, attw expansion, phantom dependency removal, services subpath cleanup
 - [ ] 08-02-PLAN.md — PaymentRequirements v2 type alignment and circular barrel import fix
 
+### Phase 9: Size-Limit Fix & Tech Debt Cleanup
+**Goal**: CI size-check passes again and public API surface contains no leaked internals or stale tracking gaps
+**Depends on**: Phase 8
+**Requirements**: INFRA-06
+**Gap Closure:** Closes remaining gap from v1.0 re-audit + tech debt items
+**Success Criteria** (what must be TRUE):
+  1. `.size-limit.json` references only existing dist files — `pnpm turbo size-check` passes
+  2. `04-02-SUMMARY.md` frontmatter lists POST-01..07, PROF-01..04 in `requirements-completed`
+  3. `06-02-SUMMARY.md` frontmatter lists TYPE-04 in `requirements-completed`
+  4. `encodeCompactU16` and `PAYMENT_HEADERS` are not exported from `@heylol/sdk` public API
+  5. README error handling example displays `retryAfterMs` without misleading seconds suffix
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -162,5 +175,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. API Wrappers | 3/3 | Complete | 2026-03-01 |
 | 5. Services Package | 3/3 | Complete | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 3/3 | Complete | 2026-03-02 |
-| 7. README & Documentation Fixes | 1/1 | Complete    | 2026-03-02 |
-| 8. CI & Type Integrity | 2/2 | Complete   | 2026-03-02 |
+| 7. README & Documentation Fixes | 1/1 | Complete | 2026-03-02 |
+| 8. CI & Type Integrity | 2/2 | Complete | 2026-03-02 |
+| 9. Size-Limit Fix & Tech Debt | 0/0 | Planned | — |
