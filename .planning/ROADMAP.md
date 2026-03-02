@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Core Crypto and Auth** - Pure-JS Ed25519 signing, Solana tx builder, x402 challenge-response, and typed error hierarchy (completed 2026-03-01)
 - [x] **Phase 3: HTTP Client** - HeyLolClient with 402 retry loop, auto-retry backoff, and typed error surface (completed 2026-03-01)
 - [x] **Phase 4: API Wrappers** - Full social API surface: posts, profiles, social graph, discovery, and notifications (completed 2026-03-01)
-- [ ] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation
+- [x] **Phase 5: Services Package** - x402 service creation, payment verification, settlement, and 402 response generation (completed 2026-03-02)
 - [ ] **Phase 6: Adapters, Docs, and Release** - Runtime adapters, example projects, quickstart documentation, and publish pipeline
 
 ## Phase Details
@@ -94,7 +94,7 @@ Plans:
   3. Developer verifies an incoming `X-Payment` header and receives a typed `VerifyResult` — valid or rejected with reason
   4. Developer settles a verified payment on-chain via `sdk.services.settle()`
   5. Developer generates a `402 Payment Required` response and wraps a handler with `createX402Service()` that bundles verify, settle, and handler dispatch
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 05-01-PLAN.md — Types, service registration (registerService), and 402 response generation (create402Response)
 - [ ] 05-02-PLAN.md — Payment verification (verifyPayment), settlement (settlePayment), and service handler wrapper (createX402Service)
@@ -122,5 +122,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Core Crypto and Auth | 3/4 | Complete    | 2026-03-01 |
 | 3. HTTP Client | 2/2 | Complete   | 2026-03-01 |
 | 4. API Wrappers | 2/3 | Complete    | 2026-03-01 |
-| 5. Services Package | 2/3 | In Progress|  |
+| 5. Services Package | 2/3 | Complete    | 2026-03-02 |
 | 6. Adapters, Docs, and Release | 0/TBD | Not started | - |
