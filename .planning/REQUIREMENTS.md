@@ -9,14 +9,14 @@ Requirements for the CLI milestone. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: User can install `heylol` globally via `npm install -g heylol` or run via `npx heylol`
+- [x] **INFRA-01**: User can install `heylol` globally via `npm install -g heylol` or run via `npx heylol`
 - [ ] **INFRA-02**: CLI outputs JSON to stdout by default for all successful responses
 - [ ] **INFRA-03**: CLI outputs structured JSON errors `{error: {code, message}}` to stderr on all failures
 - [ ] **INFRA-04**: CLI provides `--human` flag that formats output with colors and readable structure
 - [ ] **INFRA-05**: CLI auto-detects TTY — human output at terminal, JSON when piped — explicit flags override
 - [ ] **INFRA-06**: CLI uses typed exit codes: 0=success, 1=general, 2=bad-args, 3=not-found, 4=auth, 5=rate-limited
-- [ ] **INFRA-07**: CLI provides `--help` on every command and subcommand with clear descriptions
-- [ ] **INFRA-08**: CLI supports `HEYLOL_BASE_URL` env var to override API base URL
+- [x] **INFRA-07**: CLI provides `--help` on every command and subcommand with clear descriptions
+- [x] **INFRA-08**: CLI supports `HEYLOL_BASE_URL` env var to override API base URL
 - [ ] **INFRA-09**: All list commands support `--cursor` and `--limit` flags with `nextCursor` in response
 
 ### Auth
@@ -93,14 +93,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 10 | Pending |
+| INFRA-01 | Phase 10 | Complete |
 | INFRA-02 | Phase 11 | Pending |
 | INFRA-03 | Phase 11 | Pending |
 | INFRA-04 | Phase 11 | Pending |
 | INFRA-05 | Phase 11 | Pending |
 | INFRA-06 | Phase 11 | Pending |
-| INFRA-07 | Phase 10 | Pending |
-| INFRA-08 | Phase 10 | Pending |
+| INFRA-07 | Phase 10 | Complete |
+| INFRA-08 | Phase 10 | Complete |
 | INFRA-09 | Phase 11 | Pending |
 | AUTH-01 | Phase 12 | Pending |
 | AUTH-02 | Phase 12 | Pending |

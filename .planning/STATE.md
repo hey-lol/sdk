@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 10 of 14 (CLI Scaffold)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-02 — Roadmap created for v1.1 CLI (phases 10-14, 32 requirements mapped)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-03-02 — Completed 10-01: CLI scaffold with 6 command groups and ESM binary
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
@@ -31,6 +31,7 @@ Progress: [░░░░░░░░░░] 0%
 | 2-9. (remaining) | 19 | ~5.7 hrs | ~18 min |
 
 *v1.1 metrics start from Phase 10*
+| Phase 10-cli-scaffold P01 | 4 | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -42,6 +43,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Stack locked: commander@14, conf@15, picocolors@1.1, tsup ESM-only output
 - Scaffold and output module must be complete before any command logic (pitfalls research)
 - Auth gates all other commands — Phase 12 must be solid before Phase 13/14
+- tsup shebang injection requires banner.js not shebang:true option (shebang:true only chmod +x)
+- outExtension() needed in tsup to produce .mjs extension matching bin field
+- createRequire(import.meta.url) pattern for ESM-safe package.json version read (not dynamic import)
+- @types/node required as devDependency for Node built-in type declarations in CLI packages
 
 ### Pending Todos
 
@@ -54,5 +59,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-cli-scaffold/10-CONTEXT.md
+Stopped at: Completed 10-01-PLAN.md (CLI scaffold — heylol binary with 6 command groups)
+Resume file: .planning/phases/10-cli-scaffold/10-01-SUMMARY.md
