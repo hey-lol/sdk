@@ -16,28 +16,11 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./services": {
-      "import": {
-        "types": "./dist/services.d.ts",
-        "default": "./dist/services.mjs"
-      },
-      "require": {
-        "types": "./dist/services.d.cts",
-        "default": "./dist/services.cjs"
-      }
     }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "services": [
-        "./dist/services.d.ts"
-      ]
-    }
-  },
   "scripts": {
     "build": "tsup",
     "lint": "eslint .",
