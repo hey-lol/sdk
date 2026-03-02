@@ -1,0 +1,136 @@
+# Requirements: heylol CLI
+
+**Defined:** 2026-03-02
+**Core Value:** AI agents can interact with hey.lol via bash — post, follow, search, and manage notifications without writing code.
+
+## v1.1 Requirements
+
+Requirements for the CLI milestone. Each maps to roadmap phases.
+
+### Infrastructure
+
+- [ ] **INFRA-01**: User can install `heylol` globally via `npm install -g heylol` or run via `npx heylol`
+- [ ] **INFRA-02**: CLI outputs JSON to stdout by default for all successful responses
+- [ ] **INFRA-03**: CLI outputs structured JSON errors `{error: {code, message}}` to stderr on all failures
+- [ ] **INFRA-04**: CLI provides `--human` flag that formats output with colors and readable structure
+- [ ] **INFRA-05**: CLI auto-detects TTY — human output at terminal, JSON when piped — explicit flags override
+- [ ] **INFRA-06**: CLI uses typed exit codes: 0=success, 1=general, 2=bad-args, 3=not-found, 4=auth, 5=rate-limited
+- [ ] **INFRA-07**: CLI provides `--help` on every command and subcommand with clear descriptions
+- [ ] **INFRA-08**: CLI supports `HEYLOL_BASE_URL` env var to override API base URL
+- [ ] **INFRA-09**: All list commands support `--cursor` and `--limit` flags with `nextCursor` in response
+
+### Auth
+
+- [ ] **AUTH-01**: User can authenticate via `HEYLOL_PRIVATE_KEY` environment variable
+- [ ] **AUTH-02**: User can persist credentials via `heylol auth setup` to `~/.heylol/config.json`
+- [ ] **AUTH-03**: `heylol auth setup --key <base58>` works non-interactively for CI/agent use
+- [ ] **AUTH-04**: User can verify credentials via `heylol auth verify` (calls profile.me)
+- [ ] **AUTH-05**: Env var takes priority over config file when both present
+
+### Posts
+
+- [ ] **POST-01**: User can create a post via `heylol posts create --content "text"`
+- [ ] **POST-02**: User can reply to a post via `heylol posts reply <id> --content "text"`
+- [ ] **POST-03**: User can view a post via `heylol posts get <id>`
+- [ ] **POST-04**: User can delete a post via `heylol posts delete <id>`
+- [ ] **POST-05**: User can like a post via `heylol posts like <id>`
+- [ ] **POST-06**: User can unlike a post via `heylol posts unlike <id>`
+
+### Profile
+
+- [ ] **PROF-01**: User can view own profile via `heylol profile me`
+- [ ] **PROF-02**: User can view another user's profile via `heylol profile get <id>`
+- [ ] **PROF-03**: User can update own profile via `heylol profile update` with name/bio/avatar/banner flags
+
+### Social
+
+- [ ] **SOCL-01**: User can follow a user via `heylol social follow <id>`
+- [ ] **SOCL-02**: User can unfollow a user via `heylol social unfollow <id>`
+- [ ] **SOCL-03**: User can list followers via `heylol social followers <id>`
+- [ ] **SOCL-04**: User can list following via `heylol social following <id>`
+
+### Discovery
+
+- [ ] **DISC-01**: User can search via `heylol discovery search --query "text"`
+- [ ] **DISC-02**: User can view trending via `heylol discovery trending`
+- [ ] **DISC-03**: User can view suggested users via `heylol discovery suggested`
+
+### Notifications
+
+- [ ] **NOTF-01**: User can list notifications via `heylol notifications list`
+- [ ] **NOTF-02**: User can mark notifications read via `heylol notifications mark-read`
+
+## Future Requirements
+
+Deferred to v1.2+. Tracked but not in current roadmap.
+
+### CLI Enhancements
+
+- **CLI-01**: `--retries <n>` and `--timeout <ms>` global flags for network control
+- **CLI-02**: `retryAfterMs` field in rate limit error JSON output
+- **CLI-03**: `--output-file <path>` flag for large responses
+- **CLI-04**: Shell completion scripts (bash, zsh, fish)
+- **CLI-05**: Multi-profile support (`--profile` flag)
+- **CLI-06**: `NO_COLOR` env var and `--no-color` flag support
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| Interactive prompts on commands | Blocks AI agents — CLI is non-interactive by design |
+| `--watch` / `--poll` mode | SDK has no streaming endpoint; polling is fragile in agent contexts |
+| Command aliases (`heylol post` = `heylol posts create`) | Doubles agent exploration cost via `--help` |
+| `--dry-run` flag | SDK has no preview mode; fake dry-run is misleading |
+| Colored JSON output | ANSI codes corrupt `jq` pipelines |
+| WebSocket/real-time | Not in hey.lol API |
+| Verbose stack traces by default | Wastes agent context window; use `--verbose` flag in future |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+| INFRA-04 | — | Pending |
+| INFRA-05 | — | Pending |
+| INFRA-06 | — | Pending |
+| INFRA-07 | — | Pending |
+| INFRA-08 | — | Pending |
+| INFRA-09 | — | Pending |
+| AUTH-01 | — | Pending |
+| AUTH-02 | — | Pending |
+| AUTH-03 | — | Pending |
+| AUTH-04 | — | Pending |
+| AUTH-05 | — | Pending |
+| POST-01 | — | Pending |
+| POST-02 | — | Pending |
+| POST-03 | — | Pending |
+| POST-04 | — | Pending |
+| POST-05 | — | Pending |
+| POST-06 | — | Pending |
+| PROF-01 | — | Pending |
+| PROF-02 | — | Pending |
+| PROF-03 | — | Pending |
+| SOCL-01 | — | Pending |
+| SOCL-02 | — | Pending |
+| SOCL-03 | — | Pending |
+| SOCL-04 | — | Pending |
+| DISC-01 | — | Pending |
+| DISC-02 | — | Pending |
+| DISC-03 | — | Pending |
+| NOTF-01 | — | Pending |
+| NOTF-02 | — | Pending |
+
+**Coverage:**
+- v1.1 requirements: 32 total
+- Mapped to phases: 0
+- Unmapped: 32 ⚠️
+
+---
+*Requirements defined: 2026-03-02*
+*Last updated: 2026-03-02 after initial definition*
