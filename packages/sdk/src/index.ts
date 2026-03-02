@@ -7,7 +7,6 @@ export {
   buildPaymentHeader,
   getPaymentVersion,
   loadKeypair,
-  PAYMENT_HEADERS,
   parsePaymentRequirements,
 } from './auth/index.js';
 // Client
