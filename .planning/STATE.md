@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** Phase 8 in progress — CI pnpm version fix, attw all-packages coverage, phantom dependency removal, vestigial subpath cleanup
+**Current focus:** Phase 8 complete — PaymentRequirements v2 type alignment, normalizeRequirements() helper, HeyLolClient circular import eliminated
 
 ## Current Position
 
 Phase: 8 of 8 (CI and Type Integrity)
-Plan: 1 of 2 in current phase (COMPLETE)
-Status: Phase 8 plan 01 complete — CI pnpm corrected to packageManager field, attw loops all packages, @x402/core removed from services, @heylol/sdk/services subpath fully removed
-Last activity: 2026-03-02 — Plan 08-01 complete (CI fixes + phantom dep removal + vestigial subpath cleanup)
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 8 complete — PaymentRequirements.amount canonical field, maxAmountRequired deprecated alias, HeyLolClient direct imports from ./options.js and ./retry.js
+Last activity: 2026-03-02 — Plan 08-02 complete (type alignment + circular import fix)
 
 Progress: [████████░░] 80%
 
@@ -151,5 +151,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 08-01-PLAN.md (CI pnpm fix, attw all-packages, @x402/core removed, @heylol/sdk/services subpath removed)
-Resume file: .planning/phases/08-ci-and-type-integrity/08-02-PLAN.md
+Stopped at: Completed 08-02-PLAN.md (PaymentRequirements v2 type alignment + HeyLolClient circular import fix — Phase 8 COMPLETE)
+Resume file: N/A — all phases complete
