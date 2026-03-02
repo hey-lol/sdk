@@ -71,12 +71,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Services & Payments
 
-- [ ] **SVC-01**: Developer can call an x402 service with typed input/output
+- [x] **SVC-01**: Developer can call an x402 service with typed input/output
 - [x] **SVC-02**: Developer can register a service with price and schema
-- [ ] **SVC-03**: Developer can verify incoming x402 payment headers
-- [ ] **SVC-04**: Developer can settle payments on-chain
+- [x] **SVC-03**: Developer can verify incoming x402 payment headers
+- [x] **SVC-04**: Developer can settle payments on-chain
 - [x] **SVC-05**: Developer can generate 402 Payment Required responses
-- [ ] **SVC-06**: Service handler wrapper (createX402Service) bundles verify + settle + handler
+- [x] **SVC-06**: Service handler wrapper (createX402Service) bundles verify + settle + handler
 
 ### Types
 
@@ -185,12 +185,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTF-02 | Phase 4 | Complete |
 | TYPE-01 | Phase 4 | Complete |
 | TYPE-02 | Phase 4 | Complete |
-| SVC-01 | Phase 5 | Pending |
+| SVC-01 | Phase 5 | Complete |
 | SVC-02 | Phase 5 | Complete |
-| SVC-03 | Phase 5 | Pending |
-| SVC-04 | Phase 5 | Pending |
+| SVC-03 | Phase 5 | Complete |
+| SVC-04 | Phase 5 | Complete |
 | SVC-05 | Phase 5 | Complete |
-| SVC-06 | Phase 5 | Pending |
+| SVC-06 | Phase 5 | Complete |
 | ADPT-01 | Phase 6 | Pending |
 | ADPT-02 | Phase 6 | Pending |
 | ADPT-03 | Phase 6 | Pending |

@@ -50,6 +50,7 @@ Progress: [█████████░] 83%
 | Phase 04-api-wrappers P03 | 6min | 2 tasks | 10 files |
 | Phase 05-services-package P01 | 3min | 2 tasks | 10 files |
 | Phase 05-services-package P03 | 2min | 1 tasks | 6 files |
+| Phase 05-services-package P02 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 05-03]: Method-level generics on call<TInput, TOutput>() — single ServicesResource instance handles multiple service I/O types
 - [Phase 05-03]: URL pattern /services/{serviceId}/call is provisional — documented as pending validation against hey.lol API docs
 - [Phase 05-03]: Scope bounded to hey.lol identity-auth handshake (dummy Solana tx) — external x402 services requiring real USDC out of scope for v1
+- [Phase 05-services-package]: Direct fetch to facilitator /verify and /settle — no HTTPFacilitatorClient import; keeps verify/settle modules minimal
+- [Phase 05-services-package]: Settlement failure does not fail the response — handler output returned as 200 even if settle fails (best-effort)
+- [Phase 05-services-package]: typeof result.isValid === 'boolean' guard in verifyPayment — prevents truthy string bypass
 
 ### Pending Todos
 
