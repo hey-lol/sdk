@@ -121,4 +121,4 @@ Plans:
 | 11. Output and Infrastructure | 2/2 | Complete    | 2026-03-03 | - |
 | 12. Auth Commands | 1/1 | Complete    | 2026-03-03 | - |
 | 13. Post and Profile Commands | 1/1 | Complete    | 2026-03-03 | - |
-| 14. Social, Discovery, Notifications, and Publish | 2/2 | Complete   | 2026-03-03 | - |
+| 14. Social, Discovery, Notifications, and Publish | 2/2 | Complete    | 2026-03-03 | - |
