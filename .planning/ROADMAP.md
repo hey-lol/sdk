@@ -57,7 +57,7 @@ Plans:
   3. `heylol <any-command> --human` formats output with colors and readable structure instead of raw JSON
   4. Piping output (`heylol posts list | jq`) auto-selects JSON; running at terminal auto-selects human format
   5. Exit code is 0 on success, and maps to documented codes (1-5) for each error class; `echo $?` after a failed auth returns 4
-**Plans:** 1/2 plans complete
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 11-01-PLAN.md — Output module contract (printSuccess/printFailure, EXIT codes, TTY detection, --human/--json flags) and pagination flags (--cursor/--limit) on all list commands
 - [ ] 11-02-PLAN.md — Gap closure: Wire Commander exitOverride to route argument errors to EXIT.BAD_ARGS (code 2) with structured JSON stderr
@@ -111,7 +111,7 @@ Plans:
 | 8. CI & Type Integrity | v1.0 | 2/2 | Complete | 2026-03-02 |
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 10. CLI Scaffold | 1/1 | Complete    | 2026-03-02 | - |
-| 11. Output and Infrastructure | 1/1 | Complete   | 2026-03-03 | - |
+| 11. Output and Infrastructure | 2/2 | Complete   | 2026-03-03 | - |
 | 12. Auth Commands | v1.1 | 0/? | Not started | - |
 | 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
 | 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |

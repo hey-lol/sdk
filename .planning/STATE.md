@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 11 of 14 (Output Infrastructure)
-Plan: 1 of 1 in current phase — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE
 Status: In progress
-Last activity: 2026-03-03 — Completed 11-01: Output contract, GlobalContext extension, pagination flags
+Last activity: 2026-03-03 — Completed 11-02: Commander exitOverride to EXIT.BAD_ARGS with structured JSON stderr
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -33,6 +33,7 @@ Progress: [█░░░░░░░░░] 10%
 *v1.1 metrics start from Phase 10*
 | Phase 10-cli-scaffold P01 | 4 | 2 tasks | 13 files |
 | Phase 11-output-infrastructure P01 | 2 | 2 tasks | 7 files | 2 min |
+| Phase 11-output-infrastructure P02 | 1 | 1 task | 2 files | 4 min |
 
 ## Accumulated Context
 
@@ -52,6 +53,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - TTY detection priority: json flag > human flag > process.stdout.isTTY — explicit flags always win
 - EXIT codes as const object not enum — better tree-shaking, simpler TypeScript narrowing
 - parseInt passed directly as argParser for --limit — avoids custom parser boilerplate
+- exitOverride + configureOutput(writeErr noop) used together — exitOverride alone still leaks Commander's plaintext stderr before the throw
+- applyExitOverride() recursively walks cmd.commands — copyInheritedSettings is one-level-only, subcommand children require explicit propagation
+- CommanderError.exitCode === 0 guard handles --help and --version without special-casing error codes
 
 ### Pending Todos
 
@@ -64,5 +68,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 11-01-PLAN.md (Output infrastructure — output contract, GlobalContext, pagination flags)
-Resume file: .planning/phases/11-output-infrastructure/11-01-SUMMARY.md
+Stopped at: Completed 11-02-PLAN.md (Commander exitOverride to EXIT.BAD_ARGS, structured JSON stderr, recursive applyExitOverride)
+Resume file: .planning/phases/11-output-infrastructure/11-02-SUMMARY.md
