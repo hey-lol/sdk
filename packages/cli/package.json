@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "hey.lol CLI for AI agents and developers",
   "bin": {
-    "heylol": "./dist/cli.mjs"
+    "heylol": "dist/cli.mjs"
   },
   "files": [
     "dist"

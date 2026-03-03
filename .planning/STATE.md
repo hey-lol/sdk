@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 14 of 14 (Social, Discovery, Notifications, and Publish)
-Plan: 1 of 2 in current phase — COMPLETE
-Status: In progress
-Last activity: 2026-03-03 — Completed 14-01: Social/discovery/notifications command handlers (social follow/unfollow/followers/following, discovery search/trending/suggested, notifications list/mark-read)
+Plan: 2 of 2 in current phase — COMPLETE
+Status: COMPLETE
+Last activity: 2026-03-03 — Completed 14-02: Published heylol@1.0.0 to npm; npx heylol@1.0.0 --version prints 1.0.0; @heylol/sdk@1.0.0 dependency rewritten correctly by pnpm publish
 
-Progress: [████░░░░░░] 40%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -37,6 +37,7 @@ Progress: [████░░░░░░] 40%
 | Phase 12-auth-commands P01 | 2 | 2 tasks | 2 files | 2 min |
 | Phase 13-post-and-profile-commands P01 | 2 | 2 tasks | 2 files |
 | Phase 14-social-discovery-notifications P01 | 1 | 1 task | 3 files | 1 min |
+| Phase 14-social-discovery-notifications P02 | 2 | 2 tasks | 2 files | 5 min |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 13-post-and-profile-commands]: profile update command accepts empty params object — no guard for at least one flag, server returns unchanged profile
 - [Phase 14-social-discovery-notifications]: notifications mark-read implements mark-all only (no --ids flag) — success criteria only tests no-argument case; selective marking deferred
 - [Phase 14-social-discovery-notifications]: discovery search omits --type filter option — success criteria only requires --query; simpler implementation without scope creep
+- [Phase 14-publish]: pnpm publish (not npm publish) required for workspace monorepos — npm publish publishes literal workspace:* string breaking consumer installs; pnpm publish rewrites to resolved semver
+- [Phase 14-publish]: posts list() auto-fixed during preflight — was returning raw API response object instead of .posts array
 
 ### Pending Todos
 
@@ -80,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 14-01-PLAN.md (Social/discovery/notifications commands: social follow/unfollow/followers/following, discovery search/trending/suggested, notifications list/mark-read)
-Resume file: .planning/phases/14-social-discovery-notifications-and-publish/14-01-SUMMARY.md
+Stopped at: Completed 14-02-PLAN.md — heylol@1.0.0 published to npm. All Phase 14 plans complete. v1.1 CLI milestone complete.
+Resume file: .planning/phases/14-social-discovery-notifications-and-publish/14-02-SUMMARY.md
