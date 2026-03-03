@@ -28,7 +28,7 @@
 
 - [x] **Phase 10: CLI Scaffold** — Package structure, bin entry, tsup ESM-only build, workspace link to @heylol/sdk (completed 2026-03-02)
 - [x] **Phase 11: Output and Infrastructure** — stdout/stderr discipline, TTY detection, exit codes, pagination flags (completed 2026-03-03)
-- [ ] **Phase 12: Auth Commands** — Credential setup, env var and config file resolution, `heylol auth` commands
+- [x] **Phase 12: Auth Commands** — Credential setup, env var and config file resolution, `heylol auth` commands (completed 2026-03-03)
 - [ ] **Phase 13: Post and Profile Commands** — All `heylol posts` and `heylol profile` subcommands
 - [ ] **Phase 14: Social, Discovery, Notifications, and Publish** — All remaining commands plus npm publish
 
@@ -72,7 +72,7 @@ Plans:
   3. After `heylol auth setup`, subsequent commands authenticate without passing any key flags
   4. When both env var and config file are present, env var wins — commands use the env var key
   5. `heylol auth verify` returns own profile JSON on valid credentials, exits with code 4 on invalid credentials
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 12-01-PLAN.md — Config module (conf singleton, resolveKey, createClient) and auth setup/verify commands
 
@@ -114,6 +114,6 @@ Plans:
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 10. CLI Scaffold | 1/1 | Complete    | 2026-03-02 | - |
 | 11. Output and Infrastructure | 2/2 | Complete    | 2026-03-03 | - |
-| 12. Auth Commands | v1.1 | 0/1 | Not started | - |
+| 12. Auth Commands | 1/1 | Complete   | 2026-03-03 | - |
 | 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
 | 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |

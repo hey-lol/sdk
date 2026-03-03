@@ -21,11 +21,11 @@ Requirements for the CLI milestone. Each maps to roadmap phases.
 
 ### Auth
 
-- [ ] **AUTH-01**: User can authenticate via `HEYLOL_PRIVATE_KEY` environment variable
-- [ ] **AUTH-02**: User can persist credentials via `heylol auth setup` to `~/.heylol/config.json`
-- [ ] **AUTH-03**: `heylol auth setup --key <base58>` works non-interactively for CI/agent use
-- [ ] **AUTH-04**: User can verify credentials via `heylol auth verify` (calls profile.me)
-- [ ] **AUTH-05**: Env var takes priority over config file when both present
+- [x] **AUTH-01**: User can authenticate via `HEYLOL_PRIVATE_KEY` environment variable
+- [x] **AUTH-02**: User can persist credentials via `heylol auth setup` to `~/.heylol/config.json`
+- [x] **AUTH-03**: `heylol auth setup --key <base58>` works non-interactively for CI/agent use
+- [x] **AUTH-04**: User can verify credentials via `heylol auth verify` (calls profile.me)
+- [x] **AUTH-05**: Env var takes priority over config file when both present
 
 ### Posts
 
@@ -102,11 +102,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-07 | Phase 10 | Complete |
 | INFRA-08 | Phase 10 | Complete |
 | INFRA-09 | Phase 11 | Complete |
-| AUTH-01 | Phase 12 | Pending |
-| AUTH-02 | Phase 12 | Pending |
-| AUTH-03 | Phase 12 | Pending |
-| AUTH-04 | Phase 12 | Pending |
-| AUTH-05 | Phase 12 | Pending |
+| AUTH-01 | Phase 12 | Complete |
+| AUTH-02 | Phase 12 | Complete |
+| AUTH-03 | Phase 12 | Complete |
+| AUTH-04 | Phase 12 | Complete |
+| AUTH-05 | Phase 12 | Complete |
 | POST-01 | Phase 13 | Pending |
 | POST-02 | Phase 13 | Pending |
 | POST-03 | Phase 13 | Pending |
