@@ -29,7 +29,7 @@
 - [x] **Phase 10: CLI Scaffold** — Package structure, bin entry, tsup ESM-only build, workspace link to @heylol/sdk (completed 2026-03-02)
 - [x] **Phase 11: Output and Infrastructure** — stdout/stderr discipline, TTY detection, exit codes, pagination flags (completed 2026-03-03)
 - [x] **Phase 12: Auth Commands** — Credential setup, env var and config file resolution, `heylol auth` commands (completed 2026-03-03)
-- [ ] **Phase 13: Post and Profile Commands** — All `heylol posts` and `heylol profile` subcommands
+- [x] **Phase 13: Post and Profile Commands** — All `heylol posts` and `heylol profile` subcommands (completed 2026-03-03)
 - [ ] **Phase 14: Social, Discovery, Notifications, and Publish** — All remaining commands plus npm publish
 
 ## Phase Details
@@ -86,7 +86,7 @@ Plans:
   3. `heylol posts get <id>`, `heylol posts delete <id>`, `heylol posts like <id>`, `heylol posts unlike <id>` all complete without error and return JSON
   4. `heylol profile me` returns own profile JSON; `heylol profile get <id>` returns the target user's profile JSON
   5. `heylol profile update --name "Alice" --bio "dev"` applies changes and returns updated profile JSON
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 13-01-PLAN.md — Implement all post subcommands (create, get, delete, like, unlike, reply) and profile subcommands (me, get, update) as SDK-backed action handlers
 
@@ -117,5 +117,5 @@ Plans:
 | 10. CLI Scaffold | 1/1 | Complete    | 2026-03-02 | - |
 | 11. Output and Infrastructure | 2/2 | Complete    | 2026-03-03 | - |
 | 12. Auth Commands | 1/1 | Complete    | 2026-03-03 | - |
-| 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
+| 13. Post and Profile Commands | 1/1 | Complete   | 2026-03-03 | - |
 | 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |

@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** v1.1 CLI — Phase 12: Auth Commands
+**Current focus:** v1.1 CLI — Phase 13: Post and Profile Commands
 
 ## Current Position
 
-Phase: 12 of 14 (Auth Commands)
+Phase: 13 of 14 (Post and Profile Commands)
 Plan: 1 of 1 in current phase — COMPLETE
 Status: In progress
-Last activity: 2026-03-03 — Completed 12-01: Auth credential management (config.ts, auth setup, auth verify)
+Last activity: 2026-03-03 — Completed 13-01: Post and profile commands (posts create/get/delete/like/unlike/reply, profile me/get/update)
 
 Progress: [███░░░░░░░] 30%
 
@@ -35,6 +35,7 @@ Progress: [███░░░░░░░] 30%
 | Phase 11-output-infrastructure P01 | 2 | 2 tasks | 7 files | 2 min |
 | Phase 11-output-infrastructure P02 | 1 | 1 task | 2 files | 4 min |
 | Phase 12-auth-commands P01 | 2 | 2 tasks | 2 files | 2 min |
+| Phase 13-post-and-profile-commands P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - resolveKey() reads process.env.HEYLOL_PRIVATE_KEY directly (not via Commander .env()) to avoid --key option name conflict
 - AuthError (not plain Error) thrown for missing credentials — ensures exit code 4 via resolveExitCode() in output.ts
 - validate-before-write in auth setup: loadKeypair() before store.set() surfaces invalid keys at setup time
+- [Phase 13-post-and-profile-commands]: Void commands (delete, like, unlike) pass null to printSuccess — JSON.stringify(undefined) produces undefined string, null produces clean null JSON
+- [Phase 13-post-and-profile-commands]: --name CLI flag maps to displayName SDK field, --avatar to avatarUrl, --banner to bannerUrl for ergonomic CLI naming
+- [Phase 13-post-and-profile-commands]: profile update command accepts empty params object — no guard for at least one flag, server returns unchanged profile
 
 ### Pending Todos
 
@@ -73,5 +77,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 12-01-PLAN.md (Auth credential management: config.ts with conf singleton, resolveKey env-var-first, auth setup/verify subcommands)
-Resume file: .planning/phases/12-auth-commands/12-01-SUMMARY.md
+Stopped at: Completed 13-01-PLAN.md (Post and profile commands: posts create/get/delete/like/unlike/reply, profile me/get/update)
+Resume file: .planning/phases/13-post-and-profile-commands/13-01-SUMMARY.md

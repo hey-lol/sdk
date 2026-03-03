@@ -29,18 +29,18 @@ Requirements for the CLI milestone. Each maps to roadmap phases.
 
 ### Posts
 
-- [ ] **POST-01**: User can create a post via `heylol posts create --content "text"`
-- [ ] **POST-02**: User can reply to a post via `heylol posts reply <id> --content "text"`
-- [ ] **POST-03**: User can view a post via `heylol posts get <id>`
-- [ ] **POST-04**: User can delete a post via `heylol posts delete <id>`
-- [ ] **POST-05**: User can like a post via `heylol posts like <id>`
-- [ ] **POST-06**: User can unlike a post via `heylol posts unlike <id>`
+- [x] **POST-01**: User can create a post via `heylol posts create --content "text"`
+- [x] **POST-02**: User can reply to a post via `heylol posts reply <id> --content "text"`
+- [x] **POST-03**: User can view a post via `heylol posts get <id>`
+- [x] **POST-04**: User can delete a post via `heylol posts delete <id>`
+- [x] **POST-05**: User can like a post via `heylol posts like <id>`
+- [x] **POST-06**: User can unlike a post via `heylol posts unlike <id>`
 
 ### Profile
 
-- [ ] **PROF-01**: User can view own profile via `heylol profile me`
-- [ ] **PROF-02**: User can view another user's profile via `heylol profile get <id>`
-- [ ] **PROF-03**: User can update own profile via `heylol profile update` with name/bio/avatar/banner flags
+- [x] **PROF-01**: User can view own profile via `heylol profile me`
+- [x] **PROF-02**: User can view another user's profile via `heylol profile get <id>`
+- [x] **PROF-03**: User can update own profile via `heylol profile update` with name/bio/avatar/banner flags
 
 ### Social
 
@@ -107,15 +107,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 12 | Complete |
 | AUTH-04 | Phase 12 | Complete |
 | AUTH-05 | Phase 12 | Complete |
-| POST-01 | Phase 13 | Pending |
-| POST-02 | Phase 13 | Pending |
-| POST-03 | Phase 13 | Pending |
-| POST-04 | Phase 13 | Pending |
-| POST-05 | Phase 13 | Pending |
-| POST-06 | Phase 13 | Pending |
-| PROF-01 | Phase 13 | Pending |
-| PROF-02 | Phase 13 | Pending |
-| PROF-03 | Phase 13 | Pending |
+| POST-01 | Phase 13 | Complete |
+| POST-02 | Phase 13 | Complete |
+| POST-03 | Phase 13 | Complete |
+| POST-04 | Phase 13 | Complete |
+| POST-05 | Phase 13 | Complete |
+| POST-06 | Phase 13 | Complete |
+| PROF-01 | Phase 13 | Complete |
+| PROF-02 | Phase 13 | Complete |
+| PROF-03 | Phase 13 | Complete |
 | SOCL-01 | Phase 14 | Pending |
 | SOCL-02 | Phase 14 | Pending |
 | SOCL-03 | Phase 14 | Pending |
