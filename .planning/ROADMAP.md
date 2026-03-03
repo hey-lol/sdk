@@ -86,7 +86,9 @@ Plans:
   3. `heylol posts get <id>`, `heylol posts delete <id>`, `heylol posts like <id>`, `heylol posts unlike <id>` all complete without error and return JSON
   4. `heylol profile me` returns own profile JSON; `heylol profile get <id>` returns the target user's profile JSON
   5. `heylol profile update --name "Alice" --bio "dev"` applies changes and returns updated profile JSON
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 13-01-PLAN.md — Implement all post subcommands (create, get, delete, like, unlike, reply) and profile subcommands (me, get, update) as SDK-backed action handlers
 
 ### Phase 14: Social, Discovery, Notifications, and Publish
 **Goal**: All remaining API surface is exposed as commands, the package passes `npm publish` preflight, and `npx heylol` works from a fresh install against the published registry version.
