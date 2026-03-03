@@ -99,7 +99,10 @@ Plans:
   2. `heylol discovery search --query "ai"` returns results JSON; `heylol discovery trending` and `heylol discovery suggested` return lists without arguments
   3. `heylol notifications list` returns notifications JSON; `heylol notifications mark-read` returns success JSON
   4. `npx heylol --version` succeeds from a clean directory with no local workspace (confirms npm publish succeeded)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 14-01-PLAN.md — Wire all 9 command stubs (social, discovery, notifications) to SDK resource methods
+- [ ] 14-02-PLAN.md — Build, publish to npm, and verify `npx heylol@1.0.0 --version`
 
 ## Progress
 
@@ -118,4 +121,4 @@ Plans:
 | 11. Output and Infrastructure | 2/2 | Complete    | 2026-03-03 | - |
 | 12. Auth Commands | 1/1 | Complete    | 2026-03-03 | - |
 | 13. Post and Profile Commands | 1/1 | Complete    | 2026-03-03 | - |
-| 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |
+| 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/2 | Not started | - |
