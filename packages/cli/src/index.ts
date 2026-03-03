@@ -6,6 +6,7 @@ import { makeNotificationsCommand } from './commands/notifications.js';
 import { makePostsCommand } from './commands/posts.js';
 import { makeProfileCommand } from './commands/profile.js';
 import { makeSocialCommand } from './commands/social.js';
+import { EXIT } from './output.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
@@ -23,7 +24,11 @@ program
       .env('HEYLOL_BASE_URL')
       .default('https://api.hey.lol'),
   )
-  .addOption(new Option('--debug', 'verbose HTTP logging').env('HEYLOL_DEBUG').default(false));
+  .addOption(new Option('--debug', 'verbose HTTP logging').env('HEYLOL_DEBUG').default(false))
+  .addOption(
+    new Option('--human', 'format output for humans (colors, readable structure)').default(false),
+  )
+  .addOption(new Option('--json', 'force JSON output even at a terminal').default(false));
 
 const authCmd = makeAuthCommand();
 authCmd.copyInheritedSettings(program);
@@ -49,4 +54,9 @@ const notificationsCmd = makeNotificationsCommand();
 notificationsCmd.copyInheritedSettings(program);
 program.addCommand(notificationsCmd);
 
-program.parse();
+program.parseAsync().catch((err: unknown) => {
+  process.stderr.write(
+    JSON.stringify({ error: { code: 'UNKNOWN_ERROR', message: String(err) } }) + '\n',
+  );
+  process.exit(EXIT.GENERAL);
+});

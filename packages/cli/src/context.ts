@@ -5,6 +5,8 @@
 export interface GlobalContext {
   baseUrl: string;
   debug: boolean;
+  human: boolean; // --human flag
+  json: boolean; // --json flag
 }
 
 export type GlobalOpts = GlobalContext;
