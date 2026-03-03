@@ -72,7 +72,9 @@ Plans:
   3. After `heylol auth setup`, subsequent commands authenticate without passing any key flags
   4. When both env var and config file are present, env var wins — commands use the env var key
   5. `heylol auth verify` returns own profile JSON on valid credentials, exits with code 4 on invalid credentials
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 12-01-PLAN.md — Config module (conf singleton, resolveKey, createClient) and auth setup/verify commands
 
 ### Phase 13: Post and Profile Commands
 **Goal**: Users and agents can create, read, react to, and delete posts, and can view and update profiles — all via single-line commands that return structured JSON.
@@ -112,6 +114,6 @@ Plans:
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 10. CLI Scaffold | 1/1 | Complete    | 2026-03-02 | - |
 | 11. Output and Infrastructure | 2/2 | Complete    | 2026-03-03 | - |
-| 12. Auth Commands | v1.1 | 0/? | Not started | - |
+| 12. Auth Commands | v1.1 | 0/1 | Not started | - |
 | 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
 | 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |
