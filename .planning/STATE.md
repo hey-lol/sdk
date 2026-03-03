@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Developers can go from npm install to first successful API call in under 5 minutes, with zero knowledge of x402 or Solana internals required.
-**Current focus:** v1.1 CLI — Phase 13: Post and Profile Commands
+**Current focus:** v1.1 CLI — Phase 14: Social, Discovery, Notifications, and Publish
 
 ## Current Position
 
-Phase: 13 of 14 (Post and Profile Commands)
-Plan: 1 of 1 in current phase — COMPLETE
+Phase: 14 of 14 (Social, Discovery, Notifications, and Publish)
+Plan: 1 of 2 in current phase — COMPLETE
 Status: In progress
-Last activity: 2026-03-03 — Completed 13-01: Post and profile commands (posts create/get/delete/like/unlike/reply, profile me/get/update)
+Last activity: 2026-03-03 — Completed 14-01: Social/discovery/notifications command handlers (social follow/unfollow/followers/following, discovery search/trending/suggested, notifications list/mark-read)
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -36,6 +36,7 @@ Progress: [███░░░░░░░] 30%
 | Phase 11-output-infrastructure P02 | 1 | 1 task | 2 files | 4 min |
 | Phase 12-auth-commands P01 | 2 | 2 tasks | 2 files | 2 min |
 | Phase 13-post-and-profile-commands P01 | 2 | 2 tasks | 2 files |
+| Phase 14-social-discovery-notifications P01 | 1 | 1 task | 3 files | 1 min |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 13-post-and-profile-commands]: Void commands (delete, like, unlike) pass null to printSuccess — JSON.stringify(undefined) produces undefined string, null produces clean null JSON
 - [Phase 13-post-and-profile-commands]: --name CLI flag maps to displayName SDK field, --avatar to avatarUrl, --banner to bannerUrl for ergonomic CLI naming
 - [Phase 13-post-and-profile-commands]: profile update command accepts empty params object — no guard for at least one flag, server returns unchanged profile
+- [Phase 14-social-discovery-notifications]: notifications mark-read implements mark-all only (no --ids flag) — success criteria only tests no-argument case; selective marking deferred
+- [Phase 14-social-discovery-notifications]: discovery search omits --type filter option — success criteria only requires --query; simpler implementation without scope creep
 
 ### Pending Todos
 
@@ -77,5 +80,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 13-01-PLAN.md (Post and profile commands: posts create/get/delete/like/unlike/reply, profile me/get/update)
-Resume file: .planning/phases/13-post-and-profile-commands/13-01-SUMMARY.md
+Stopped at: Completed 14-01-PLAN.md (Social/discovery/notifications commands: social follow/unfollow/followers/following, discovery search/trending/suggested, notifications list/mark-read)
+Resume file: .planning/phases/14-social-discovery-notifications-and-publish/14-01-SUMMARY.md

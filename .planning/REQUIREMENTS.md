@@ -44,21 +44,21 @@ Requirements for the CLI milestone. Each maps to roadmap phases.
 
 ### Social
 
-- [ ] **SOCL-01**: User can follow a user via `heylol social follow <id>`
-- [ ] **SOCL-02**: User can unfollow a user via `heylol social unfollow <id>`
-- [ ] **SOCL-03**: User can list followers via `heylol social followers <id>`
-- [ ] **SOCL-04**: User can list following via `heylol social following <id>`
+- [x] **SOCL-01**: User can follow a user via `heylol social follow <id>`
+- [x] **SOCL-02**: User can unfollow a user via `heylol social unfollow <id>`
+- [x] **SOCL-03**: User can list followers via `heylol social followers <id>`
+- [x] **SOCL-04**: User can list following via `heylol social following <id>`
 
 ### Discovery
 
-- [ ] **DISC-01**: User can search via `heylol discovery search --query "text"`
-- [ ] **DISC-02**: User can view trending via `heylol discovery trending`
-- [ ] **DISC-03**: User can view suggested users via `heylol discovery suggested`
+- [x] **DISC-01**: User can search via `heylol discovery search --query "text"`
+- [x] **DISC-02**: User can view trending via `heylol discovery trending`
+- [x] **DISC-03**: User can view suggested users via `heylol discovery suggested`
 
 ### Notifications
 
-- [ ] **NOTF-01**: User can list notifications via `heylol notifications list`
-- [ ] **NOTF-02**: User can mark notifications read via `heylol notifications mark-read`
+- [x] **NOTF-01**: User can list notifications via `heylol notifications list`
+- [x] **NOTF-02**: User can mark notifications read via `heylol notifications mark-read`
 
 ## Future Requirements
 
@@ -116,15 +116,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROF-01 | Phase 13 | Complete |
 | PROF-02 | Phase 13 | Complete |
 | PROF-03 | Phase 13 | Complete |
-| SOCL-01 | Phase 14 | Pending |
-| SOCL-02 | Phase 14 | Pending |
-| SOCL-03 | Phase 14 | Pending |
-| SOCL-04 | Phase 14 | Pending |
-| DISC-01 | Phase 14 | Pending |
-| DISC-02 | Phase 14 | Pending |
-| DISC-03 | Phase 14 | Pending |
-| NOTF-01 | Phase 14 | Pending |
-| NOTF-02 | Phase 14 | Pending |
+| SOCL-01 | Phase 14 | Complete |
+| SOCL-02 | Phase 14 | Complete |
+| SOCL-03 | Phase 14 | Complete |
+| SOCL-04 | Phase 14 | Complete |
+| DISC-01 | Phase 14 | Complete |
+| DISC-02 | Phase 14 | Complete |
+| DISC-03 | Phase 14 | Complete |
+| NOTF-01 | Phase 14 | Complete |
+| NOTF-02 | Phase 14 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 32 total
