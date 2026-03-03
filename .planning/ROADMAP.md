@@ -27,7 +27,7 @@
 **Milestone Goal:** Ship a `heylol` CLI that AI agents can use via bash to interact with hey.lol — post, follow, search, and manage notifications without writing code.
 
 - [x] **Phase 10: CLI Scaffold** — Package structure, bin entry, tsup ESM-only build, workspace link to @heylol/sdk (completed 2026-03-02)
-- [ ] **Phase 11: Output and Infrastructure** — stdout/stderr discipline, TTY detection, exit codes, pagination flags
+- [x] **Phase 11: Output and Infrastructure** — stdout/stderr discipline, TTY detection, exit codes, pagination flags (completed 2026-03-03)
 - [ ] **Phase 12: Auth Commands** — Credential setup, env var and config file resolution, `heylol auth` commands
 - [ ] **Phase 13: Post and Profile Commands** — All `heylol posts` and `heylol profile` subcommands
 - [ ] **Phase 14: Social, Discovery, Notifications, and Publish** — All remaining commands plus npm publish
@@ -57,7 +57,7 @@ Plans:
   3. `heylol <any-command> --human` formats output with colors and readable structure instead of raw JSON
   4. Piping output (`heylol posts list | jq`) auto-selects JSON; running at terminal auto-selects human format
   5. Exit code is 0 on success, and maps to documented codes (1-5) for each error class; `echo $?` after a failed auth returns 4
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 11-01-PLAN.md — Output module contract (printSuccess/printFailure, EXIT codes, TTY detection, --human/--json flags) and pagination flags (--cursor/--limit) on all list commands
 
@@ -110,7 +110,7 @@ Plans:
 | 8. CI & Type Integrity | v1.0 | 2/2 | Complete | 2026-03-02 |
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 10. CLI Scaffold | 1/1 | Complete    | 2026-03-02 | - |
-| 11. Output and Infrastructure | v1.1 | 0/? | Not started | - |
+| 11. Output and Infrastructure | 1/1 | Complete   | 2026-03-03 | - |
 | 12. Auth Commands | v1.1 | 0/? | Not started | - |
 | 13. Post and Profile Commands | v1.1 | 0/? | Not started | - |
 | 14. Social, Discovery, Notifications, and Publish | v1.1 | 0/? | Not started | - |
