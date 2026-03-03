@@ -6,7 +6,14 @@
  * typed method calls to correct HTTP paths and bodies.
  */
 
-import type { CreatePostParams, Post, PostId, ReplyPostParams } from '../types/index.js';
+import type {
+  CreatePostParams,
+  PaginatedList,
+  PaginationParams,
+  Post,
+  PostId,
+  ReplyPostParams,
+} from '../types/index.js';
 
 // ---------------------------------------------------------------------------
 // Minimal HttpClient interface — breaks circular imports
@@ -24,6 +31,7 @@ interface HttpClient {
 
 const ROUTES = {
   posts: '/posts',
+  feed: '/posts/feed',
   post: (id: PostId) => `/posts/${id}`,
   postLike: (id: PostId) => `/posts/${id}/like`,
   postReplies: (id: PostId) => `/posts/${id}/replies`,
@@ -38,6 +46,29 @@ export class PostsResource {
 
   constructor(client: HttpClient) {
     this.client = client;
+  }
+
+  /**
+   * List posts in the authenticated user's feed. (POST-01 feed)
+   *
+   * @param params - Optional pagination parameters (cursor, limit)
+   * @returns Paginated list of posts
+   * @throws {APIError} If the request fails
+   *
+   * @example
+   * ```ts
+   * const feed = await client.posts.list({ limit: 20 });
+   * for (const post of feed.items) {
+   *   console.log(post.content);
+   * }
+   * ```
+   */
+  list(params?: PaginationParams): Promise<PaginatedList<Post>> {
+    const query = new URLSearchParams();
+    if (params?.cursor) query.set('cursor', params.cursor);
+    if (params?.limit !== undefined) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.client.get<PaginatedList<Post>>(qs ? `${ROUTES.feed}?${qs}` : ROUTES.feed);
   }
 
   /**
