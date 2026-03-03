@@ -114,6 +114,16 @@ None - no external service configuration required.
 - All list commands have --cursor and --limit flags, ready for pagination wiring in Phases 13-14
 - No blockers
 
+## Self-Check: PASSED
+
+All files exist and all commits verified:
+- packages/cli/src/output.ts — FOUND
+- packages/cli/src/context.ts — FOUND
+- packages/cli/src/index.ts — FOUND
+- .planning/phases/11-output-infrastructure/11-01-SUMMARY.md — FOUND
+- Commit 80e7fa2 — FOUND
+- Commit 5cb7e45 — FOUND
+
 ---
 *Phase: 11-output-infrastructure*
 *Completed: 2026-03-03*
