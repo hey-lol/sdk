@@ -6,6 +6,8 @@ export function makeNotificationsCommand(): Command {
   cmd
     .command('list')
     .description('List your notifications')
+    .option('--cursor <string>', 'cursor for next page')
+    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
     .action(() => {
       throw new Error('not implemented');
     });

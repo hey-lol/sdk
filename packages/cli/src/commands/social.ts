@@ -23,6 +23,8 @@ export function makeSocialCommand(): Command {
     .command('followers')
     .description('List followers of a user')
     .argument('<id>', 'user ID')
+    .option('--cursor <string>', 'cursor for next page')
+    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
     .action(() => {
       throw new Error('not implemented');
     });
@@ -31,6 +33,8 @@ export function makeSocialCommand(): Command {
     .command('following')
     .description('List users followed by a user')
     .argument('<id>', 'user ID')
+    .option('--cursor <string>', 'cursor for next page')
+    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
     .action(() => {
       throw new Error('not implemented');
     });

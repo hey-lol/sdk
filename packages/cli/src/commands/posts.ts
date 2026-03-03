@@ -6,6 +6,8 @@ export function makePostsCommand(): Command {
   cmd
     .command('list')
     .description('List posts in your feed')
+    .option('--cursor <string>', 'cursor for next page')
+    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
     .action(() => {
       throw new Error('not implemented');
     });
