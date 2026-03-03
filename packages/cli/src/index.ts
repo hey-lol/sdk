@@ -1,4 +1,4 @@
-import { Command, Option } from 'commander';
+import { Command, CommanderError, Option } from 'commander';
 import { createRequire } from 'module';
 import { makeAuthCommand } from './commands/auth.js';
 import { makeDiscoveryCommand } from './commands/discovery.js';
@@ -6,7 +6,8 @@ import { makeNotificationsCommand } from './commands/notifications.js';
 import { makePostsCommand } from './commands/posts.js';
 import { makeProfileCommand } from './commands/profile.js';
 import { makeSocialCommand } from './commands/social.js';
-import { EXIT } from './output.js';
+import type { OutputOpts } from './output.js';
+import { EXIT, printBadArgs } from './output.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
@@ -19,6 +20,11 @@ program
   .description('hey.lol CLI for AI agents and developers')
   .version(version, '-V, --version')
   .showSuggestionAfterError(true)
+  .exitOverride()
+  .configureOutput({
+    // Suppress Commander's built-in stderr writes — our catch handler emits structured JSON instead.
+    writeErr: () => undefined,
+  })
   .addOption(
     new Option('--base-url <url>', 'API base URL')
       .env('HEYLOL_BASE_URL')
@@ -54,7 +60,27 @@ const notificationsCmd = makeNotificationsCommand();
 notificationsCmd.copyInheritedSettings(program);
 program.addCommand(notificationsCmd);
 
+// Apply exitOverride and configureOutput recursively to the entire command tree so that
+// Commander errors from subcommands (e.g. missing required options) throw CommanderError
+// rather than calling process.exit() directly. copyInheritedSettings only propagates one level.
+function applyExitOverride(cmd: Command): void {
+  cmd.exitOverride();
+  cmd.configureOutput({ writeErr: () => undefined });
+  for (const sub of cmd.commands) {
+    applyExitOverride(sub);
+  }
+}
+applyExitOverride(program);
+
 program.parseAsync().catch((err: unknown) => {
+  if (err instanceof CommanderError) {
+    // Commander error codes: 'commander.unknownOption', 'commander.missingArgument',
+    // 'commander.missingMandatoryOptionValue', 'commander.invalidArgument', etc.
+    // Version/help use 'commander.version' and 'commander.helpDisplayed' with exitCode 0.
+    if (err.exitCode === 0) process.exit(0);
+    const opts: OutputOpts = { json: program.opts().json, human: program.opts().human };
+    printBadArgs(err.message, opts);
+  }
   process.stderr.write(
     JSON.stringify({ error: { code: 'UNKNOWN_ERROR', message: String(err) } }) + '\n',
   );

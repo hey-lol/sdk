@@ -96,3 +96,14 @@ export function printFailure(err: unknown, opts: OutputOpts = {}): never {
 
   process.exit(code);
 }
+
+export function printBadArgs(message: string, opts: OutputOpts = {}): never {
+  if (isHumanMode(opts)) {
+    process.stderr.write(pc.red('Error: ') + message + '\n');
+    process.stderr.write(pc.dim('code: BAD_ARGS') + '\n');
+  } else {
+    process.stderr.write(JSON.stringify({ error: { code: 'BAD_ARGS', message } }) + '\n');
+  }
+
+  process.exit(EXIT.BAD_ARGS);
+}
