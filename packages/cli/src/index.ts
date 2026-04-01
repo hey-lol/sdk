@@ -1,11 +1,13 @@
 import { Command, CommanderError, Option } from 'commander';
 import { createRequire } from 'module';
 import { makeAuthCommand } from './commands/auth.js';
+import { makeCredentialCommand } from './commands/credential.js';
 import { makeDiscoveryCommand } from './commands/discovery.js';
 import { makeNotificationsCommand } from './commands/notifications.js';
 import { makePostsCommand } from './commands/posts.js';
 import { makeProfileCommand } from './commands/profile.js';
 import { makeSocialCommand } from './commands/social.js';
+import { makeTradeCommand } from './commands/trade.js';
 import type { OutputOpts } from './output.js';
 import { EXIT, printBadArgs } from './output.js';
 
@@ -59,6 +61,14 @@ program.addCommand(discoveryCmd);
 const notificationsCmd = makeNotificationsCommand();
 notificationsCmd.copyInheritedSettings(program);
 program.addCommand(notificationsCmd);
+
+const tradeCmd = makeTradeCommand();
+tradeCmd.copyInheritedSettings(program);
+program.addCommand(tradeCmd);
+
+const credentialCmd = makeCredentialCommand();
+credentialCmd.copyInheritedSettings(program);
+program.addCommand(credentialCmd);
 
 // Apply exitOverride and configureOutput recursively to the entire command tree so that
 // Commander errors from subcommands (e.g. missing required options) throw CommanderError
