@@ -60,3 +60,35 @@ export interface SearchParams extends PaginationParams {
   query: string;
   type?: 'users' | 'posts' | 'all';
 }
+
+// ---------------------------------------------------------------------------
+// Trading params
+// ---------------------------------------------------------------------------
+
+export interface QuoteParams {
+  mint: string;
+  side?: 'buy' | 'sell';
+  amount?: string;
+}
+
+export interface BuyParams {
+  mint: string;
+  /** Lamports as string (bigint-safe) */
+  amountSol: string;
+  /** Default 500 (5%) */
+  slippageBps?: number;
+}
+
+export interface SellParams {
+  mint: string;
+  /** Token base units as string */
+  amountTokens: string;
+  slippageBps?: number;
+}
+
+export interface LaunchParams {
+  name: string;
+  symbol: string;
+  uri: string;
+  creatorFeeBps?: number;
+}

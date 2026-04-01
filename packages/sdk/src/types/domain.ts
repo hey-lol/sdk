@@ -99,3 +99,52 @@ export interface SearchResults {
   users: User[];
   posts: Post[];
 }
+
+// ---------------------------------------------------------------------------
+// Trading types
+// ---------------------------------------------------------------------------
+
+export interface QuoteResult {
+  mint: string;
+  graduated: boolean;
+  migrated: boolean;
+  pricePerToken: string;
+  marketCapLamports: string;
+  realSolReserves: string;
+  virtualSolReserves: string;
+  virtualTokenReserves: string;
+  totalTokensBought: string;
+  curveProgress: number;
+  bondingThresholdLamports: string;
+  volume24h: string;
+  quote: {
+    tokensOut?: string;
+    solOut?: string;
+    feeAmount: string;
+    netSolIn?: string;
+    grossSol?: string;
+    minTokensOut?: string;
+    minSolOut?: string;
+  } | null;
+}
+
+export interface BuildTxResponse {
+  unsignedTx: string;
+  message: string;
+  signerIndex: number;
+  quote?: Record<string, string>;
+  mint?: string;
+}
+
+export interface TradeResult {
+  txSignature: string;
+  success: boolean;
+}
+
+export interface CredentialRegisterResult {
+  unsignedTx?: string;
+  message?: string;
+  signerIndex?: number;
+  registered?: boolean;
+  skipped?: boolean;
+}

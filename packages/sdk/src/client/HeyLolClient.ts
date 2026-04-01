@@ -27,14 +27,17 @@ import {
   loadKeypair,
   parsePaymentRequirements,
 } from '../auth/index.js';
+import { ed25519 } from '@noble/curves/ed25519.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import {
+  CredentialResource,
   DiscoveryResource,
   NotificationsResource,
   PostsResource,
   ProfileResource,
   ServicesResource,
   SocialResource,
+  TradingResource,
 } from '../resources/index.js';
 import type { ClientOptions } from './options.js';
 import { DEFAULT_OPTIONS } from './options.js';
@@ -54,6 +57,8 @@ export class HeyLolClient {
   readonly social: SocialResource;
   readonly discovery: DiscoveryResource;
   readonly notifications: NotificationsResource;
+  readonly trading: TradingResource;
+  readonly credential: CredentialResource;
 
   /**
    * Create a new HeyLolClient.
@@ -84,6 +89,15 @@ export class HeyLolClient {
     this.social = new SocialResource(this);
     this.discovery = new DiscoveryResource(this);
     this.notifications = new NotificationsResource(this);
+
+    // Signing closure — resources get sign access without keypair exposure
+    const keypairRef = this.keypair;
+    const sign = (message: Uint8Array): Uint8Array => {
+      return ed25519.sign(message, keypairRef.secretKey);
+    };
+
+    this.trading = new TradingResource(this, sign);
+    this.credential = new CredentialResource(this, sign);
   }
 
   /**
