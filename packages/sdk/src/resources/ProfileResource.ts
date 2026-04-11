@@ -6,7 +6,16 @@
  * typed method calls to correct HTTP paths and bodies.
  */
 
-import type { Profile, UpdateProfileParams, UserId } from '../types/index.js';
+import type {
+  AvatarConfirmResponse,
+  BannerConfirmResponse,
+  Profile,
+  RegisterProfileParams,
+  UpdateProfileParams,
+  UploadUrlParams,
+  UploadUrlResponse,
+  Username,
+} from '../types/index.js';
 
 // ---------------------------------------------------------------------------
 // Minimal HttpClient interface — breaks circular imports
@@ -14,7 +23,9 @@ import type { Profile, UpdateProfileParams, UserId } from '../types/index.js';
 
 interface HttpClient {
   get<T>(path: string): Promise<T>;
+  post<T>(path: string, body?: unknown): Promise<T>;
   patch<T>(path: string, body?: unknown): Promise<T>;
+  delete<T>(path: string): Promise<T>;
 }
 
 // ---------------------------------------------------------------------------
@@ -22,8 +33,14 @@ interface HttpClient {
 // ---------------------------------------------------------------------------
 
 const ROUTES = {
-  me: '/profile/me',
-  user: (id: UserId) => `/users/${id}/profile`,
+  me: '/profile/',
+  user: (username: Username) => `/profile/${username}`,
+  checkUsername: (username: string) => `/profile/check-username/${username}`,
+  register: '/profile/',
+  avatarUploadUrl: '/profile/avatar/upload-url',
+  avatarConfirm: '/profile/avatar/confirm',
+  bannerUploadUrl: '/profile/banner/upload-url',
+  bannerConfirm: '/profile/banner/confirm',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -38,7 +55,7 @@ export class ProfileResource {
   }
 
   /**
-   * Get the authenticated user's own profile. (PROF-01)
+   * Get the authenticated user's own profile.
    *
    * @returns The profile for the currently authenticated user
    * @throws {APIError} If authentication fails or the request errors
@@ -54,30 +71,28 @@ export class ProfileResource {
   }
 
   /**
-   * Get another user's profile by branded UserId. (PROF-02)
+   * Get another user's profile by username.
    *
-   * @param id - Branded `UserId` (use `asUserId()` to create one)
+   * @param username - Branded `Username` (use `asUsername()` to create one)
    * @returns The profile for the specified user
    * @throws {APIError} With status 404 if the user does not exist
    *
    * @example
    * ```ts
-   * import { asUserId } from '@heylol/sdk';
+   * import { asUsername } from '@heylol/sdk';
    *
-   * const profile = await client.profile.get(asUserId('user123'));
+   * const profile = await client.profile.get(asUsername('alice'));
    * console.log(profile.displayName);
    * ```
    */
-  get(id: UserId): Promise<Profile> {
-    return this.client.get<Profile>(ROUTES.user(id));
+  get(username: Username): Promise<Profile> {
+    return this.client.get<Profile>(ROUTES.user(username));
   }
 
   /**
    * Update profile fields.
    *
-   * A single method covers both PROF-03 (displayName, bio) and PROF-04
-   * (avatarUrl, bannerUrl) since UpdateProfileParams includes all four
-   * optional fields. Only the fields included in params are sent.
+   * Only the fields included in params are sent.
    *
    * @param params - Partial profile fields to update; all fields are optional
    * @returns The updated profile
@@ -93,5 +108,82 @@ export class ProfileResource {
    */
   update(params: UpdateProfileParams): Promise<Profile> {
     return this.client.patch<Profile>(ROUTES.me, params);
+  }
+
+  /**
+   * Register a new profile.
+   *
+   * @param params - Registration fields including username and display name
+   * @returns The newly created profile
+   */
+  register(params: RegisterProfileParams): Promise<Profile> {
+    return this.client.post<Profile>(ROUTES.register, params);
+  }
+
+  /**
+   * Delete the authenticated user's profile.
+   *
+   * @returns void
+   */
+  delete(): Promise<void> {
+    return this.client.delete<void>(ROUTES.me);
+  }
+
+  /**
+   * Check whether a username is available.
+   *
+   * @param username - The username to check
+   * @returns Object with `available` boolean and optional `reason` string
+   */
+  checkUsername(username: string): Promise<{ available: boolean; reason?: string }> {
+    return this.client.get<{ available: boolean; reason?: string }>(ROUTES.checkUsername(username));
+  }
+
+  /**
+   * Step 1 of avatar upload: get a pre-signed upload URL.
+   * After receiving the URL, upload the file directly to it (outside the SDK),
+   * then call confirmAvatar() to finalize.
+   * Part of the "uploadAvatar" operation per D-04.
+   *
+   * @param params - Upload parameters including file type
+   * @returns Pre-signed URL info for uploading the avatar
+   */
+  uploadAvatar(params: UploadUrlParams): Promise<UploadUrlResponse> {
+    return this.client.post<UploadUrlResponse>(ROUTES.avatarUploadUrl, params);
+  }
+
+  /**
+   * Step 2 of avatar upload: confirm the upload after file has been sent to the pre-signed URL.
+   * Part of the "uploadAvatar" operation per D-04.
+   *
+   * @param params - Confirmation params with the storage path from uploadAvatar()
+   * @returns The confirmed avatar URL and updated profile
+   */
+  confirmAvatar(params: { storagePath: string }): Promise<AvatarConfirmResponse> {
+    return this.client.post<AvatarConfirmResponse>(ROUTES.avatarConfirm, params);
+  }
+
+  /**
+   * Step 1 of banner upload: get a pre-signed upload URL.
+   * After receiving the URL, upload the file directly to it (outside the SDK),
+   * then call confirmBanner() to finalize.
+   * Part of the "uploadBanner" operation per D-04.
+   *
+   * @param params - Upload parameters including file type
+   * @returns Pre-signed URL info for uploading the banner
+   */
+  uploadBanner(params: UploadUrlParams): Promise<UploadUrlResponse> {
+    return this.client.post<UploadUrlResponse>(ROUTES.bannerUploadUrl, params);
+  }
+
+  /**
+   * Step 2 of banner upload: confirm the upload after file has been sent to the pre-signed URL.
+   * Part of the "uploadBanner" operation per D-04.
+   *
+   * @param params - Confirmation params with the storage path from uploadBanner()
+   * @returns The confirmed banner URL and updated profile
+   */
+  confirmBanner(params: { storagePath: string }): Promise<BannerConfirmResponse> {
+    return this.client.post<BannerConfirmResponse>(ROUTES.bannerConfirm, params);
   }
 }
