@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { SocialResource } from '../src/resources/SocialResource.js';
-import { asUserId } from '../src/types/index.js';
+import { asUsername } from '../src/types/index.js';
 
 // ---------------------------------------------------------------------------
 // Mock client helper
@@ -20,52 +20,52 @@ function mockClient() {
 
 describe('SocialResource', () => {
   describe('follow()', () => {
-    it('calls POST /users/:id/follow', async () => {
+    it('calls POST /users/:username/follow', async () => {
       const client = mockClient();
       const resource = new SocialResource(client);
-      const id = asUserId('u-1');
+      const username = asUsername('alice');
       client.post.mockResolvedValueOnce(undefined);
 
-      await resource.follow(id);
+      await resource.follow(username);
 
-      expect(client.post).toHaveBeenCalledWith('/users/u-1/follow');
+      expect(client.post).toHaveBeenCalledWith('/users/alice/follow');
     });
   });
 
   describe('unfollow()', () => {
-    it('calls DELETE /users/:id/follow', async () => {
+    it('calls DELETE /users/:username/follow', async () => {
       const client = mockClient();
       const resource = new SocialResource(client);
-      const id = asUserId('u-1');
+      const username = asUsername('alice');
       client.delete.mockResolvedValueOnce(undefined);
 
-      await resource.unfollow(id);
+      await resource.unfollow(username);
 
-      expect(client.delete).toHaveBeenCalledWith('/users/u-1/follow');
+      expect(client.delete).toHaveBeenCalledWith('/users/alice/follow');
     });
   });
 
   describe('followers()', () => {
-    it('calls GET /users/:id/followers with no params', async () => {
+    it('calls GET /users/:username/followers with no params', async () => {
       const client = mockClient();
       const resource = new SocialResource(client);
-      const id = asUserId('u-1');
+      const username = asUsername('alice');
       client.get.mockResolvedValueOnce({ items: [], hasMore: false });
 
-      await resource.followers(id);
+      await resource.followers(username);
 
-      expect(client.get).toHaveBeenCalledWith('/users/u-1/followers', undefined);
+      expect(client.get).toHaveBeenCalledWith('/users/alice/followers', undefined);
     });
 
-    it('passes pagination params to GET /users/:id/followers', async () => {
+    it('passes pagination params to GET /users/:username/followers', async () => {
       const client = mockClient();
       const resource = new SocialResource(client);
-      const id = asUserId('u-1');
+      const username = asUsername('alice');
       client.get.mockResolvedValueOnce({ items: [], hasMore: false, nextCursor: 'abc' });
 
-      await resource.followers(id, { cursor: 'abc', limit: 50 });
+      await resource.followers(username, { cursor: 'abc', limit: 50 });
 
-      expect(client.get).toHaveBeenCalledWith('/users/u-1/followers', {
+      expect(client.get).toHaveBeenCalledWith('/users/alice/followers', {
         cursor: 'abc',
         limit: 50,
       });
@@ -73,18 +73,78 @@ describe('SocialResource', () => {
   });
 
   describe('following()', () => {
-    it('calls GET /users/:id/following with pagination params', async () => {
+    it('calls GET /users/:username/following with pagination params', async () => {
       const client = mockClient();
       const resource = new SocialResource(client);
-      const id = asUserId('u-2');
+      const username = asUsername('bob');
       client.get.mockResolvedValueOnce({ items: [], hasMore: false });
 
-      await resource.following(id, { cursor: 'xyz', limit: 20 });
+      await resource.following(username, { cursor: 'xyz', limit: 20 });
 
-      expect(client.get).toHaveBeenCalledWith('/users/u-2/following', {
+      expect(client.get).toHaveBeenCalledWith('/users/bob/following', {
         cursor: 'xyz',
         limit: 20,
       });
+    });
+  });
+
+  describe('block()', () => {
+    it('calls POST /users/:username/block', async () => {
+      const client = mockClient();
+      const resource = new SocialResource(client);
+      const username = asUsername('bob');
+      client.post.mockResolvedValueOnce(undefined);
+
+      await resource.block(username);
+
+      expect(client.post).toHaveBeenCalledWith('/users/bob/block');
+    });
+  });
+
+  describe('unblock()', () => {
+    it('calls DELETE /users/:username/block', async () => {
+      const client = mockClient();
+      const resource = new SocialResource(client);
+      const username = asUsername('bob');
+      client.delete.mockResolvedValueOnce(undefined);
+
+      await resource.unblock(username);
+
+      expect(client.delete).toHaveBeenCalledWith('/users/bob/block');
+    });
+  });
+
+  describe('blocks()', () => {
+    it('calls GET /users/blocks', async () => {
+      const client = mockClient();
+      const resource = new SocialResource(client);
+      client.get.mockResolvedValueOnce({ items: [], hasMore: false });
+
+      await resource.blocks();
+
+      expect(client.get).toHaveBeenCalledWith('/users/blocks');
+    });
+  });
+
+  describe('suggestions()', () => {
+    it('calls GET /suggestions/ with no params', async () => {
+      const client = mockClient();
+      const resource = new SocialResource(client);
+      client.get.mockResolvedValueOnce({ items: [], hasMore: false });
+
+      await resource.suggestions();
+
+      expect(client.get).toHaveBeenCalledWith('/suggestions/', undefined);
+    });
+
+    it('passes pagination params to GET /suggestions/', async () => {
+      const client = mockClient();
+      const resource = new SocialResource(client);
+      client.get.mockResolvedValueOnce({ items: [], hasMore: false });
+
+      await resource.suggestions({ limit: 5 });
+
+      expect(client.get).toHaveBeenCalledWith('/suggestions/', { limit: 5 });
     });
   });
 });

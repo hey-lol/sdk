@@ -5,7 +5,7 @@
  * imports. HeyLolClient satisfies this interface structurally via its typed methods.
  */
 
-import type { PaginatedList, PaginationParams, User, UserId } from '../types/index.js';
+import type { PaginatedList, PaginationParams, User, Username } from '../types/index.js';
 
 // ---------------------------------------------------------------------------
 // Local HttpClient interface — prevents circular imports with HeyLolClient
@@ -22,9 +22,12 @@ interface HttpClient {
 // ---------------------------------------------------------------------------
 
 const ROUTES = {
-  follow: (id: UserId) => `/users/${id}/follow`,
-  followers: (id: UserId) => `/users/${id}/followers`,
-  following: (id: UserId) => `/users/${id}/following`,
+  follow: (username: Username) => `/users/${username}/follow`,
+  followers: (username: Username) => `/users/${username}/followers`,
+  following: (username: Username) => `/users/${username}/following`,
+  block: (username: Username) => `/users/${username}/block`,
+  blocks: '/users/blocks',
+  suggestions: '/suggestions/',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -39,62 +42,62 @@ export class SocialResource {
   }
 
   /**
-   * Follow a user by branded UserId. (SOCL-01)
+   * Follow a user by username. (SOCL-01)
    *
-   * @param id - Branded `UserId` of the user to follow
+   * @param username - Username of the user to follow
    * @returns `undefined` (204 No Content)
    * @throws {APIError} With status 404 if the user does not exist
    *
    * @example
    * ```ts
-   * import { asUserId } from '@heylol/sdk';
+   * import { asUsername } from '@heylol/sdk';
    *
-   * await client.social.follow(asUserId('user123'));
+   * await client.social.follow(asUsername('alice'));
    * ```
    */
-  follow(id: UserId): Promise<void> {
-    return this._client.post<void>(ROUTES.follow(id));
+  follow(username: Username): Promise<void> {
+    return this._client.post<void>(ROUTES.follow(username));
   }
 
   /**
-   * Unfollow a user by branded UserId. (SOCL-02)
+   * Unfollow a user by username. (SOCL-02)
    *
-   * @param id - Branded `UserId` of the user to unfollow
+   * @param username - Username of the user to unfollow
    * @returns `undefined` (204 No Content)
    * @throws {APIError} With status 404 if the user does not exist
    *
    * @example
    * ```ts
-   * import { asUserId } from '@heylol/sdk';
+   * import { asUsername } from '@heylol/sdk';
    *
-   * await client.social.unfollow(asUserId('user123'));
+   * await client.social.unfollow(asUsername('alice'));
    * ```
    */
-  unfollow(id: UserId): Promise<void> {
-    return this._client.delete<void>(ROUTES.follow(id));
+  unfollow(username: Username): Promise<void> {
+    return this._client.delete<void>(ROUTES.follow(username));
   }
 
   /**
    * List a user's followers with optional pagination. (SOCL-03)
    *
-   * @param id - Branded `UserId` of the user whose followers to list
+   * @param username - Username of the user whose followers to list
    * @param params - Optional pagination cursor and limit
    * @returns Paginated list of users following the given user
    *
    * @example
    * ```ts
-   * import { asUserId } from '@heylol/sdk';
+   * import { asUsername } from '@heylol/sdk';
    *
-   * const page1 = await client.social.followers(asUserId('user123'), { limit: 20 });
-   * const page2 = await client.social.followers(asUserId('user123'), {
+   * const page1 = await client.social.followers(asUsername('alice'), { limit: 20 });
+   * const page2 = await client.social.followers(asUsername('alice'), {
    *   cursor: page1.nextCursor,
    *   limit: 20,
    * });
    * ```
    */
-  followers(id: UserId, params?: PaginationParams): Promise<PaginatedList<User>> {
+  followers(username: Username, params?: PaginationParams): Promise<PaginatedList<User>> {
     return this._client.get<PaginatedList<User>>(
-      ROUTES.followers(id),
+      ROUTES.followers(username),
       params as Record<string, string | number | undefined>,
     );
   }
@@ -102,20 +105,94 @@ export class SocialResource {
   /**
    * List users that a user is following with optional pagination. (SOCL-04)
    *
-   * @param id - Branded `UserId` of the user whose following list to retrieve
+   * @param username - Username of the user whose following list to retrieve
    * @param params - Optional pagination cursor and limit
    * @returns Paginated list of users that the given user follows
    *
    * @example
    * ```ts
-   * import { asUserId } from '@heylol/sdk';
+   * import { asUsername } from '@heylol/sdk';
    *
-   * const following = await client.social.following(asUserId('user123'), { limit: 20 });
+   * const following = await client.social.following(asUsername('alice'), { limit: 20 });
    * ```
    */
-  following(id: UserId, params?: PaginationParams): Promise<PaginatedList<User>> {
+  following(username: Username, params?: PaginationParams): Promise<PaginatedList<User>> {
     return this._client.get<PaginatedList<User>>(
-      ROUTES.following(id),
+      ROUTES.following(username),
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Block a user by username. (SOCL-05)
+   *
+   * @param username - Username of the user to block
+   * @returns `undefined` (204 No Content)
+   * @throws {APIError} With status 404 if the user does not exist
+   *
+   * @example
+   * ```ts
+   * import { asUsername } from '@heylol/sdk';
+   *
+   * await client.social.block(asUsername('bob'));
+   * ```
+   */
+  block(username: Username): Promise<void> {
+    return this._client.post<void>(ROUTES.block(username));
+  }
+
+  /**
+   * Unblock a user by username. (SOCL-06)
+   *
+   * @param username - Username of the user to unblock
+   * @returns `undefined` (204 No Content)
+   * @throws {APIError} With status 404 if the user does not exist
+   *
+   * @example
+   * ```ts
+   * import { asUsername } from '@heylol/sdk';
+   *
+   * await client.social.unblock(asUsername('bob'));
+   * ```
+   */
+  unblock(username: Username): Promise<void> {
+    return this._client.delete<void>(ROUTES.block(username));
+  }
+
+  /**
+   * List blocked users. (SOCL-07)
+   *
+   * @returns Paginated list of blocked users
+   *
+   * @example
+   * ```ts
+   * const blocked = await client.social.blocks();
+   * for (const user of blocked.items) {
+   *   console.log(user.username);
+   * }
+   * ```
+   */
+  blocks(): Promise<PaginatedList<User>> {
+    return this._client.get<PaginatedList<User>>(ROUTES.blocks);
+  }
+
+  /**
+   * Get follow suggestions. (SOCL-08)
+   *
+   * @param params - Optional pagination cursor and limit
+   * @returns Paginated list of suggested users to follow
+   *
+   * @example
+   * ```ts
+   * const suggested = await client.social.suggestions({ limit: 5 });
+   * for (const user of suggested.items) {
+   *   console.log(user.username);
+   * }
+   * ```
+   */
+  suggestions(params?: PaginationParams): Promise<PaginatedList<User>> {
+    return this._client.get<PaginatedList<User>>(
+      ROUTES.suggestions,
       params as Record<string, string | number | undefined>,
     );
   }
