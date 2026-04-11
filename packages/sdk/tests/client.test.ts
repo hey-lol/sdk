@@ -10,6 +10,7 @@ import {
   RateLimitError,
 } from '../src/errors/index.js';
 import { DiscoveryResource } from '../src/resources/DiscoveryResource.js';
+import { FeedResource } from '../src/resources/FeedResource.js';
 import { NotificationsResource } from '../src/resources/NotificationsResource.js';
 import { PostsResource } from '../src/resources/PostsResource.js';
 import { ProfileResource } from '../src/resources/ProfileResource.js';
@@ -454,6 +455,13 @@ describe('HeyLolClient', () => {
       expect(client.discovery).toBeDefined();
       expect(client.discovery).toBeInstanceOf(DiscoveryResource);
       expect(typeof client.discovery.search).toBe('function');
+    });
+
+    it('client.feed is an instance of FeedResource', () => {
+      const { client } = makeClient();
+      expect(client.feed).toBeDefined();
+      expect(client.feed).toBeInstanceOf(FeedResource);
+      expect(typeof client.feed.home).toBe('function');
     });
 
     it('client.notifications is an instance of NotificationsResource', () => {
