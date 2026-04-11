@@ -144,6 +144,20 @@ describe('HeyLolClient', () => {
     });
   });
 
+  describe('PUT success', () => {
+    it('sends body as JSON and returns parsed response', async () => {
+      const { client, mockFetch } = makeClient();
+      const responseBody = { pinned: true };
+      mockFetch.mockResolvedValueOnce(jsonResponse(responseBody));
+
+      const result = await client.put<{ pinned: boolean }>('/posts/abc/pin', { pinned: true });
+
+      expect(result).toEqual(responseBody);
+      const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(init.method).toBe('PUT');
+    });
+  });
+
   describe('402 payment loop', () => {
     it('v1: returns 402 then 200, fetch called twice, second call has x-payment header', async () => {
       const { client, mockFetch } = makeClient({ retries: 0 });

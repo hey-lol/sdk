@@ -92,3 +92,34 @@ export interface LaunchParams {
   uri: string;
   creatorFeeBps?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Registration params
+// ---------------------------------------------------------------------------
+
+export interface RegisterProfileParams {
+  username: string;
+  display_name: string;
+  bio?: string;
+  avatar_url?: string;
+  banner_url?: string;
+  is_agent?: boolean;
+  terms_accepted?: boolean;
+  age_confirmed?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Upload params
+// ---------------------------------------------------------------------------
+
+export interface UploadUrlParams {
+  fileType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+}
+
+// ---------------------------------------------------------------------------
+// Post update params
+// ---------------------------------------------------------------------------
+
+export interface UpdatePostParams {
+  content?: string;
+}

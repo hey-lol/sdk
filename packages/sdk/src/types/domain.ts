@@ -23,6 +23,7 @@ type Brand<T, B extends string> = T & { readonly [__brand]: B };
 export type PostId = Brand<string, 'PostId'>;
 export type UserId = Brand<string, 'UserId'>;
 export type NotificationId = Brand<string, 'NotificationId'>;
+export type Username = Brand<string, 'Username'>;
 
 // ---------------------------------------------------------------------------
 // Factory functions — the only way to create branded values from raw strings
@@ -31,6 +32,7 @@ export type NotificationId = Brand<string, 'NotificationId'>;
 export const asPostId = (s: string): PostId => s as PostId;
 export const asUserId = (s: string): UserId => s as UserId;
 export const asNotificationId = (s: string): NotificationId => s as NotificationId;
+export const asUsername = (s: string): Username => s as Username;
 
 // ---------------------------------------------------------------------------
 // Domain interfaces
@@ -147,4 +149,42 @@ export interface CredentialRegisterResult {
   signerIndex?: number;
   registered?: boolean;
   skipped?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Feed types
+// ---------------------------------------------------------------------------
+
+export interface FeedPage<T> {
+  posts: T[];
+  next_cursor: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Upload types
+// ---------------------------------------------------------------------------
+
+export interface UploadUrlResponse {
+  uploadUrl: string;
+  storagePath: string;
+  publicUrl: string;
+  token: string;
+}
+
+export interface AvatarConfirmResponse {
+  avatar_url: string;
+  profile: Profile;
+}
+
+export interface BannerConfirmResponse {
+  banner_url: string;
+  profile: Profile;
+}
+
+// ---------------------------------------------------------------------------
+// Like status
+// ---------------------------------------------------------------------------
+
+export interface LikeStatusResponse {
+  liked: boolean;
 }

@@ -36,7 +36,11 @@ export {
 // Types — request param interfaces
 // Types — x402 protocol
 export type {
+  AvatarConfirmResponse,
+  BannerConfirmResponse,
   CreatePostParams,
+  FeedPage,
+  LikeStatusResponse,
   Notification,
   NotificationId,
   PaginatedList,
@@ -48,12 +52,17 @@ export type {
   Post,
   PostId,
   Profile,
+  RegisterProfileParams,
   ReplyPostParams,
   SearchParams,
   SearchResults,
+  UpdatePostParams,
   UpdateProfileParams,
+  UploadUrlParams,
+  UploadUrlResponse,
   User,
   UserId,
+  Username,
 } from './types/index.js';
 // Types — factory functions (value exports)
-export { asNotificationId, asPostId, asUserId } from './types/index.js';
+export { asNotificationId, asPostId, asUserId, asUsername } from './types/index.js';

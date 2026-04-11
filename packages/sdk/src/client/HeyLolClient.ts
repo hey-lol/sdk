@@ -264,6 +264,17 @@ export class HeyLolClient {
   }
 
   /**
+   * Issue an HTTP PUT request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @param body - Optional request body, serialized as JSON
+   * @returns Parsed JSON response body cast to `T`
+   */
+  async put<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>('PUT', path, body);
+  }
+
+  /**
    * Issue an HTTP DELETE request and return the parsed response.
    *
    * @param path - URL path relative to `baseUrl`
