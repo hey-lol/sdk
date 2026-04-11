@@ -26,6 +26,7 @@ export {
 // Resources
 export {
   DiscoveryResource,
+  FeedResource,
   NotificationsResource,
   PostsResource,
   ProfileResource,

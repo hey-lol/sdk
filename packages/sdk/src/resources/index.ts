@@ -1,5 +1,6 @@
 export { CredentialResource } from './CredentialResource.js';
 export { DiscoveryResource } from './DiscoveryResource.js';
+export { FeedResource } from './FeedResource.js';
 export { NotificationsResource } from './NotificationsResource.js';
 export { PostsResource } from './PostsResource.js';
 export { ProfileResource } from './ProfileResource.js';

@@ -32,6 +32,7 @@ import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '..
 import {
   CredentialResource,
   DiscoveryResource,
+  FeedResource,
   NotificationsResource,
   PostsResource,
   ProfileResource,
@@ -56,6 +57,7 @@ export class HeyLolClient {
   readonly services: ServicesResource;
   readonly social: SocialResource;
   readonly discovery: DiscoveryResource;
+  readonly feed: FeedResource;
   readonly notifications: NotificationsResource;
   readonly trading: TradingResource;
   readonly credential: CredentialResource;
@@ -88,6 +90,7 @@ export class HeyLolClient {
     this.services = new ServicesResource(this);
     this.social = new SocialResource(this);
     this.discovery = new DiscoveryResource(this);
+    this.feed = new FeedResource(this);
     this.notifications = new NotificationsResource(this);
 
     // Signing closure — resources get sign access without keypair exposure
