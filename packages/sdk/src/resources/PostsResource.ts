@@ -8,11 +8,12 @@
 
 import type {
   CreatePostParams,
-  PaginatedList,
+  LikeStatusResponse,
   PaginationParams,
   Post,
   PostId,
   ReplyPostParams,
+  UpdatePostParams,
 } from '../types/index.js';
 
 // ---------------------------------------------------------------------------
@@ -20,8 +21,10 @@ import type {
 // ---------------------------------------------------------------------------
 
 interface HttpClient {
-  get<T>(path: string): Promise<T>;
+  get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T>;
   post<T>(path: string, body?: unknown): Promise<T>;
+  patch<T>(path: string, body?: unknown): Promise<T>;
+  put<T>(path: string, body?: unknown): Promise<T>;
   delete<T>(path: string): Promise<T>;
 }
 
@@ -31,10 +34,12 @@ interface HttpClient {
 
 const ROUTES = {
   posts: '/posts',
-  feed: '/posts/feed',
   post: (id: PostId) => `/posts/${id}`,
   postLike: (id: PostId) => `/posts/${id}/like`,
+  postLikeStatus: (id: PostId) => `/posts/${id}/like/status`,
   postReplies: (id: PostId) => `/posts/${id}/replies`,
+  postPin: (id: PostId) => `/posts/${id}/pin`,
+  postRepost: (id: PostId) => `/posts/${id}/repost`,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -46,29 +51,6 @@ export class PostsResource {
 
   constructor(client: HttpClient) {
     this.client = client;
-  }
-
-  /**
-   * List posts in the authenticated user's feed. (POST-01 feed)
-   *
-   * @param params - Optional pagination parameters (cursor, limit)
-   * @returns Paginated list of posts
-   * @throws {APIError} If the request fails
-   *
-   * @example
-   * ```ts
-   * const feed = await client.posts.list({ limit: 20 });
-   * for (const post of feed.items) {
-   *   console.log(post.content);
-   * }
-   * ```
-   */
-  list(params?: PaginationParams): Promise<PaginatedList<Post>> {
-    const query = new URLSearchParams();
-    if (params?.cursor) query.set('cursor', params.cursor);
-    if (params?.limit !== undefined) query.set('limit', String(params.limit));
-    const qs = query.toString();
-    return this.client.get<PaginatedList<Post>>(qs ? `${ROUTES.feed}?${qs}` : ROUTES.feed);
   }
 
   /**
@@ -127,6 +109,27 @@ export class PostsResource {
   }
 
   /**
+   * Update a post's content. (POST-03b)
+   *
+   * @param id - Branded `PostId` of the post to update
+   * @param params - Fields to update (currently only content)
+   * @returns The updated post
+   * @throws {APIError} With status 403 if you do not own the post, or 404 if not found
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * const updated = await client.posts.update(asPostId('abc123'), {
+   *   content: 'Updated content',
+   * });
+   * ```
+   */
+  update(id: PostId, params: UpdatePostParams): Promise<Post> {
+    return this.client.patch<Post>(ROUTES.post(id), params);
+  }
+
+  /**
    * Delete own post by branded PostId. (POST-04)
    *
    * @param id - Branded `PostId` of the post to delete
@@ -142,6 +145,24 @@ export class PostsResource {
    */
   delete(id: PostId): Promise<void> {
     return this.client.delete<void>(ROUTES.post(id));
+  }
+
+  /**
+   * Pin or unpin a post (toggles pin state). (POST-08)
+   *
+   * @param id - Branded `PostId` of the post to pin/unpin
+   * @returns `undefined` (204 No Content)
+   * @throws {APIError} With status 403 if you do not own the post, or 404 if not found
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * await client.posts.pin(asPostId('abc123'));
+   * ```
+   */
+  pin(id: PostId): Promise<void> {
+    return this.client.put<void>(ROUTES.postPin(id));
   }
 
   /**
@@ -199,5 +220,87 @@ export class PostsResource {
    */
   reply(id: PostId, params: ReplyPostParams): Promise<Post> {
     return this.client.post<Post>(ROUTES.postReplies(id), params);
+  }
+
+  /**
+   * List replies for a post with cursor-based pagination.
+   * Returns replies in ascending order (oldest first) for conversation flow.
+   *
+   * Note: This is a GET method for listing replies. To CREATE a reply, use reply().
+   *
+   * @param id - Branded `PostId` of the post to list replies for
+   * @param params - Optional pagination cursor and limit
+   * @returns Replies page with next_cursor for pagination
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * const page = await client.posts.replies(asPostId('abc123'));
+   * for (const reply of page.replies) {
+   *   console.log(reply.content);
+   * }
+   * ```
+   */
+  replies(id: PostId, params?: PaginationParams): Promise<{ replies: Post[]; next_cursor: string | null }> {
+    return this.client.get<{ replies: Post[]; next_cursor: string | null }>(
+      ROUTES.postReplies(id),
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Repost (quote-repost) a post. (POST-09)
+   *
+   * @param id - Branded `PostId` of the post to repost
+   * @returns `undefined` (204 No Content)
+   * @throws {APIError} With status 404 if the post does not exist
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * await client.posts.repost(asPostId('abc123'));
+   * ```
+   */
+  repost(id: PostId): Promise<void> {
+    return this.client.post<void>(ROUTES.postRepost(id));
+  }
+
+  /**
+   * Remove a repost. (POST-09)
+   *
+   * @param id - Branded `PostId` of the repost to remove
+   * @returns `undefined` (204 No Content)
+   * @throws {APIError} With status 404 if the post does not exist
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * await client.posts.unrepost(asPostId('abc123'));
+   * ```
+   */
+  unrepost(id: PostId): Promise<void> {
+    return this.client.delete<void>(ROUTES.postRepost(id));
+  }
+
+  /**
+   * Check if the authenticated user has liked a post. (POST-05b)
+   *
+   * @param id - Branded `PostId` of the post to check
+   * @returns Object with `liked` boolean
+   * @throws {APIError} With status 404 if the post does not exist
+   *
+   * @example
+   * ```ts
+   * import { asPostId } from '@heylol/sdk';
+   *
+   * const { liked } = await client.posts.likeStatus(asPostId('abc123'));
+   * console.log(liked ? 'You liked this' : 'Not liked');
+   * ```
+   */
+  likeStatus(id: PostId): Promise<LikeStatusResponse> {
+    return this.client.get<LikeStatusResponse>(ROUTES.postLikeStatus(id));
   }
 }
