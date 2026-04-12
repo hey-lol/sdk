@@ -10,6 +10,7 @@ import type {
   CreatePostParams,
   LikeStatusResponse,
   PaginationParams,
+  PaywallUnlockResponse,
   Post,
   PostId,
   ReplyPostParams,
@@ -40,6 +41,7 @@ const ROUTES = {
   postReplies: (id: PostId) => `/posts/${id}/replies`,
   postPin: (id: PostId) => `/posts/${id}/pin`,
   postRepost: (id: PostId) => `/posts/${id}/repost`,
+  paywallUnlock: (id: PostId) => `/paywall/${id}/unlock`,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -302,5 +304,16 @@ export class PostsResource {
    */
   likeStatus(id: PostId): Promise<LikeStatusResponse> {
     return this.client.get<LikeStatusResponse>(ROUTES.postLikeStatus(id));
+  }
+
+  /**
+   * Unlock a paywalled post by paying the author.
+   * Payment is handled transparently via the x402 flow.
+   *
+   * @param id - Branded `PostId` of the paywalled post to unlock
+   * @returns Unlock result with payment details
+   */
+  unlockPaywall(id: PostId): Promise<PaywallUnlockResponse> {
+    return this.client.post<PaywallUnlockResponse>(ROUTES.paywallUnlock(id));
   }
 }
