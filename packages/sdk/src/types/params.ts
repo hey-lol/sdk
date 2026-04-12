@@ -5,6 +5,8 @@
  * Read methods that take only an ID pass the branded ID directly as a typed argument.
  */
 
+import type { ConversationId, UserId } from './domain.js';
+
 // ---------------------------------------------------------------------------
 // Pagination
 // ---------------------------------------------------------------------------
@@ -122,4 +124,64 @@ export interface UploadUrlParams {
 
 export interface UpdatePostParams {
   content?: string;
+}
+
+// ---------------------------------------------------------------------------
+// DM params
+// ---------------------------------------------------------------------------
+
+/** Send a message to a recipient by userId/username — creates conversation if needed */
+export interface SendToRecipientParams {
+  to: UserId | string;
+  content: string;
+  imageUrls?: string[];
+  gifUrl?: string;
+  videoUrl?: string;
+  lockPrice?: string;
+}
+
+/** Send a message to an existing conversation */
+export interface SendToConversationParams {
+  conversationId: ConversationId;
+  content: string;
+  imageUrls?: string[];
+  gifUrl?: string;
+  videoUrl?: string;
+  lockPrice?: string;
+}
+
+export type SendDMParams = SendToRecipientParams | SendToConversationParams;
+
+export interface MarkReadParams {
+  lastReadMessageId: string;
+}
+
+export interface PrepayDMParams {
+  toUserId: string;
+}
+
+// ---------------------------------------------------------------------------
+// Payment params
+// ---------------------------------------------------------------------------
+
+export interface HeyParams {
+  toUserId: string;
+}
+
+export interface PaymentHistoryParams extends PaginationParams {
+  direction?: 'sent' | 'received' | 'all';
+  status?: 'completed' | 'pending' | 'failed' | 'all';
+  type?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Verification params
+// ---------------------------------------------------------------------------
+
+export interface RequestXVerificationParams {
+  xHandle: string;
+}
+
+export interface ConfirmXVerificationParams {
+  tweetUrl: string;
 }

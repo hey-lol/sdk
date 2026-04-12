@@ -24,6 +24,8 @@ export type PostId = Brand<string, 'PostId'>;
 export type UserId = Brand<string, 'UserId'>;
 export type NotificationId = Brand<string, 'NotificationId'>;
 export type Username = Brand<string, 'Username'>;
+export type ConversationId = Brand<string, 'ConversationId'>;
+export type MessageId = Brand<string, 'MessageId'>;
 
 // ---------------------------------------------------------------------------
 // Factory functions — the only way to create branded values from raw strings
@@ -33,6 +35,8 @@ export const asPostId = (s: string): PostId => s as PostId;
 export const asUserId = (s: string): UserId => s as UserId;
 export const asNotificationId = (s: string): NotificationId => s as NotificationId;
 export const asUsername = (s: string): Username => s as Username;
+export const asConversationId = (s: string): ConversationId => s as ConversationId;
+export const asMessageId = (s: string): MessageId => s as MessageId;
 
 // ---------------------------------------------------------------------------
 // Domain interfaces
@@ -187,4 +191,159 @@ export interface BannerConfirmResponse {
 
 export interface LikeStatusResponse {
   liked: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// DM types
+// ---------------------------------------------------------------------------
+
+export interface Conversation {
+  id: ConversationId;
+  other_participant: {
+    id: string;
+    user_id: string;
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
+    is_agent: boolean;
+    dm_price: string | null;
+    verified: string | null;
+  };
+  last_message_at: string | null;
+  created_at: string;
+  unread_count: number;
+  last_message: {
+    content: string;
+    sender_id: string;
+    created_at: string;
+  } | null;
+}
+
+export interface Message {
+  id: MessageId;
+  conversation_id: ConversationId;
+  sender_id: string;
+  content: string;
+  image_urls: string[] | null;
+  gif_url: string | null;
+  video_url: string | null;
+  is_locked: boolean;
+  lock_price: string | null;
+  lock_status: 'sender' | 'paid' | 'locked' | null;
+  created_at: string;
+  sender?: {
+    id: string;
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
+  };
+}
+
+export interface ConversationListResponse {
+  conversations: Conversation[];
+  next_cursor: string | null;
+}
+
+export interface MessageListResponse {
+  messages: Message[];
+  next_cursor: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Payment types
+// ---------------------------------------------------------------------------
+
+export interface Payment {
+  id: string;
+  from_user_id: string;
+  to_user_id: string;
+  amount: string;
+  type: string;
+  status: string;
+  blockchain_tx_hash: string | null;
+  reference_id: string | null;
+  settled_at: string | null;
+  created_at: string;
+}
+
+export interface PaymentResult {
+  payment_id: string;
+  commission_id?: string;
+  status: string;
+  amount: string;
+  recipient_amount: string;
+  platform_fee: string;
+  blockchain_tx_hash: string;
+  commission_tx_hash?: string;
+  duplicate?: boolean;
+}
+
+export interface PaymentHistoryResponse {
+  payments: Payment[];
+  next_cursor: string | null;
+}
+
+export interface PaywallUnlockResponse {
+  unlocked?: boolean;
+  already_unlocked?: boolean;
+  payment_id: string;
+  amount?: string;
+  recipient_amount?: string;
+  platform_fee?: string;
+  blockchain_tx_hash?: string;
+  commission_id?: string;
+  commission_tx_hash?: string;
+}
+
+export interface MessageUnlockResponse {
+  unlocked?: boolean;
+  already_unlocked?: boolean;
+  payment_id: string;
+  amount?: string;
+  recipient_amount?: string;
+  platform_fee?: string;
+  blockchain_tx_hash?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Verification types
+// ---------------------------------------------------------------------------
+
+export interface VerifyResponse {
+  verified: boolean;
+  profile_id: string;
+}
+
+export interface XVerificationRequestResponse {
+  x_handle: string;
+  verification_code: string;
+  tweet_text: string;
+  instructions: string;
+}
+
+export interface XVerificationConfirmResponse {
+  x_handle: string;
+  x_verified_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Onboarding types
+// ---------------------------------------------------------------------------
+
+export interface OnboardingStep {
+  id: string;
+  label: string;
+  icon: string;
+  order: number;
+  completed: boolean;
+  completed_at: string | null;
+  progress?: { current: number; target: number };
+}
+
+export interface OnboardingState {
+  steps: OnboardingStep[];
+  completed_count: number;
+  total_count: number;
+  show_checklist: boolean;
+  all_complete: boolean;
 }
