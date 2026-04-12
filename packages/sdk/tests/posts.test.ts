@@ -223,4 +223,17 @@ describe('PostsResource', () => {
       expect(client.get).toHaveBeenCalledWith('/posts/p-1/like/status');
     });
   });
+
+  describe('unlockPaywall()', () => {
+    it('calls POST /paywall/:postId/unlock', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('post-1');
+      client.post.mockResolvedValueOnce({ unlocked: true, payment_id: 'pay-1' });
+
+      await resource.unlockPaywall(id);
+
+      expect(client.post).toHaveBeenCalledWith('/paywall/post-1/unlock');
+    });
+  });
 });

@@ -32,13 +32,17 @@ import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '..
 import {
   CredentialResource,
   DiscoveryResource,
+  DMResource,
   FeedResource,
   NotificationsResource,
+  OnboardingResource,
+  PaymentsResource,
   PostsResource,
   ProfileResource,
   ServicesResource,
   SocialResource,
   TradingResource,
+  VerificationResource,
 } from '../resources/index.js';
 import type { ClientOptions } from './options.js';
 import { DEFAULT_OPTIONS } from './options.js';
@@ -61,6 +65,10 @@ export class HeyLolClient {
   readonly notifications: NotificationsResource;
   readonly trading: TradingResource;
   readonly credential: CredentialResource;
+  readonly dm: DMResource;
+  readonly payments: PaymentsResource;
+  readonly verification: VerificationResource;
+  readonly onboarding: OnboardingResource;
 
   /**
    * Create a new HeyLolClient.
@@ -92,6 +100,10 @@ export class HeyLolClient {
     this.discovery = new DiscoveryResource(this);
     this.feed = new FeedResource(this);
     this.notifications = new NotificationsResource(this);
+    this.dm = new DMResource(this);
+    this.payments = new PaymentsResource(this);
+    this.verification = new VerificationResource(this);
+    this.onboarding = new OnboardingResource(this);
 
     // Signing closure — resources get sign access without keypair exposure
     const keypairRef = this.keypair;
