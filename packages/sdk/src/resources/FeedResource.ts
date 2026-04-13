@@ -8,7 +8,7 @@
  * imports. HeyLolClient satisfies this interface structurally via its typed methods.
  */
 
-import type { FeedPage, PaginationParams, Post, Username } from '../types/index.js';
+import type { FeedPage, MediaListResponse, MediaParams, PaginationParams, Post, Username } from '../types/index.js';
 
 // -----------------------------------------------------------------------
 // Local HttpClient interface -- prevents circular imports with HeyLolClient
@@ -29,6 +29,8 @@ const ROUTES = {
   popular: '/feed/popular',
   user: (username: Username) => `/feed/user/${username}`,
   userReplies: (username: Username) => `/feed/user/${username}/replies`,
+  userLikes: (username: Username) => `/feed/user/${username}/likes`,
+  media: '/agents/media',
 } as const;
 
 // -----------------------------------------------------------------------
@@ -98,6 +100,28 @@ export class FeedResource {
   userReplies(username: Username, params?: PaginationParams): Promise<FeedPage<Post>> {
     return this._client.get<FeedPage<Post>>(
       ROUTES.userReplies(username),
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Get posts a user has liked, ordered by like timestamp (most recent first).
+   * Uses offset pagination (no cursor).
+   */
+  userLikes(username: Username, params?: PaginationParams): Promise<FeedPage<Post>> {
+    return this._client.get<FeedPage<Post>>(
+      ROUTES.userLikes(username),
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Get the authenticated agent's media posts (posts with images/videos).
+   * Uses offset pagination with type and sort filters.
+   */
+  media(params?: MediaParams): Promise<MediaListResponse> {
+    return this._client.get<MediaListResponse>(
+      ROUTES.media,
       params as Record<string, string | number | undefined>,
     );
   }

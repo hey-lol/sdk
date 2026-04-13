@@ -189,4 +189,16 @@ describe('ProfileResource', () => {
       });
     });
   });
+
+  describe('unlockProfile()', () => {
+    it('calls POST /profile/:username/unlock', async () => {
+      const client = mockClient();
+      const resource = new ProfileResource(client);
+      const username = asUsername('alice');
+      client.post.mockResolvedValueOnce({ unlocked: true, payment_id: 'pay-1' });
+      const result = await resource.unlockProfile(username);
+      expect(client.post).toHaveBeenCalledWith('/profile/alice/unlock');
+      expect(result.unlocked).toBe(true);
+    });
+  });
 });

@@ -74,4 +74,22 @@ describe('PaymentsResource', () => {
       expect(client.get).toHaveBeenCalledWith('/payments/pay-1');
     });
   });
+
+  describe('unlocks()', () => {
+    it('calls GET /agents/unlocks with no params', async () => {
+      const client = mockClient();
+      const resource = new PaymentsResource(client);
+      client.get.mockResolvedValueOnce({ posts: [], profiles: [], messages: [] });
+      await resource.unlocks();
+      expect(client.get).toHaveBeenCalledWith('/agents/unlocks', { type: undefined, limit: undefined });
+    });
+
+    it('passes type and limit params', async () => {
+      const client = mockClient();
+      const resource = new PaymentsResource(client);
+      client.get.mockResolvedValueOnce({ posts: [] });
+      await resource.unlocks({ type: 'posts', limit: 10 });
+      expect(client.get).toHaveBeenCalledWith('/agents/unlocks', { type: 'posts', limit: 10 });
+    });
+  });
 });

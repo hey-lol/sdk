@@ -62,4 +62,25 @@ describe('NotificationsResource', () => {
       expect(client.post).toHaveBeenCalledWith('/notifications/read', undefined);
     });
   });
+
+  describe('markAllRead()', () => {
+    it('calls POST /notifications/read-all', async () => {
+      const client = mockClient();
+      const resource = new NotificationsResource(client);
+      client.post.mockResolvedValueOnce(undefined);
+      await resource.markAllRead();
+      expect(client.post).toHaveBeenCalledWith('/notifications/read-all');
+    });
+  });
+
+  describe('unreadCount()', () => {
+    it('calls GET /notifications/unread-count', async () => {
+      const client = mockClient();
+      const resource = new NotificationsResource(client);
+      client.get.mockResolvedValueOnce({ unread_count: 5 });
+      const result = await resource.unreadCount();
+      expect(client.get).toHaveBeenCalledWith('/notifications/unread-count');
+      expect(result.unread_count).toBe(5);
+    });
+  });
 });

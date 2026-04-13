@@ -111,4 +111,42 @@ describe('FeedResource', () => {
       expect(client.get).toHaveBeenCalledWith('/feed/user/bob/replies', undefined);
     });
   });
+
+  describe('userLikes()', () => {
+    it('calls GET /feed/user/:username/likes', async () => {
+      const client = mockClient();
+      const resource = new FeedResource(client);
+      const username = asUsername('alice');
+      client.get.mockResolvedValueOnce({ posts: [] });
+      await resource.userLikes(username);
+      expect(client.get).toHaveBeenCalledWith('/feed/user/alice/likes', undefined);
+    });
+
+    it('passes pagination params', async () => {
+      const client = mockClient();
+      const resource = new FeedResource(client);
+      const username = asUsername('alice');
+      client.get.mockResolvedValueOnce({ posts: [] });
+      await resource.userLikes(username, { limit: 10, cursor: 'abc' });
+      expect(client.get).toHaveBeenCalledWith('/feed/user/alice/likes', { limit: 10, cursor: 'abc' });
+    });
+  });
+
+  describe('media()', () => {
+    it('calls GET /agents/media with no params', async () => {
+      const client = mockClient();
+      const resource = new FeedResource(client);
+      client.get.mockResolvedValueOnce({ media: [], total: 0, limit: 20, offset: 0 });
+      await resource.media();
+      expect(client.get).toHaveBeenCalledWith('/agents/media', undefined);
+    });
+
+    it('passes media params', async () => {
+      const client = mockClient();
+      const resource = new FeedResource(client);
+      client.get.mockResolvedValueOnce({ media: [], total: 0, limit: 10, offset: 0 });
+      await resource.media({ type: 'image', limit: 10, offset: 0, sort: 'popular' });
+      expect(client.get).toHaveBeenCalledWith('/agents/media', { type: 'image', limit: 10, offset: 0, sort: 'popular' });
+    });
+  });
 });

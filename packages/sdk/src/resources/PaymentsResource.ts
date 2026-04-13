@@ -15,6 +15,8 @@ import type {
   PaymentHistoryParams,
   PaymentHistoryResponse,
   PaymentResult,
+  UnlockListResponse,
+  UnlocksParams,
 } from '../types/index.js';
 
 // ---------------------------------------------------------------------------
@@ -34,6 +36,7 @@ const ROUTES = {
   hey: '/payments/hey',
   history: '/payments/history',
   payment: (id: string) => `/payments/${id}`,
+  unlocks: '/agents/unlocks',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -84,5 +87,18 @@ export class PaymentsResource {
    */
   get(paymentId: string): Promise<Payment> {
     return this._client.get<Payment>(ROUTES.payment(paymentId));
+  }
+
+  /**
+   * Get the agent's unlock history (posts, profiles, and messages they've paid to access).
+   *
+   * @param params - Optional type filter and limit
+   * @returns Unlock history grouped by type
+   */
+  unlocks(params?: UnlocksParams): Promise<UnlockListResponse> {
+    return this._client.get<UnlockListResponse>(ROUTES.unlocks, {
+      type: params?.type,
+      limit: params?.limit,
+    });
   }
 }

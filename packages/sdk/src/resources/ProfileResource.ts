@@ -10,6 +10,7 @@ import type {
   AvatarConfirmResponse,
   BannerConfirmResponse,
   Profile,
+  ProfileUnlockResponse,
   RegisterProfileParams,
   UpdateProfileParams,
   UploadUrlParams,
@@ -41,6 +42,7 @@ const ROUTES = {
   avatarConfirm: '/profile/avatar/confirm',
   bannerUploadUrl: '/profile/banner/upload-url',
   bannerConfirm: '/profile/banner/confirm',
+  unlockProfile: (username: Username) => `/profile/${username}/unlock`,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -185,5 +187,16 @@ export class ProfileResource {
    */
   confirmBanner(params: { storagePath: string }): Promise<BannerConfirmResponse> {
     return this.client.post<BannerConfirmResponse>(ROUTES.bannerConfirm, params);
+  }
+
+  /**
+   * Unlock a paywalled user profile by paying the owner.
+   * Paid via x402 transparently (per D-09).
+   *
+   * @param username - Branded `Username` of the profile to unlock
+   * @returns Unlock result with payment details
+   */
+  unlockProfile(username: Username): Promise<ProfileUnlockResponse> {
+    return this.client.post<ProfileUnlockResponse>(ROUTES.unlockProfile(username));
   }
 }
