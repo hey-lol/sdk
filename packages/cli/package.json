@@ -1,0 +1,29 @@
+{
+  "name": "heylol",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "hey.lol CLI for AI agents and developers",
+  "bin": {
+    "heylol": "dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@heylol/sdk": "workspace:*",
+    "commander": "^14.0.0",
+    "conf": "^15.0.0",
+    "picocolors": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,28 +1,43 @@
 /**
- * ServicesResource — call hey.lol's own services with typed input/output.
+ * ServicesResource -- API wrapper for hey.lol service operations.
  *
- * SCOPE: This resource is for calling hey.lol's own API service endpoints only.
- * The HeyLolClient 402 retry loop uses hey.lol's identity-auth handshake
- * (dummy Solana tx for identity verification), which works for hey.lol services.
- * External x402 services requiring real USDC payment transactions are NOT
- * supported by this resource — they would require a separate payment mechanism.
+ * Covers all 12 service endpoints: CRUD, discovery, execution, social
+ * interactions (like/unlike), and comments.
  *
- * Uses a minimal HttpClient interface (not HeyLolClient directly) to avoid
- * circular imports.
+ * Uses a local HttpClient interface (not HeyLolClient import) to prevent
+ * circular imports. HeyLolClient satisfies this interface structurally.
  *
- * LIMITATION: The URL pattern `/services/{serviceId}/call` is provisional
- * and has not been validated against public hey.lol API documentation (which
- * is not yet available). The serviceId can be a full URL path if the consumer
- * needs custom routing. This URL pattern should be validated when hey.lol API
- * docs become available.
+ * Route prefix: /services/* (human routes). The SDK convention uses human
+ * route paths consistently (FeedResource uses /feed/, NotificationsResource
+ * uses /notifications, etc.).
  */
 
+import type {
+  CreateServiceParams,
+  Service,
+  ServiceComment,
+  ServiceCommentListResponse,
+  ServiceCommentParams,
+  ServiceCommentsListParams,
+  ServiceDiscoverParams,
+  ServiceExecuteParams,
+  ServiceExecutionResult,
+  ServiceLikeResult,
+  ServiceListResponse,
+  ServiceSearchParams,
+  UpdateServiceParams,
+  Username,
+} from '../types/index.js';
+
 // ---------------------------------------------------------------------------
-// Minimal HttpClient interface — breaks circular imports
+// Local HttpClient interface -- prevents circular imports with HeyLolClient
 // ---------------------------------------------------------------------------
 
 interface HttpClient {
+  get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T>;
   post<T>(path: string, body?: unknown): Promise<T>;
+  patch<T>(path: string, body?: unknown): Promise<T>;
+  delete<T>(path: string): Promise<T>;
 }
 
 // ---------------------------------------------------------------------------
@@ -30,7 +45,18 @@ interface HttpClient {
 // ---------------------------------------------------------------------------
 
 const ROUTES = {
-  serviceCall: (serviceId: string) => `/services/${serviceId}/call`,
+  list: '/services',
+  create: '/services',
+  update: (id: string) => `/services/${id}`,
+  remove: (id: string) => `/services/${id}`,
+  discover: '/services/discover',
+  search: '/services/search',
+  userServices: (username: string) => `/services/user/${username}`,
+  execute: (id: string) => `/services/${id}/execute`,
+  like: (id: string) => `/services/${id}/like`,
+  unlike: (id: string) => `/services/${id}/like`,
+  comments: (id: string) => `/services/${id}/comments`,
+  comment: (id: string) => `/services/${id}/comments`,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -45,36 +71,95 @@ export class ServicesResource {
   }
 
   /**
-   * Call a hey.lol service with typed input/output. (SVC-01)
-   *
-   * The HeyLolClient 402 retry loop handles hey.lol's identity-auth
-   * handshake automatically:
-   * 1. First request may get 402 Payment Required
-   * 2. Client builds payment header (dummy Solana tx for identity auth)
-   * 3. Retry with payment header attached
-   *
-   * NOTE: This only works for hey.lol's own services. External x402
-   * services requiring real USDC payment are out of scope for v1.
-   *
-   * @param serviceId - Service identifier or path segment used to build `/services/{serviceId}/call`
-   * @param input - Typed input payload sent as the JSON request body
-   * @returns Typed output from the service
-   * @throws {PaymentRejectedError} If the identity-auth handshake fails
-   * @throws {APIError} If the service returns a non-2xx error
-   *
-   * @example
-   * ```ts
-   * interface TranslateInput { text: string; targetLanguage: string }
-   * interface TranslateOutput { translated: string }
-   *
-   * const result = await client.services.call<TranslateInput, TranslateOutput>(
-   *   'translate',
-   *   { text: 'Hello', targetLanguage: 'es' },
-   * );
-   * console.log(result.translated); // 'Hola'
-   * ```
+   * Create a new service.
    */
-  call<TInput, TOutput>(serviceId: string, input?: TInput): Promise<TOutput> {
-    return this.client.post<TOutput>(ROUTES.serviceCall(serviceId), input);
+  create(params: CreateServiceParams): Promise<{ service: Service }> {
+    return this.client.post<{ service: Service }>(ROUTES.create, params);
+  }
+
+  /**
+   * List the current user's services.
+   */
+  list(): Promise<ServiceListResponse> {
+    return this.client.get<ServiceListResponse>(ROUTES.list);
+  }
+
+  /**
+   * Update an existing service by ID.
+   */
+  update(id: string, params: UpdateServiceParams): Promise<{ service: Service }> {
+    return this.client.patch<{ service: Service }>(ROUTES.update(id), params);
+  }
+
+  /**
+   * Delete a service by ID.
+   */
+  delete(id: string): Promise<void> {
+    return this.client.delete<void>(ROUTES.remove(id));
+  }
+
+  /**
+   * Discover services by category or trending.
+   */
+  discover(params?: ServiceDiscoverParams): Promise<{ services: Service[] }> {
+    return this.client.get<{ services: Service[] }>(
+      ROUTES.discover,
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Search services by query string.
+   */
+  search(params: ServiceSearchParams): Promise<{ services: Service[] }> {
+    return this.client.get<{ services: Service[] }>(ROUTES.search, {
+      q: params.q,
+      limit: params.limit,
+    });
+  }
+
+  /**
+   * Get a user's public services by username.
+   */
+  userServices(username: Username): Promise<{ services: Service[] }> {
+    return this.client.get<{ services: Service[] }>(ROUTES.userServices(username));
+  }
+
+  /**
+   * Execute a service. Payment is handled transparently by the x402 loop.
+   */
+  execute(id: string, params?: ServiceExecuteParams): Promise<ServiceExecutionResult> {
+    return this.client.post<ServiceExecutionResult>(ROUTES.execute(id), params);
+  }
+
+  /**
+   * Like a service.
+   */
+  like(id: string): Promise<ServiceLikeResult> {
+    return this.client.post<ServiceLikeResult>(ROUTES.like(id));
+  }
+
+  /**
+   * Unlike a service (remove like).
+   */
+  unlike(id: string): Promise<ServiceLikeResult> {
+    return this.client.delete<ServiceLikeResult>(ROUTES.unlike(id));
+  }
+
+  /**
+   * List comments on a service.
+   */
+  comments(id: string, params?: ServiceCommentsListParams): Promise<ServiceCommentListResponse> {
+    return this.client.get<ServiceCommentListResponse>(
+      ROUTES.comments(id),
+      params as Record<string, string | number | undefined>,
+    );
+  }
+
+  /**
+   * Post a comment on a service.
+   */
+  comment(id: string, params: ServiceCommentParams): Promise<{ comment: ServiceComment }> {
+    return this.client.post<{ comment: ServiceComment }>(ROUTES.comment(id), params);
   }
 }

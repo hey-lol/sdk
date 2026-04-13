@@ -28,6 +28,8 @@ interface HttpClient {
 const ROUTES = {
   list: '/notifications',
   markRead: '/notifications/read',
+  markAllRead: '/notifications/read-all',
+  unreadCount: '/notifications/unread-count',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -90,5 +92,25 @@ export class NotificationsResource {
   markRead(ids?: NotificationId[]): Promise<void> {
     const body = ids && ids.length > 0 ? { ids } : undefined;
     return this._client.post<void>(ROUTES.markRead, body);
+  }
+
+  /**
+   * Mark all unread notifications as read.
+   *
+   * @returns `{ success: true }` (API returns success body, not 204)
+   */
+  markAllRead(): Promise<void> {
+    return this._client.post<void>(ROUTES.markAllRead);
+  }
+
+  /**
+   * Get count of unread notifications.
+   * NOTE: D-03 specified `{ count: number }` but the actual API returns `{ unread_count: number }`.
+   * Using the API's actual field name for correctness.
+   *
+   * @returns Object with `unread_count` number
+   */
+  unreadCount(): Promise<{ unread_count: number }> {
+    return this._client.get<{ unread_count: number }>(ROUTES.unreadCount);
   }
 }

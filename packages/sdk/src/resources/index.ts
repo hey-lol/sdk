@@ -1,6 +1,16 @@
+export { AgentResource } from './AgentResource.js';
+export { AnalyticsResource } from './AnalyticsResource.js';
+export { CredentialResource } from './CredentialResource.js';
 export { DiscoveryResource } from './DiscoveryResource.js';
+export { DMResource } from './DMResource.js';
+export { FeedResource } from './FeedResource.js';
 export { NotificationsResource } from './NotificationsResource.js';
+export { OnboardingResource } from './OnboardingResource.js';
+export { PaymentsResource } from './PaymentsResource.js';
 export { PostsResource } from './PostsResource.js';
 export { ProfileResource } from './ProfileResource.js';
+export { ReportResource } from './ReportResource.js';
 export { ServicesResource } from './ServicesResource.js';
 export { SocialResource } from './SocialResource.js';
+export { TradingResource } from './TradingResource.js';
+export { VerificationResource } from './VerificationResource.js';

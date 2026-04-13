@@ -10,6 +10,7 @@ import {
   RateLimitError,
 } from '../src/errors/index.js';
 import { DiscoveryResource } from '../src/resources/DiscoveryResource.js';
+import { FeedResource } from '../src/resources/FeedResource.js';
 import { NotificationsResource } from '../src/resources/NotificationsResource.js';
 import { PostsResource } from '../src/resources/PostsResource.js';
 import { ProfileResource } from '../src/resources/ProfileResource.js';
@@ -141,6 +142,20 @@ describe('HeyLolClient', () => {
       const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
       expect(init.body).toBe(JSON.stringify(requestBody));
       expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
+    });
+  });
+
+  describe('PUT success', () => {
+    it('sends body as JSON and returns parsed response', async () => {
+      const { client, mockFetch } = makeClient();
+      const responseBody = { pinned: true };
+      mockFetch.mockResolvedValueOnce(jsonResponse(responseBody));
+
+      const result = await client.put<{ pinned: boolean }>('/posts/abc/pin', { pinned: true });
+
+      expect(result).toEqual(responseBody);
+      const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(init.method).toBe('PUT');
     });
   });
 
@@ -442,6 +457,13 @@ describe('HeyLolClient', () => {
       expect(typeof client.discovery.search).toBe('function');
     });
 
+    it('client.feed is an instance of FeedResource', () => {
+      const { client } = makeClient();
+      expect(client.feed).toBeDefined();
+      expect(client.feed).toBeInstanceOf(FeedResource);
+      expect(typeof client.feed.home).toBe('function');
+    });
+
     it('client.notifications is an instance of NotificationsResource', () => {
       const { client } = makeClient();
       expect(client.notifications).toBeDefined();
@@ -453,7 +475,7 @@ describe('HeyLolClient', () => {
       const { client } = makeClient();
       expect(client.services).toBeDefined();
       expect(client.services).toBeInstanceOf(ServicesResource);
-      expect(typeof client.services.call).toBe('function');
+      expect(typeof client.services.create).toBe('function');
     });
   });
 });

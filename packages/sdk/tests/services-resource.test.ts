@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ServicesResource } from '../src/resources/ServicesResource.js';
+import { asUsername } from '../src/types/index.js';
 
 // ---------------------------------------------------------------------------
 // Mock client helper
@@ -7,7 +8,10 @@ import { ServicesResource } from '../src/resources/ServicesResource.js';
 
 function mockClient() {
   return {
+    get: vi.fn(),
     post: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
   };
 }
 
@@ -16,64 +20,184 @@ function mockClient() {
 // ---------------------------------------------------------------------------
 
 describe('ServicesResource', () => {
-  describe('call()', () => {
-    it('delegates to client.post with correct provisional path', async () => {
+  describe('create()', () => {
+    it('calls POST /services with body', async () => {
       const client = mockClient();
       const resource = new ServicesResource(client);
-      client.post.mockResolvedValueOnce({ result: 'ok' });
+      const params = { name: 'Test Service', endpoint_url: 'https://example.com/api', slug: 'test-svc' };
+      client.post.mockResolvedValueOnce({ service: { id: 'svc-1', ...params } });
 
-      await resource.call('my-service', { query: 'hello' });
+      await resource.create(params);
 
-      expect(client.post).toHaveBeenCalledWith('/services/my-service/call', { query: 'hello' });
+      expect(client.post).toHaveBeenCalledWith('/services', params);
+    });
+  });
+
+  describe('list()', () => {
+    it('calls GET /services with no params', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      client.get.mockResolvedValueOnce({ services: [] });
+
+      await resource.list();
+
+      expect(client.get).toHaveBeenCalledWith('/services');
+    });
+  });
+
+  describe('update()', () => {
+    it('calls PATCH /services/:id with body', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      const params = { name: 'Updated Name' };
+      client.patch.mockResolvedValueOnce({ service: { id: 'svc-1', name: 'Updated Name' } });
+
+      await resource.update('svc-1', params);
+
+      expect(client.patch).toHaveBeenCalledWith('/services/svc-1', params);
+    });
+  });
+
+  describe('delete()', () => {
+    it('calls DELETE /services/:id', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      client.delete.mockResolvedValueOnce(undefined);
+
+      await resource.delete('svc-1');
+
+      expect(client.delete).toHaveBeenCalledWith('/services/svc-1');
+    });
+  });
+
+  describe('discover()', () => {
+    it('calls GET /services/discover with params', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      const params = { mode: 'trending' as const, limit: 10 };
+      client.get.mockResolvedValueOnce({ services: [] });
+
+      await resource.discover(params);
+
+      expect(client.get).toHaveBeenCalledWith('/services/discover', params);
     });
 
-    it('passes serviceId into route template', async () => {
+    it('calls GET /services/discover with undefined when no params', async () => {
       const client = mockClient();
       const resource = new ServicesResource(client);
-      client.post.mockResolvedValueOnce({});
+      client.get.mockResolvedValueOnce({ services: [] });
 
-      await resource.call('translate-text', { text: 'hello' });
+      await resource.discover();
 
-      expect(client.post).toHaveBeenCalledWith('/services/translate-text/call', {
-        text: 'hello',
-      });
+      expect(client.get).toHaveBeenCalledWith('/services/discover', undefined);
+    });
+  });
+
+  describe('search()', () => {
+    it('calls GET /services/search with q and limit', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      client.get.mockResolvedValueOnce({ services: [] });
+
+      await resource.search({ q: 'translate', limit: 5 });
+
+      expect(client.get).toHaveBeenCalledWith('/services/search', { q: 'translate', limit: 5 });
+    });
+  });
+
+  describe('userServices()', () => {
+    it('calls GET /services/user/:username', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      const username = asUsername('alice');
+      client.get.mockResolvedValueOnce({ services: [] });
+
+      await resource.userServices(username);
+
+      expect(client.get).toHaveBeenCalledWith('/services/user/alice');
+    });
+  });
+
+  describe('execute()', () => {
+    it('calls POST /services/:id/execute with body', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      const params = { params: { text: 'hello' } };
+      client.post.mockResolvedValueOnce({ execution_id: 'exec-1', output: 'hola', duration_ms: 42 });
+
+      await resource.execute('svc-1', params);
+
+      expect(client.post).toHaveBeenCalledWith('/services/svc-1/execute', params);
     });
 
-    it('passes input as body', async () => {
+    it('calls POST /services/:id/execute with undefined when no params', async () => {
       const client = mockClient();
       const resource = new ServicesResource(client);
-      const input = { prompt: 'Summarize this', maxTokens: 100 };
-      client.post.mockResolvedValueOnce({ summary: 'done' });
+      client.post.mockResolvedValueOnce({ execution_id: 'exec-2', output: 'pong', duration_ms: 5 });
 
-      await resource.call('summarize', input);
+      await resource.execute('svc-1');
 
-      expect(client.post).toHaveBeenCalledWith('/services/summarize/call', input);
+      expect(client.post).toHaveBeenCalledWith('/services/svc-1/execute', undefined);
+    });
+  });
+
+  describe('like()', () => {
+    it('calls POST /services/:id/like', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      client.post.mockResolvedValueOnce({ liked: true, like_count: 1 });
+
+      await resource.like('svc-1');
+
+      expect(client.post).toHaveBeenCalledWith('/services/svc-1/like');
+    });
+  });
+
+  describe('unlike()', () => {
+    it('calls DELETE /services/:id/like', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      client.delete.mockResolvedValueOnce({ liked: false, like_count: 0 });
+
+      await resource.unlike('svc-1');
+
+      expect(client.delete).toHaveBeenCalledWith('/services/svc-1/like');
+    });
+  });
+
+  describe('comments()', () => {
+    it('calls GET /services/:id/comments with params', async () => {
+      const client = mockClient();
+      const resource = new ServicesResource(client);
+      const params = { limit: 10, cursor: 'abc' };
+      client.get.mockResolvedValueOnce({ comments: [], next_cursor: null });
+
+      await resource.comments('svc-1', params);
+
+      expect(client.get).toHaveBeenCalledWith('/services/svc-1/comments', params);
     });
 
-    it('works without input (undefined body)', async () => {
+    it('calls GET /services/:id/comments with undefined when no params', async () => {
       const client = mockClient();
       const resource = new ServicesResource(client);
-      client.post.mockResolvedValueOnce({ status: 'pong' });
+      client.get.mockResolvedValueOnce({ comments: [], next_cursor: null });
 
-      await resource.call('ping');
+      await resource.comments('svc-1');
 
-      expect(client.post).toHaveBeenCalledWith('/services/ping/call', undefined);
+      expect(client.get).toHaveBeenCalledWith('/services/svc-1/comments', undefined);
     });
+  });
 
-    it('returns typed output from client.post', async () => {
+  describe('comment()', () => {
+    it('calls POST /services/:id/comments with body', async () => {
       const client = mockClient();
       const resource = new ServicesResource(client);
-      const expected = { translated: 'hola', language: 'es' };
-      client.post.mockResolvedValueOnce(expected);
+      const params = { content: 'Great service!' };
+      client.post.mockResolvedValueOnce({ comment: { id: 'cmt-1', content: 'Great service!' } });
 
-      const result = await resource.call<
-        { text: string },
-        { translated: string; language: string }
-      >('translate', { text: 'hello' });
+      await resource.comment('svc-1', params);
 
-      expect(result).toEqual(expected);
-      expect(result.translated).toBe('hola');
-      expect(result.language).toBe('es');
+      expect(client.post).toHaveBeenCalledWith('/services/svc-1/comments', params);
     });
   });
 });

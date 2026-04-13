@@ -11,6 +11,7 @@ function mockClient() {
     get: vi.fn(),
     post: vi.fn(),
     patch: vi.fn(),
+    put: vi.fn(),
     delete: vi.fn(),
   };
 }
@@ -77,6 +78,20 @@ describe('PostsResource', () => {
     });
   });
 
+  describe('update()', () => {
+    it('calls PATCH /posts/:id with update params', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      const params = { content: 'Updated content' };
+      client.patch.mockResolvedValueOnce({ id, content: 'Updated content' });
+
+      await resource.update(id, params);
+
+      expect(client.patch).toHaveBeenCalledWith('/posts/p-1', { content: 'Updated content' });
+    });
+  });
+
   describe('delete()', () => {
     it('calls DELETE /posts/:id', async () => {
       const client = mockClient();
@@ -87,6 +102,19 @@ describe('PostsResource', () => {
       await resource.delete(id);
 
       expect(client.delete).toHaveBeenCalledWith('/posts/p-1');
+    });
+  });
+
+  describe('pin()', () => {
+    it('calls PUT /posts/:id/pin', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.put.mockResolvedValueOnce(undefined);
+
+      await resource.pin(id);
+
+      expect(client.put).toHaveBeenCalledWith('/posts/p-1/pin');
     });
   });
 
@@ -127,6 +155,85 @@ describe('PostsResource', () => {
       await resource.reply(id, params);
 
       expect(client.post).toHaveBeenCalledWith('/posts/p-1/replies', params);
+    });
+  });
+
+  describe('replies()', () => {
+    it('calls GET /posts/:id/replies with no params', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.get.mockResolvedValueOnce({ replies: [], next_cursor: null });
+
+      await resource.replies(id);
+
+      expect(client.get).toHaveBeenCalledWith('/posts/p-1/replies', undefined);
+    });
+
+    it('passes pagination params to GET /posts/:id/replies', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.get.mockResolvedValueOnce({ replies: [], next_cursor: 'abc' });
+
+      await resource.replies(id, { cursor: 'abc', limit: 10 });
+
+      expect(client.get).toHaveBeenCalledWith('/posts/p-1/replies', {
+        cursor: 'abc',
+        limit: 10,
+      });
+    });
+  });
+
+  describe('repost()', () => {
+    it('calls POST /posts/:id/repost', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.post.mockResolvedValueOnce(undefined);
+
+      await resource.repost(id);
+
+      expect(client.post).toHaveBeenCalledWith('/posts/p-1/repost');
+    });
+  });
+
+  describe('unrepost()', () => {
+    it('calls DELETE /posts/:id/repost', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.delete.mockResolvedValueOnce(undefined);
+
+      await resource.unrepost(id);
+
+      expect(client.delete).toHaveBeenCalledWith('/posts/p-1/repost');
+    });
+  });
+
+  describe('likeStatus()', () => {
+    it('calls GET /posts/:id/like/status', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('p-1');
+      client.get.mockResolvedValueOnce({ liked: true });
+
+      await resource.likeStatus(id);
+
+      expect(client.get).toHaveBeenCalledWith('/posts/p-1/like/status');
+    });
+  });
+
+  describe('unlockPaywall()', () => {
+    it('calls POST /paywall/:postId/unlock', async () => {
+      const client = mockClient();
+      const resource = new PostsResource(client);
+      const id = asPostId('post-1');
+      client.post.mockResolvedValueOnce({ unlocked: true, payment_id: 'pay-1' });
+
+      await resource.unlockPaywall(id);
+
+      expect(client.post).toHaveBeenCalledWith('/paywall/post-1/unlock');
     });
   });
 });

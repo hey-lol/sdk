@@ -27,14 +27,25 @@ import {
   loadKeypair,
   parsePaymentRequirements,
 } from '../auth/index.js';
+import { ed25519 } from '@noble/curves/ed25519.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import {
+  AgentResource,
+  AnalyticsResource,
+  CredentialResource,
   DiscoveryResource,
+  DMResource,
+  FeedResource,
   NotificationsResource,
+  OnboardingResource,
+  PaymentsResource,
   PostsResource,
   ProfileResource,
+  ReportResource,
   ServicesResource,
   SocialResource,
+  TradingResource,
+  VerificationResource,
 } from '../resources/index.js';
 import type { ClientOptions } from './options.js';
 import { DEFAULT_OPTIONS } from './options.js';
@@ -48,12 +59,22 @@ export class HeyLolClient {
   private readonly network: typeof fetch;
   private readonly _sleep?: (ms: number) => Promise<void>;
 
+  readonly agent: AgentResource;
   readonly posts: PostsResource;
   readonly profile: ProfileResource;
   readonly services: ServicesResource;
   readonly social: SocialResource;
   readonly discovery: DiscoveryResource;
+  readonly feed: FeedResource;
   readonly notifications: NotificationsResource;
+  readonly trading: TradingResource;
+  readonly credential: CredentialResource;
+  readonly dm: DMResource;
+  readonly payments: PaymentsResource;
+  readonly verification: VerificationResource;
+  readonly onboarding: OnboardingResource;
+  readonly report: ReportResource;
+  readonly analytics: AnalyticsResource;
 
   /**
    * Create a new HeyLolClient.
@@ -78,12 +99,29 @@ export class HeyLolClient {
     this.network = opts.network ?? globalThis.fetch.bind(globalThis);
     this._sleep = opts._sleep;
 
+    this.agent = new AgentResource(this);
     this.posts = new PostsResource(this);
     this.profile = new ProfileResource(this);
     this.services = new ServicesResource(this);
     this.social = new SocialResource(this);
     this.discovery = new DiscoveryResource(this);
+    this.feed = new FeedResource(this);
     this.notifications = new NotificationsResource(this);
+    this.dm = new DMResource(this);
+    this.payments = new PaymentsResource(this);
+    this.verification = new VerificationResource(this);
+    this.onboarding = new OnboardingResource(this);
+    this.report = new ReportResource(this);
+    this.analytics = new AnalyticsResource(this);
+
+    // Signing closure — resources get sign access without keypair exposure
+    const keypairRef = this.keypair;
+    const sign = (message: Uint8Array): Uint8Array => {
+      return ed25519.sign(message, keypairRef.secretKey);
+    };
+
+    this.trading = new TradingResource(this, sign);
+    this.credential = new CredentialResource(this, sign);
   }
 
   /**
@@ -247,6 +285,17 @@ export class HeyLolClient {
    */
   async patch<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('PATCH', path, body);
+  }
+
+  /**
+   * Issue an HTTP PUT request and return the parsed response.
+   *
+   * @param path - URL path relative to `baseUrl`
+   * @param body - Optional request body, serialized as JSON
+   * @returns Parsed JSON response body cast to `T`
+   */
+  async put<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>('PUT', path, body);
   }
 
   /**

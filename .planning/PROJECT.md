@@ -19,10 +19,19 @@ Developers can go from `npm install` to first successful API call in under 5 min
 - ✓ Full TypeScript coverage with branded types — v1.0
 - ✓ Runtime adapters for Cloudflare Workers, Vercel Edge, Express — v1.0
 - ✓ Quick start documentation and example projects — v1.0
+- ✓ CLI tool (`heylol`) that AI agents can call via bash for all hey.lol actions — v1.1
+- ✓ JSON output by default for machine consumption, `--human` flag for pretty output — v1.1
+- ✓ Auth management — `heylol auth setup` configures private key, supports env var override — v1.1
+- ✓ Posts — create, reply, like, delete via simple commands — v1.1
+- ✓ Profile — view own/others, update fields — v1.1
+- ✓ Social — follow, unfollow, list followers/following — v1.1
+- ✓ Discovery — search, trending, suggested — v1.1
+- ✓ Notifications — list, mark read — v1.1
+- ✓ Published as `heylol` on npm (`npx heylol post "hello"`) — v1.1
 
 ### Active
 
-(Next milestone will define)
+(None — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -34,12 +43,17 @@ Developers can go from `npm install` to first successful API call in under 5 min
 - Rate limit header exposure — v2 feature
 - React hooks package — v2 feature
 
+## Current Milestone
+
+None active. Start next with `/gsd:new-milestone`.
+
 ## Context
 
-Shipped v1.0 with 5,769 LOC TypeScript across 5 packages.
+Shipped v1.0 SDK (5,769 LOC) and v1.1 CLI (709 LOC) — 6,478 LOC TypeScript total across 6 packages.
 Tech stack: TypeScript, tsup, Turborepo, pnpm workspaces, Vitest, Biome.
 Crypto: @noble/curves/ed25519, @scure/base (pure JS, edge-compatible).
-Published to npm: @heylol/sdk, @heylol/services, @heylol/adapter-cloudflare, @heylol/adapter-vercel, @heylol/adapter-express.
+CLI: commander@14, conf@15, picocolors@1.1 (ESM-only, Node.js).
+Published to npm: @heylol/sdk, @heylol/services, @heylol/adapter-cloudflare, @heylol/adapter-vercel, @heylol/adapter-express, heylol (CLI).
 3 example projects: Cloudflare AI agent, x402 service provider, Next.js dashboard.
 
 ## Constraints
@@ -64,6 +78,13 @@ Published to npm: @heylol/sdk, @heylol/services, @heylol/adapter-cloudflare, @he
 | Direct fetch to facilitator (no HTTPFacilitatorClient) | Keeps verify/settle modules minimal | ✓ Good — fewer deps, simpler code |
 | Settlement failure doesn't fail response | Best-effort settlement, handler output still returned | ✓ Good — resilient to chain issues |
 | PaymentRequirements.amount as v2 canonical field | v1 used maxAmountRequired, normalizeRequirements() bridges both | ✓ Good — forward-compatible |
+| CLI as thin SDK wrapper | Every command maps 1-to-1 to SDK methods, no new API logic | ✓ Good — 709 LOC for 22 subcommands |
+| commander@14 for CLI framework | Mature, TypeScript support, nested subcommands, env var binding | ✓ Good — clean help output, exitOverride support |
+| conf@15 for config persistence | Simple JSON config at ~/.heylol/config.json | ✓ Good — atomic writes, no corruption |
+| printFailure returns never | Type system enforces no code after failure paths | ✓ Good — catches unreachable code at compile time |
+| TTY auto-detection with explicit override | json flag > human flag > isTTY — explicit flags always win | ✓ Good — agents get JSON, humans get colors |
+| EXIT codes as const object not enum | Better tree-shaking, simpler TypeScript narrowing | ✓ Good — 6 typed codes (0-5) |
+| pnpm publish for workspace monorepos | npm publish publishes literal workspace:* string | ✓ Good — rewrites to resolved semver |
 
 ---
-*Last updated: 2026-03-02 after v1.0 milestone*
+*Last updated: 2026-03-03 after v1.1 CLI milestone shipped*

@@ -3,6 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 SDK Launch** — Phases 1-9 (shipped 2026-03-02)
+- ✅ **v1.1 CLI** — Phases 10-14 (shipped 2026-03-03)
 
 ## Phases
 
@@ -21,6 +22,17 @@
 
 </details>
 
+<details>
+<summary>✅ v1.1 CLI (Phases 10-14) — SHIPPED 2026-03-03</summary>
+
+- [x] Phase 10: CLI Scaffold (1/1 plans) — completed 2026-03-02
+- [x] Phase 11: Output and Infrastructure (2/2 plans) — completed 2026-03-03
+- [x] Phase 12: Auth Commands (1/1 plans) — completed 2026-03-03
+- [x] Phase 13: Post and Profile Commands (1/1 plans) — completed 2026-03-03
+- [x] Phase 14: Social, Discovery, Notifications, and Publish (2/2 plans) — completed 2026-03-03
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -34,3 +46,8 @@
 | 7. README & Documentation Fixes | v1.0 | 1/1 | Complete | 2026-03-02 |
 | 8. CI & Type Integrity | v1.0 | 2/2 | Complete | 2026-03-02 |
 | 9. Size-Limit Fix & Tech Debt | v1.0 | 1/1 | Complete | 2026-03-02 |
+| 10. CLI Scaffold | v1.1 | 1/1 | Complete | 2026-03-02 |
+| 11. Output and Infrastructure | v1.1 | 2/2 | Complete | 2026-03-03 |
+| 12. Auth Commands | v1.1 | 1/1 | Complete | 2026-03-03 |
+| 13. Post and Profile Commands | v1.1 | 1/1 | Complete | 2026-03-03 |
+| 14. Social, Discovery, Notifications, and Publish | v1.1 | 2/2 | Complete | 2026-03-03 |
