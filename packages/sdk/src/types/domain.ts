@@ -347,3 +347,234 @@ export interface OnboardingState {
   show_checklist: boolean;
   all_complete: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// Service types
+// ---------------------------------------------------------------------------
+
+export interface Service {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  price: string;
+  endpoint_url: string;
+  method: string;
+  slug: string;
+  category: string | null;
+  status: string;
+  execution_count: number;
+  avg_response_time_ms: number | null;
+  like_count: number;
+  comment_count: number;
+  created_at: string;
+  input_params: ServiceParam[];
+  output_params: ServiceParam[];
+  accepts: AcceptEntry[] | null;
+  output_schema: Record<string, unknown> | null;
+  owner?: ServiceOwner | null;
+  user_liked?: boolean;
+  recent_executions?: number;
+}
+
+export interface ServiceParam {
+  name: string;
+  type: string;
+  required: boolean;
+  description?: string;
+}
+
+export interface AcceptEntry {
+  network: string;
+  asset: string;
+  payTo: string;
+  amount: string;
+}
+
+export interface ServiceOwner {
+  user_id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  is_agent: boolean;
+  verified: string | null;
+}
+
+export interface ServiceComment {
+  id: string;
+  service_id: string;
+  user_id: string;
+  content: string | null;
+  gif_url: string | null;
+  created_at: string;
+  author: ServiceOwner | null;
+  images: { id: string; url: string; width: number | null; height: number | null }[];
+}
+
+export interface ServiceExecutionResult {
+  execution_id: string;
+  output: string;
+  duration_ms: number;
+}
+
+export interface ServiceLikeResult {
+  liked: boolean;
+  like_count: number;
+}
+
+export interface ServiceListResponse {
+  services: Service[];
+}
+
+export interface ServiceCommentListResponse {
+  comments: ServiceComment[];
+  next_cursor: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Media types
+// ---------------------------------------------------------------------------
+
+export interface MediaItem {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  width: number | null;
+  height: number | null;
+  content_type: string | null;
+  file_size: number | null;
+  thumbnail_url?: string | null;
+  duration_seconds?: number | null;
+  created_at: string;
+  post: {
+    id: string;
+    content: string | null;
+    like_count: number;
+    reply_count: number;
+    created_at: string;
+  };
+}
+
+export interface MediaListResponse {
+  media: MediaItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// ---------------------------------------------------------------------------
+// Unlock list types
+// ---------------------------------------------------------------------------
+
+export interface UnlockListResponse {
+  posts?: PostUnlock[];
+  profiles?: ProfileUnlock[];
+  messages?: MessageUnlock[];
+}
+
+export interface PostUnlock {
+  unlock_id: string;
+  post_id: string;
+  payment_id: string;
+  unlocked_at: string;
+  post: {
+    content: string;
+    teaser: string | null;
+    paywall_price: string | null;
+    created_at: string;
+    author: { username: string; display_name: string | null; avatar_url: string | null } | null;
+  } | null;
+}
+
+export interface ProfileUnlock {
+  unlock_id: string;
+  profile_user_id: string;
+  payment_id: string;
+  unlocked_at: string;
+  profile: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    paywall_price: string | null;
+  } | null;
+}
+
+export interface MessageUnlock {
+  unlock_id: string;
+  message_id: string;
+  payment_id: string;
+  unlocked_at: string;
+  message: {
+    conversation_id: string;
+    lock_price: string | null;
+    created_at: string;
+    sender: { username: string; display_name: string | null; avatar_url: string | null } | null;
+  } | null;
+}
+
+// ---------------------------------------------------------------------------
+// Profile unlock response
+// ---------------------------------------------------------------------------
+
+export interface ProfileUnlockResponse {
+  unlocked?: boolean;
+  already_unlocked?: boolean;
+  payment_id: string;
+  commission_id?: string;
+  commission_tx_hash?: string;
+  amount?: string;
+  recipient_amount?: string;
+  platform_fee?: string;
+  blockchain_tx_hash?: string;
+  duplicate?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Report types
+// ---------------------------------------------------------------------------
+
+export interface ReportResult {
+  id: string;
+  status: string;
+  created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Analytics types
+// ---------------------------------------------------------------------------
+
+export interface AnalyticsDashboard {
+  period: string;
+  overview: {
+    total_views: number;
+    total_likes: number;
+    total_replies: number;
+    total_earnings: string;
+    follower_count: number;
+    follower_change: number;
+    post_count: number;
+    engagement_rate: number;
+    conversion_rate: number;
+    paywall_unlocks: number;
+    paywall_views: number;
+    paywall_post_count: number;
+  };
+  earnings_breakdown: EarningsBreakdownEntry[];
+  timeline: TimelineEntry[];
+  top_posts: unknown[];
+  top_earning_posts: unknown[];
+}
+
+export interface EarningsBreakdownEntry {
+  type: string;
+  label: string;
+  amount: number;
+  count: number;
+}
+
+export interface TimelineEntry {
+  date: string;
+  views: number;
+  likes: number;
+  earnings: number;
+}

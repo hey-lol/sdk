@@ -5,7 +5,7 @@
  * Read methods that take only an ID pass the branded ID directly as a typed argument.
  */
 
-import type { ConversationId, UserId } from './domain.js';
+import type { ConversationId, ServiceParam, UserId } from './domain.js';
 
 // ---------------------------------------------------------------------------
 // Pagination
@@ -184,4 +184,102 @@ export interface RequestXVerificationParams {
 
 export interface ConfirmXVerificationParams {
   tweetUrl: string;
+}
+
+// ---------------------------------------------------------------------------
+// Service params
+// ---------------------------------------------------------------------------
+
+export interface CreateServiceParams {
+  name: string;
+  description?: string;
+  price?: string;
+  endpoint_url: string;
+  method?: 'GET' | 'POST';
+  slug: string;
+  input_params?: ServiceParam[];
+  output_params?: ServiceParam[];
+  sample_input?: string;
+  sample_output?: string;
+  category?: 'ai' | 'defi' | 'data' | 'content' | 'social' | 'dev' | 'other';
+}
+
+export interface UpdateServiceParams {
+  name?: string;
+  description?: string | null;
+  endpoint_url?: string;
+  method?: 'GET' | 'POST';
+  slug?: string;
+  input_params?: ServiceParam[] | null;
+  output_params?: ServiceParam[] | null;
+  sample_input?: string | null;
+  sample_output?: string | null;
+  category?: 'ai' | 'defi' | 'data' | 'content' | 'social' | 'dev' | 'other' | null;
+  status?: 'active' | 'paused' | 'deprecated';
+}
+
+export interface ServiceDiscoverParams {
+  mode?: 'trending';
+  category?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ServiceSearchParams {
+  q: string;
+  limit?: number;
+}
+
+export interface ServiceExecuteParams {
+  params?: Record<string, unknown>;
+}
+
+export interface ServiceCommentParams {
+  content?: string;
+  gif_url?: string;
+  media_urls?: string[];
+}
+
+export interface ServiceCommentsListParams {
+  limit?: number;
+  cursor?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Media params
+// ---------------------------------------------------------------------------
+
+export interface MediaParams {
+  type?: 'image' | 'video';
+  limit?: number;
+  offset?: number;
+  sort?: 'recent' | 'popular' | 'engagement';
+}
+
+// ---------------------------------------------------------------------------
+// Unlock list params
+// ---------------------------------------------------------------------------
+
+export interface UnlocksParams {
+  type?: 'all' | 'posts' | 'profiles' | 'messages';
+  limit?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Report params
+// ---------------------------------------------------------------------------
+
+export interface CreateReportParams {
+  reported_type: 'post' | 'message' | 'user';
+  reported_id: string;
+  reason: 'spam' | 'nudity' | 'hate_speech' | 'violence' | 'scam' | 'impersonation' | 'other';
+  details?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Analytics params
+// ---------------------------------------------------------------------------
+
+export interface AnalyticsParams {
+  period?: '7d' | '30d' | 'all';
 }
