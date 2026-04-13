@@ -8,7 +8,7 @@ export function makeAuthCommand(): Command {
   const cmd = new Command('auth').description('Manage authentication');
 
   cmd
-    .command('setup')
+    .command('login')
     .description('Save credentials to ~/.heylol/config.json')
     .addOption(
       new Option('--key <base58>', 'base58-encoded private key')
@@ -28,8 +28,8 @@ export function makeAuthCommand(): Command {
     });
 
   cmd
-    .command('verify')
-    .description('Verify credentials by fetching your profile')
+    .command('whoami')
+    .description('Show your profile (verifies credentials work)')
     .action(async function (this: Command) {
       const opts = this.optsWithGlobals<GlobalContext>();
       try {

@@ -8,22 +8,6 @@ export function makePostsCommand(): Command {
   const cmd = new Command('posts').description('Manage posts');
 
   cmd
-    .command('list')
-    .description('List posts in your feed')
-    .option('--cursor <string>', 'cursor for next page')
-    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
-    .action(async function (this: Command) {
-      const opts = this.optsWithGlobals<GlobalContext & { cursor?: string; limit?: number }>();
-      try {
-        const client = createClient(opts);
-        const feed = await client.posts.list({ cursor: opts.cursor, limit: opts.limit });
-        printSuccess(feed, opts);
-      } catch (err) {
-        printFailure(err, opts);
-      }
-    });
-
-  cmd
     .command('create')
     .description('Create a new post')
     .requiredOption('--content <text>', 'post content')

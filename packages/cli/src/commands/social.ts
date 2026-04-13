@@ -1,4 +1,4 @@
-import { asUserId } from '@heylol/sdk';
+import { asUsername } from '@heylol/sdk';
 import { Command } from 'commander';
 import { createClient } from '../config.js';
 import type { GlobalContext } from '../context.js';
@@ -10,12 +10,12 @@ export function makeSocialCommand(): Command {
   cmd
     .command('follow')
     .description('Follow a user')
-    .argument('<id>', 'user ID')
-    .action(async function (this: Command, id: string) {
+    .argument('<username>', 'username to follow')
+    .action(async function (this: Command, username: string) {
       const opts = this.optsWithGlobals<GlobalContext>();
       try {
         const client = createClient(opts);
-        await client.social.follow(asUserId(id));
+        await client.social.follow(asUsername(username));
         printSuccess(null, opts);
       } catch (err) {
         printFailure(err, opts);
@@ -25,12 +25,12 @@ export function makeSocialCommand(): Command {
   cmd
     .command('unfollow')
     .description('Unfollow a user')
-    .argument('<id>', 'user ID')
-    .action(async function (this: Command, id: string) {
+    .argument('<username>', 'username to unfollow')
+    .action(async function (this: Command, username: string) {
       const opts = this.optsWithGlobals<GlobalContext>();
       try {
         const client = createClient(opts);
-        await client.social.unfollow(asUserId(id));
+        await client.social.unfollow(asUsername(username));
         printSuccess(null, opts);
       } catch (err) {
         printFailure(err, opts);
@@ -40,14 +40,14 @@ export function makeSocialCommand(): Command {
   cmd
     .command('followers')
     .description('List followers of a user')
-    .argument('<id>', 'user ID')
+    .argument('<username>', 'username')
     .option('--cursor <string>', 'cursor for next page')
     .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
-    .action(async function (this: Command, id: string) {
+    .action(async function (this: Command, username: string) {
       const opts = this.optsWithGlobals<GlobalContext & { cursor?: string; limit?: number }>();
       try {
         const client = createClient(opts);
-        const result = await client.social.followers(asUserId(id), {
+        const result = await client.social.followers(asUsername(username), {
           cursor: opts.cursor,
           limit: opts.limit,
         });
@@ -60,14 +60,14 @@ export function makeSocialCommand(): Command {
   cmd
     .command('following')
     .description('List users followed by a user')
-    .argument('<id>', 'user ID')
+    .argument('<username>', 'username')
     .option('--cursor <string>', 'cursor for next page')
     .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
-    .action(async function (this: Command, id: string) {
+    .action(async function (this: Command, username: string) {
       const opts = this.optsWithGlobals<GlobalContext & { cursor?: string; limit?: number }>();
       try {
         const client = createClient(opts);
-        const result = await client.social.following(asUserId(id), {
+        const result = await client.social.following(asUsername(username), {
           cursor: opts.cursor,
           limit: opts.limit,
         });

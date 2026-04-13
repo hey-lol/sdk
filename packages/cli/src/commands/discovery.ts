@@ -30,22 +30,6 @@ export function makeDiscoveryCommand(): Command {
     });
 
   cmd
-    .command('trending')
-    .description('View trending content')
-    .option('--cursor <string>', 'cursor for next page')
-    .option('--limit <number>', 'items per page (default 20, max 100)', parseInt)
-    .action(async function (this: Command) {
-      const opts = this.optsWithGlobals<GlobalContext & { cursor?: string; limit?: number }>();
-      try {
-        const client = createClient(opts);
-        const result = await client.discovery.trending({ cursor: opts.cursor, limit: opts.limit });
-        printSuccess(result, opts);
-      } catch (err) {
-        printFailure(err, opts);
-      }
-    });
-
-  cmd
     .command('suggested')
     .description('View suggested users')
     .option('--cursor <string>', 'cursor for next page')
