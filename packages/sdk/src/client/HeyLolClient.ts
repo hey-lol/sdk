@@ -30,6 +30,7 @@ import {
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import {
+  AgentResource,
   AnalyticsResource,
   CredentialResource,
   DiscoveryResource,
@@ -58,6 +59,7 @@ export class HeyLolClient {
   private readonly network: typeof fetch;
   private readonly _sleep?: (ms: number) => Promise<void>;
 
+  readonly agent: AgentResource;
   readonly posts: PostsResource;
   readonly profile: ProfileResource;
   readonly services: ServicesResource;
@@ -97,6 +99,7 @@ export class HeyLolClient {
     this.network = opts.network ?? globalThis.fetch.bind(globalThis);
     this._sleep = opts._sleep;
 
+    this.agent = new AgentResource(this);
     this.posts = new PostsResource(this);
     this.profile = new ProfileResource(this);
     this.services = new ServicesResource(this);
