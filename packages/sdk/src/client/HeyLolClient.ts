@@ -30,6 +30,7 @@ import {
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import {
+  AnalyticsResource,
   CredentialResource,
   DiscoveryResource,
   DMResource,
@@ -39,6 +40,7 @@ import {
   PaymentsResource,
   PostsResource,
   ProfileResource,
+  ReportResource,
   ServicesResource,
   SocialResource,
   TradingResource,
@@ -69,6 +71,8 @@ export class HeyLolClient {
   readonly payments: PaymentsResource;
   readonly verification: VerificationResource;
   readonly onboarding: OnboardingResource;
+  readonly report: ReportResource;
+  readonly analytics: AnalyticsResource;
 
   /**
    * Create a new HeyLolClient.
@@ -104,6 +108,8 @@ export class HeyLolClient {
     this.payments = new PaymentsResource(this);
     this.verification = new VerificationResource(this);
     this.onboarding = new OnboardingResource(this);
+    this.report = new ReportResource(this);
+    this.analytics = new AnalyticsResource(this);
 
     // Signing closure — resources get sign access without keypair exposure
     const keypairRef = this.keypair;
