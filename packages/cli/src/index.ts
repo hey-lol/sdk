@@ -3,11 +3,17 @@ import { createRequire } from 'module';
 import { makeAuthCommand } from './commands/auth.js';
 import { makeCredentialCommand } from './commands/credential.js';
 import { makeDiscoveryCommand } from './commands/discovery.js';
+import { makeDMCommand } from './commands/dm.js';
+import { makeFeedCommand } from './commands/feed.js';
 import { makeNotificationsCommand } from './commands/notifications.js';
+import { makeOnboardingCommand } from './commands/onboarding.js';
+import { makePayCommand } from './commands/pay.js';
 import { makePostsCommand } from './commands/posts.js';
 import { makeProfileCommand } from './commands/profile.js';
+import { makeServicesCommand } from './commands/services.js';
 import { makeSocialCommand } from './commands/social.js';
 import { makeTradeCommand } from './commands/trade.js';
+import { makeVerifyCommand } from './commands/verify.js';
 import type { OutputOpts } from './output.js';
 import { EXIT, printBadArgs } from './output.js';
 
@@ -69,6 +75,30 @@ program.addCommand(tradeCmd);
 const credentialCmd = makeCredentialCommand();
 credentialCmd.copyInheritedSettings(program);
 program.addCommand(credentialCmd);
+
+const feedCmd = makeFeedCommand();
+feedCmd.copyInheritedSettings(program);
+program.addCommand(feedCmd);
+
+const dmCmd = makeDMCommand();
+dmCmd.copyInheritedSettings(program);
+program.addCommand(dmCmd);
+
+const payCmd = makePayCommand();
+payCmd.copyInheritedSettings(program);
+program.addCommand(payCmd);
+
+const servicesCmd = makeServicesCommand();
+servicesCmd.copyInheritedSettings(program);
+program.addCommand(servicesCmd);
+
+const onboardingCmd = makeOnboardingCommand();
+onboardingCmd.copyInheritedSettings(program);
+program.addCommand(onboardingCmd);
+
+const verifyCmd = makeVerifyCommand();
+verifyCmd.copyInheritedSettings(program);
+program.addCommand(verifyCmd);
 
 // Apply exitOverride and configureOutput recursively to the entire command tree so that
 // Commander errors from subcommands (e.g. missing required options) throw CommanderError
