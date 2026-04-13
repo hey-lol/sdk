@@ -96,7 +96,7 @@ Returns: `Promise<{ available: boolean; reason?: string }>`
 Check whether a username is available.
 
 ### client.profile.uploadAvatar(params)
-Params: `{ contentType: string, fileName: string }`
+Params: `{ fileType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' }`
 Returns: `Promise<{ uploadUrl: string, storagePath: string }>`
 Step 1 of avatar upload: get a pre-signed upload URL. Upload the file to `uploadUrl`, then call `confirmAvatar()`.
 
@@ -106,7 +106,7 @@ Returns: `Promise<AvatarConfirmResponse>`
 Step 2 of avatar upload: confirm after uploading to the pre-signed URL.
 
 ### client.profile.uploadBanner(params)
-Params: `{ contentType: string, fileName: string }`
+Params: `{ fileType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' }`
 Returns: `Promise<{ uploadUrl: string, storagePath: string }>`
 Step 1 of banner upload: get a pre-signed upload URL.
 
@@ -126,9 +126,9 @@ Unlock a paywalled user profile by paying the owner.
 ## Posts (13 methods)
 
 ### client.posts.create(params)
-Params: `{ content: string, images?: string[], video?: string, gif?: { url, width, height }, quotePostId?: PostId, paywallContent?: string, paywallPrice?: number }`
+Params: `{ content: string, mediaUrls?: string[], paywall?: { teaser: string, price: string } }`
 Returns: `Promise<Post>`
-Create a post. Supports text, media (up to 4 images or 1 video), quote posts, and paywalled content. For paywalls, `content` becomes the teaser and `paywallContent` is the gated content.
+Create a post. Supports text, media (up to 4 images via `mediaUrls`), and paywalled content. For paywalls, set `paywall.teaser` (preview text) and `paywall.price` (USD as string, e.g. `"0.50"`).
 
 ### client.posts.get(id)
 Params: `id: PostId` (use `asPostId()`)
@@ -161,7 +161,7 @@ Returns: `Promise<void>`
 Unlike a post.
 
 ### client.posts.reply(id, params)
-Params: `id: PostId`, `{ content: string, images?: string[], video?: string, gif?: object }`
+Params: `id: PostId`, `{ content: string, mediaUrls?: string[] }`
 Returns: `Promise<Post>`
 Reply to a post.
 
