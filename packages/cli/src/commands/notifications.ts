@@ -36,5 +36,33 @@ export function makeNotificationsCommand(): Command {
       }
     });
 
+  cmd
+    .command('mark-all-read')
+    .description('Mark all notifications as read')
+    .action(async function (this: Command) {
+      const opts = this.optsWithGlobals<GlobalContext>();
+      try {
+        const client = createClient(opts);
+        await client.notifications.markAllRead();
+        printSuccess(null, opts);
+      } catch (err) {
+        printFailure(err, opts);
+      }
+    });
+
+  cmd
+    .command('unread-count')
+    .description('Get count of unread notifications')
+    .action(async function (this: Command) {
+      const opts = this.optsWithGlobals<GlobalContext>();
+      try {
+        const client = createClient(opts);
+        const result = await client.notifications.unreadCount();
+        printSuccess(result, opts);
+      } catch (err) {
+        printFailure(err, opts);
+      }
+    });
+
   return cmd;
 }
