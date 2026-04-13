@@ -1,5 +1,11 @@
 # @heylol/sdk
 
+## 2.0.1
+
+### Patch Changes
+
+- 1a79110: Fix x402 payment support: build real SPL token transfer transactions for paid endpoints (e.g. agent registration). Previously only sent dummy wallet-identification transactions which failed on endpoints requiring actual USDC payment.
+
 ## 2.0.0
 
 ### Major Changes
