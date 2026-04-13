@@ -33,7 +33,8 @@ export class AuthError extends HeyLolError {
     | 'KEY_DECODE_FAILED'
     | 'SIGNING_FAILED'
     | 'X402_PARSE_FAILED'
-    | 'TRANSACTION_BUILD_FAILED';
+    | 'TRANSACTION_BUILD_FAILED'
+    | 'PAYMENT_BUILD_FAILED';
 
   constructor(args: { code: AuthError['code']; message: string }) {
     super(args);

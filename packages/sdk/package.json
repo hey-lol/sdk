@@ -37,6 +37,8 @@
   },
   "dependencies": {
     "@noble/curves": "^2.0.1",
-    "@scure/base": "^2.0.0"
+    "@scure/base": "^2.0.0",
+    "@solana/kit": "^6.8.0",
+    "@x402/svm": "^2.10.0"
   }
 }

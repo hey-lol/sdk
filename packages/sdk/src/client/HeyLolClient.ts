@@ -19,15 +19,16 @@
  * ```
  */
 
+import { ed25519 } from '@noble/curves/ed25519.js';
 import type { Keypair } from '../auth/index.js';
 import {
   buildDummyTransaction,
   buildPaymentHeader,
+  buildRealPayment,
   getPaymentVersion,
   loadKeypair,
   parsePaymentRequirements,
 } from '../auth/index.js';
-import { ed25519 } from '@noble/curves/ed25519.js';
 import { APIError, NetworkError, PaymentRejectedError, RateLimitError } from '../errors/index.js';
 import {
   AgentResource,
@@ -193,8 +194,17 @@ export class HeyLolClient {
 
         const requirements = await parsePaymentRequirements(response);
         const version = getPaymentVersion(response) ?? 1;
-        const signedTx = buildDummyTransaction(this.keypair.publicKey, this.keypair.secretKey);
-        paymentHeader = buildPaymentHeader(requirements[0], signedTx, version);
+        const req = requirements[0];
+        const amount = BigInt(req.amount || req.maxAmountRequired || '0');
+
+        if (amount > 0n) {
+          // Real payment — build an actual SPL token transfer via @x402/svm
+          paymentHeader = await buildRealPayment(req, this.keypair, version);
+        } else {
+          // Zero-amount — wallet identification only (dummy transaction)
+          const signedTx = buildDummyTransaction(this.keypair.publicKey, this.keypair.secretKey);
+          paymentHeader = buildPaymentHeader(req, signedTx, version);
+        }
 
         // Retry the same attempt function — now with paymentHeader set
         return attempt();
