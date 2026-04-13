@@ -475,7 +475,7 @@ describe('HeyLolClient', () => {
       const { client } = makeClient();
       expect(client.services).toBeDefined();
       expect(client.services).toBeInstanceOf(ServicesResource);
-      expect(typeof client.services.call).toBe('function');
+      expect(typeof client.services.create).toBe('function');
     });
   });
 });
