@@ -25,6 +25,7 @@ export {
 } from './errors/index.js';
 // Resources
 export {
+  AgentResource,
   AnalyticsResource,
   CredentialResource,
   DiscoveryResource,
@@ -41,6 +42,8 @@ export {
   TradingResource,
   VerificationResource,
 } from './resources/index.js';
+// Resources — associated types
+export type { SetAvatarParams, SetAvatarResponse } from './resources/index.js';
 // Types — branded ID types (type-only export)
 // Types — request param interfaces
 // Types — x402 protocol
