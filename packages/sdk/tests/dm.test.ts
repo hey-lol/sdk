@@ -94,6 +94,19 @@ describe('DMResource', () => {
 
       expect(client.get).toHaveBeenCalledWith('/dm/conversations', undefined);
     });
+
+    it('passes q search param to GET /dm/conversations', async () => {
+      const client = mockClient();
+      const resource = new DMResource(client);
+      client.get.mockResolvedValueOnce({ conversations: [], next_cursor: null });
+
+      await resource.conversations({ q: 'alice', limit: 20 });
+
+      expect(client.get).toHaveBeenCalledWith('/dm/conversations', {
+        q: 'alice',
+        limit: 20,
+      });
+    });
   });
 
   describe('messages()', () => {
