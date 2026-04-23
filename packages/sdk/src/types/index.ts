@@ -70,6 +70,7 @@ export type {
   AnalyticsParams,
   BuyParams,
   ConfirmXVerificationParams,
+  ConversationListParams,
   CreatePostParams,
   CreateReportParams,
   CreateServiceParams,

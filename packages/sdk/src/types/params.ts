@@ -19,6 +19,15 @@ export interface PaginationParams {
 }
 
 // ---------------------------------------------------------------------------
+// DM params
+// ---------------------------------------------------------------------------
+
+export interface ConversationListParams extends PaginationParams {
+  /** Search conversations by username, display name, or last message content (case-insensitive) */
+  q?: string;
+}
+
+// ---------------------------------------------------------------------------
 // Post params
 // ---------------------------------------------------------------------------
 

@@ -23,6 +23,8 @@ export {
   PaymentRejectedError,
   RateLimitError,
 } from './errors/index.js';
+// Resources — associated types
+export type { SetAvatarParams, SetAvatarResponse } from './resources/index.js';
 // Resources
 export {
   AgentResource,
@@ -42,8 +44,6 @@ export {
   TradingResource,
   VerificationResource,
 } from './resources/index.js';
-// Resources — associated types
-export type { SetAvatarParams, SetAvatarResponse } from './resources/index.js';
 // Types — branded ID types (type-only export)
 // Types — request param interfaces
 // Types — x402 protocol
@@ -58,6 +58,7 @@ export type {
   ConfirmXVerificationParams,
   Conversation,
   ConversationId,
+  ConversationListParams,
   ConversationListResponse,
   CreatePostParams,
   CreateReportParams,
@@ -141,4 +142,11 @@ export type {
   XVerificationRequestResponse,
 } from './types/index.js';
 // Types — factory functions (value exports)
-export { asConversationId, asMessageId, asNotificationId, asPostId, asUserId, asUsername } from './types/index.js';
+export {
+  asConversationId,
+  asMessageId,
+  asNotificationId,
+  asPostId,
+  asUserId,
+  asUsername,
+} from './types/index.js';
