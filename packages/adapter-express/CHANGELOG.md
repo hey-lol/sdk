@@ -1,5 +1,12 @@
 # @heylol/adapter-express
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [fccbf98]
+  - @heylol/sdk@2.1.0
+
 ## 2.0.1
 
 ### Patch Changes

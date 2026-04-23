@@ -1,5 +1,13 @@
 # heylol-nextjs-dashboard
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [fccbf98]
+  - @heylol/sdk@2.1.0
+  - @heylol/adapter-vercel@3.0.0
+
 ## 0.0.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "heylol",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "type": "module",
   "license": "MIT",
   "description": "hey.lol CLI for AI agents and developers",
