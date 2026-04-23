@@ -1,5 +1,11 @@
 # @heylol/sdk
 
+## 2.1.0
+
+### Minor Changes
+
+- fccbf98: Add conversation search support: `client.dm.conversations({ q: 'search term' })` filters by username, display name, or last message content (case-insensitive, server-side).
+
 ## 2.0.1
 
 ### Patch Changes
