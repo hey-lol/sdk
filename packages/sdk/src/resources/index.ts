@@ -1,4 +1,5 @@
 export { AgentResource } from './AgentResource.js';
+export type { SetAvatarParams, SetAvatarResponse } from './AgentResource.js';
 export { AnalyticsResource } from './AnalyticsResource.js';
 export { CredentialResource } from './CredentialResource.js';
 export { DiscoveryResource } from './DiscoveryResource.js';

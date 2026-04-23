@@ -12,16 +12,17 @@
 import type {
   Conversation,
   ConversationId,
+  ConversationListParams,
   ConversationListResponse,
+  MarkReadParams,
   Message,
   MessageId,
   MessageListResponse,
   MessageUnlockResponse,
   PaginationParams,
   PaymentResult,
-  SendDMParams,
-  MarkReadParams,
   PrepayDMParams,
+  SendDMParams,
 } from '../types/index.js';
 
 // ---------------------------------------------------------------------------
@@ -79,16 +80,13 @@ export class DMResource {
     if ('conversationId' in params) {
       // Send to existing conversation
       const { conversationId, content, imageUrls, gifUrl, videoUrl, lockPrice } = params;
-      return this._client.post<SendDMResponse>(
-        ROUTES.conversationMessages(conversationId),
-        {
-          content,
-          image_urls: imageUrls,
-          gif_url: gifUrl,
-          video_url: videoUrl,
-          lock_price: lockPrice,
-        },
-      );
+      return this._client.post<SendDMResponse>(ROUTES.conversationMessages(conversationId), {
+        content,
+        image_urls: imageUrls,
+        gif_url: gifUrl,
+        video_url: videoUrl,
+        lock_price: lockPrice,
+      });
     }
 
     // Create/get conversation and send first message
@@ -105,9 +103,10 @@ export class DMResource {
 
   /**
    * List conversations with cursor-based pagination.
+   * Pass `q` to search by username, display name, or last message content.
    * Returns API-shaped response (not PaginatedList<T>).
    */
-  conversations(params?: PaginationParams): Promise<ConversationListResponse> {
+  conversations(params?: ConversationListParams): Promise<ConversationListResponse> {
     return this._client.get<ConversationListResponse>(
       ROUTES.conversations,
       params as Record<string, string | number | undefined>,
@@ -118,7 +117,10 @@ export class DMResource {
    * List messages in a conversation with cursor-based pagination.
    * Returns API-shaped response (not PaginatedList<T>).
    */
-  messages(conversationId: ConversationId, params?: PaginationParams): Promise<MessageListResponse> {
+  messages(
+    conversationId: ConversationId,
+    params?: PaginationParams,
+  ): Promise<MessageListResponse> {
     return this._client.get<MessageListResponse>(
       ROUTES.conversationMessages(conversationId),
       params as Record<string, string | number | undefined>,
@@ -129,10 +131,9 @@ export class DMResource {
    * Mark messages in a conversation as read up to a given message ID.
    */
   markRead(conversationId: ConversationId, params: MarkReadParams): Promise<{ success: boolean }> {
-    return this._client.post<{ success: boolean }>(
-      ROUTES.conversationRead(conversationId),
-      { last_read_message_id: params.lastReadMessageId },
-    );
+    return this._client.post<{ success: boolean }>(ROUTES.conversationRead(conversationId), {
+      last_read_message_id: params.lastReadMessageId,
+    });
   }
 
   /**
